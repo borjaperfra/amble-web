@@ -39,13 +39,6 @@ const words = (line: string) => line.split(' ');
     color: var(--color-accent-strong);
     padding-right: 2vw;
   }
-  .word {
-    display: inline-block;
-    white-space: pre;
-  }
-  .js .word {
-    opacity: var(--ink-min);
-  }
   .body {
     max-width: 26rem;
     margin-top: var(--space-7);
@@ -58,29 +51,4 @@ const words = (line: string) => line.split(' ');
       margin-left: 0;
     }
   }
-  @media (prefers-reduced-motion: reduce) {
-    .js .word {
-      opacity: 1;
-    }
-  }
 </style>
-
-<script>
-  import { gsap, reducedMotion } from '../../scripts/motion';
-
-  if (!reducedMotion) {
-    for (const statement of document.querySelectorAll<HTMLElement>('[data-ink]')) {
-      gsap.to(statement.querySelectorAll('.word'), {
-        opacity: 1,
-        ease: 'none',
-        stagger: 0.12,
-        scrollTrigger: {
-          trigger: statement,
-          start: 'top 82%',
-          end: 'bottom 45%',
-          scrub: 0.6,
-        },
-      });
-    }
-  }
-</script>

@@ -1,4 +1,6 @@
 ---
+// The one moment of colour on the page: the listening screen, full bleed in
+// moss, with the eye breathing. Almost nothing to read — silence is the point.
 import Symbol from '../Symbol.astro';
 import type { HomeContent } from '../../content/home';
 
@@ -11,37 +13,42 @@ const { c } = Astro.props;
 
 <section class="listening" aria-labelledby="listening-title">
   <div class="container inner">
-    <p class="kicker">{c.kicker}</p>
-    <h2 class="heading title" id="listening-title">{c.title}</h2>
-    <p class="lede body">{c.body}</p>
+    <p class="kicker" data-reveal>{c.kicker}</p>
+    <h2 class="display title" id="listening-title" data-reveal>{c.title}</h2>
 
-    <div class="screen" data-reveal>
-      <p class="status">
-        <Symbol size={22} breathe />
-        <span>{c.status}</span>
-      </p>
-      <p class="heading quiet">{c.quiet}</p>
-
-      <p class="kicker for">{c.forLabel}</p>
-      <ul class="items" role="list">
-        {c.items.map((item) => <li>{item}</li>)}
-      </ul>
-
-      <hr class="rule" />
-
-      <p class="empty">
-        <span class="heading">{c.empty[0]}</span>
-        <span>{c.empty[1]}</span>
-      </p>
+    <div class="eye" data-reveal>
+      <Symbol size={148} breathe watch />
     </div>
+
+    <p class="status" data-reveal>
+      <span class="pulse" aria-hidden="true"></span>
+      {c.status}
+    </p>
+
+    <ul class="items" role="list">
+      {
+        c.items.map((item, i) => (
+          <li data-reveal style={`--i:${i}`}>
+            {item}
+          </li>
+        ))
+      }
+    </ul>
+
+    <p class="empty" data-reveal>
+      <span class="heading">{c.empty[0]}</span>
+      <span>{c.empty[1]}</span>
+    </p>
   </div>
 </section>
 
 <style>
   .listening {
+    --symbol-iris: var(--color-accent-soft);
     padding-block: var(--space-section);
-    background: var(--color-surface);
-    border-block: var(--border-width) solid var(--color-border-subtle);
+    color: var(--color-text-inverse);
+    background: var(--color-accent-strong);
+    overflow: hidden;
   }
   .inner {
     display: flex;
@@ -49,59 +56,75 @@ const { c } = Astro.props;
     align-items: center;
     text-align: center;
   }
+  .kicker {
+    color: var(--color-accent-soft);
+  }
   .title {
     margin-top: var(--space-4);
-    font-size: var(--text-heading-xl);
+    font-size: var(--text-display-lg);
   }
-  .body {
-    margin-top: var(--space-5);
-    max-width: 34rem;
-  }
-  .screen {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-    max-width: var(--width-narrow);
+  .eye {
     margin-top: var(--space-9);
+    color: var(--color-text-inverse);
   }
   .status {
     display: inline-flex;
     align-items: center;
     gap: var(--space-3);
+    margin-top: var(--space-7);
     font-size: var(--text-label);
     font-weight: var(--weight-semibold);
     letter-spacing: var(--tracking-label);
     text-transform: uppercase;
-    color: var(--color-accent-strong);
+    color: var(--color-accent-soft);
   }
-  .quiet {
-    margin-top: var(--space-6);
-    font-size: var(--text-heading-lg);
+  .pulse {
+    width: 8px;
+    height: 8px;
+    border-radius: var(--radius-full);
+    background: var(--color-accent-soft);
+    animation: pulse var(--motion-breath) ease-in-out infinite;
   }
-  .for {
-    margin-top: var(--space-8);
+  @keyframes pulse {
+    0%,
+    100% {
+      opacity: 0.5;
+      scale: 1;
+    }
+    50% {
+      opacity: 1;
+      scale: 1.25;
+    }
   }
   .items {
     display: flex;
-    flex-direction: column;
+    flex-wrap: wrap;
+    justify-content: center;
     gap: var(--space-2);
-    margin-top: var(--space-4);
+    max-width: 36rem;
+    margin-top: var(--space-6);
+  }
+  .items li {
+    padding: var(--space-2) var(--space-4);
     font-family: var(--font-display);
     font-size: var(--text-heading-sm);
-  }
-  .rule {
-    width: 48px;
-    margin-block: var(--space-8);
+    border: var(--border-width) solid rgb(250 248 243 / 0.28);
+    border-radius: var(--radius-full);
   }
   .empty {
     display: flex;
     flex-direction: column;
     gap: var(--space-1);
-    color: var(--color-text-muted);
+    margin-top: var(--space-9);
+    color: var(--color-accent-soft);
   }
   .empty .heading {
-    font-size: var(--text-heading-sm);
-    color: var(--color-text);
+    font-size: var(--text-heading-md);
+    color: var(--color-text-inverse);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .pulse {
+      animation: none;
+    }
   }
 </style>

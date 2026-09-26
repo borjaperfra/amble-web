@@ -7,17 +7,28 @@ interface Props {
 }
 
 const { c } = Astro.props;
+
+// Quiet 1.5px line icons (DESIGN_SYSTEM §26), drawn for these four only.
+const icons = {
+  why: '<circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/><path d="M9 11.2l1.5 1.5 3-3.2"/>',
+  correct: '<path d="M4 20h4L19 9a2.1 2.1 0 0 0-3-3L5 17z"/><path d="m14.5 7.5 3 3"/>',
+  export: '<path d="M12 15V4"/><path d="m7.5 8.5 4.5-4.5 4.5 4.5"/><path d="M5 13v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/>',
+  delete: '<path d="M4 7h16"/><path d="M9.5 7V4.8h5V7"/><path d="M6.5 7l.9 12a2 2 0 0 0 2 1.8h5.2a2 2 0 0 0 2-1.8l.9-12"/>',
+};
 ---
 
 <section class="section container" aria-labelledby="data-title">
-  <SectionIntro id="data-title" kicker={c.kicker} title={c.title} body={c.body} align="center" />
+  <SectionIntro id="data-title" kicker={c.kicker} title={c.title} align="center" />
 
   <ul class="items" role="list">
     {
       c.items.map((item, i) => (
         <li class="item" data-reveal style={`--i:${i}`}>
+          <span class="icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="26" height="26" set:html={icons[item.icon]} />
+          </span>
           <p class="heading item-title">{item.title}</p>
-          <p class="item-body">{item.body}</p>
+          <p class="item-line">{item.line}</p>
         </li>
       ))
     }
@@ -27,31 +38,47 @@ const { c } = Astro.props;
 <style>
   .items {
     display: grid;
-    gap: var(--space-7) var(--space-6);
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-7) var(--space-5);
     max-width: var(--width-wide);
     margin: var(--space-8) auto 0;
   }
-  @media (min-width: 640px) {
-    .items {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
-  @media (min-width: 1000px) {
+  @media (min-width: 900px) {
     .items {
       grid-template-columns: repeat(4, 1fr);
     }
   }
   .item {
-    padding-top: var(--space-5);
-    border-top: var(--border-width) solid var(--color-border);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: var(--space-2);
+  }
+  .icon {
+    display: grid;
+    place-items: center;
+    width: 72px;
+    height: 72px;
+    margin-bottom: var(--space-3);
+    color: var(--color-accent-strong);
+    background: var(--color-accent-wash);
+    border-radius: var(--radius-full);
+  }
+  .icon svg {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
   }
   .item-title {
     font-size: var(--text-heading-sm);
   }
-  .item-body {
-    margin-top: var(--space-2);
+  .item-line {
+    max-width: 20ch;
     font-size: var(--text-body-sm);
     color: var(--color-text-muted);
-    text-wrap: pretty;
+    text-wrap: balance;
   }
 </style>

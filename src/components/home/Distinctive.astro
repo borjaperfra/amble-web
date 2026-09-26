@@ -1,0 +1,71 @@
+---
+// The distinctive profile (DESIGN_SYSTEM §18) as a poster: three things,
+// crossed. Typography and composition do the work; it should be screenshot-worthy.
+import type { HomeContent } from '../../content/home';
+
+interface Props {
+  c: HomeContent['distinctive'];
+}
+
+const { c } = Astro.props;
+---
+
+<section class="distinctive container" aria-labelledby="distinctive-title">
+  <p class="kicker" data-reveal>{c.kicker}</p>
+  <h2 class="display words" id="distinctive-title" data-ink>
+    {
+      c.words.map((w, i) => (
+        <>
+          {i > 0 && (
+            <span class="times" aria-hidden="true">
+              <span class="word">×</span>
+            </span>
+          )}
+          <span class:list={['term', `t${i}`]}>
+            {w.split(' ').map((part) => (
+              <span class="word">{part} </span>
+            ))}
+          </span>
+        </>
+      ))
+    }
+  </h2>
+  <p class="lede line" data-reveal>{c.line}</p>
+</section>
+
+<style>
+  .distinctive {
+    display: flex;
+    flex-direction: column;
+    padding-block: var(--space-section);
+  }
+  .words {
+    display: flex;
+    flex-direction: column;
+    margin-top: var(--space-6);
+    font-size: clamp(2.75rem, 0.5rem + 8.4vw, 8.5rem);
+    line-height: 0.95;
+    letter-spacing: -0.035em;
+  }
+  .t0 {
+    align-self: flex-start;
+  }
+  .t1 {
+    align-self: center;
+    font-style: italic;
+    color: var(--color-accent-strong);
+  }
+  .t2 {
+    align-self: flex-end;
+  }
+  .times {
+    align-self: center;
+    margin-block: 0.05em;
+    font-size: 0.5em;
+    color: var(--color-accent);
+  }
+  .line {
+    align-self: flex-end;
+    margin-top: var(--space-7);
+  }
+</style>

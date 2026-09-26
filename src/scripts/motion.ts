@@ -25,4 +25,17 @@ export function startSmoothScroll() {
   return lenis;
 }
 
+// Statements marked [data-ink] ink themselves in, word by word, as they scroll by.
+export function inkStatements() {
+  if (reducedMotion) return;
+  for (const statement of document.querySelectorAll<HTMLElement>('[data-ink]')) {
+    gsap.to(statement.querySelectorAll('.word'), {
+      opacity: 1,
+      ease: 'none',
+      stagger: 0.12,
+      scrollTrigger: { trigger: statement, start: 'top 82%', end: 'bottom 45%', scrub: 0.6 },
+    });
+  }
+}
+
 export { gsap, ScrollTrigger, Flip };

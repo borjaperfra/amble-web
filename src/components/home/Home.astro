@@ -5,7 +5,7 @@ import Interlude from './Interlude.astro';
 import Story from './Story.astro';
 import Interview from './Interview.astro';
 import Defence from './Defence.astro';
-import MapSection from './MapSection.astro';
+import Distinctive from './Distinctive.astro';
 import Triage from './Triage.astro';
 import Listening from './Listening.astro';
 import Roadmap from './Roadmap.astro';
@@ -24,9 +24,9 @@ const c = home[lang];
     <Hero c={c.hero} />
     <Interlude lines={c.story.interlude} body={c.story.interludeBody} id="interlude-pdf" />
     <Story c={c.story} strength={c.strength} sourceNames={c.sourceNames} />
-    <Interview c={c.interview} />
+    <Interview c={c.interview} sourceNames={c.sourceNames} />
     <Defence c={c.defence} />
-    <MapSection c={c.map} strength={c.strength} sourceNames={c.sourceNames} />
+    <Distinctive c={c.distinctive} />
     <Triage c={c.triage} />
     <Listening c={c.listening} />
     <Roadmap c={c.roadmap} />
@@ -37,6 +37,7 @@ const c = home[lang];
 </Base>
 
 <script>
-  import { startSmoothScroll } from '../../scripts/motion';
+  import { startSmoothScroll, inkStatements } from '../../scripts/motion';
   startSmoothScroll();
+  inkStatements();
 </script>

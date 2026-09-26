@@ -74,6 +74,20 @@ const canonical = new URL(getRelativeLocaleUrl(lang, path), Astro.site);
         { rootMargin: '0px 0px -12% 0px' },
       );
       items.forEach((el) => observer.observe(el));
+
+      // Scenes play once, when most of them is on screen.
+      const scenes = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (!entry.isIntersecting) continue;
+            entry.target.classList.add('is-playing');
+            entry.target.dispatchEvent(new CustomEvent('scene:play'));
+            scenes.unobserve(entry.target);
+          }
+        },
+        { threshold: 0.35 },
+      );
+      document.querySelectorAll('[data-scene]').forEach((el) => scenes.observe(el));
     </script>
   </body>
 </html>

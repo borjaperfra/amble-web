@@ -187,6 +187,23 @@ input {
   color: var(--color-text);
 }
 
+/* ---------- Ink: scrubbed statements (see inkStatements) ---------- */
+
+[data-ink] .word {
+  display: inline-block;
+  white-space: pre;
+}
+
+.js [data-ink] .word {
+  opacity: var(--ink-min);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .js [data-ink] .word {
+    opacity: 1;
+  }
+}
+
 /* ---------- Arrival: things settle into place (DESIGN_SYSTEM §12) ---------- */
 
 .js [data-reveal] {

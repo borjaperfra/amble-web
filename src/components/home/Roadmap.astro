@@ -1,5 +1,8 @@
 ---
+// The road, drawn: three small scenes on one line. v0 is the Rep reading your
+// work; v1 many offers narrowing to one; v2 two eyes, yours and theirs, talking.
 import SectionIntro from '../SectionIntro.astro';
+import Symbol from '../Symbol.astro';
 import type { HomeContent } from '../../content/home';
 
 interface Props {
@@ -10,67 +13,203 @@ const { c } = Astro.props;
 ---
 
 <section class="section container" aria-labelledby="roadmap-title">
-  <div class="split">
-    <SectionIntro id="roadmap-title" kicker={c.kicker} title={c.title} body={c.body} />
+  <SectionIntro id="roadmap-title" kicker={c.kicker} title={c.title} align="center" />
 
-    <ol class="steps" role="list">
-      {
-        c.steps.map((step, i) => (
-          <li class:list={['step', { current: i === 0 }]} data-reveal style={`--i:${i}`}>
-            <span class="marker" aria-hidden="true" />
-            <p class="meta">
-              <span class="version">{step.version}</span>
-              {i === 0 && <span class="now">{c.now}</span>}
-            </p>
-            <p class="heading step-title">{step.title}</p>
-            <p class="step-body">{step.body}</p>
-            {step.extra && <p class="extra">{step.extra}</p>}
-          </li>
-        ))
-      }
-    </ol>
-  </div>
+  <ol class="road" role="list" data-scene>
+    {
+      c.steps.map((step, i) => (
+        <li class:list={['stop', { current: i === 0 }]} style={`--i:${i}`}>
+          <div class="art" aria-hidden="true">
+            {i === 0 && (
+              <div class="art-v0">
+                <span class="paper p1" />
+                <span class="paper p2" />
+                <Symbol size={44} breathe />
+              </div>
+            )}
+            {i === 1 && (
+              <div class="art-v1">
+                {Array.from({ length: 5 }, (_, k) => (
+                  <span class:list={['offer', { fit: k === 2 }]} style={`--k:${k}`} />
+                ))}
+              </div>
+            )}
+            {i === 2 && (
+              <div class="art-v2">
+                <Symbol size={40} />
+                <span class="talk">
+                  <span />
+                  <span />
+                  <span />
+                </span>
+                <Symbol size={40} class="mirror" />
+              </div>
+            )}
+          </div>
+          <p class="meta">
+            <span class="version">{step.version}</span>
+            {i === 0 && <span class="now">{c.now}</span>}
+          </p>
+          <p class="heading stop-title">{step.title}</p>
+          <p class="stop-line">{step.line}</p>
+          {step.extra && <p class="extra">{step.extra}</p>}
+        </li>
+      ))
+    }
+  </ol>
 </section>
 
 <style>
-  .steps {
+  .road {
     position: relative;
+    display: grid;
+    gap: var(--space-8);
+    max-width: var(--width-wide);
+    margin: var(--space-8) auto 0;
+  }
+  @media (min-width: 860px) {
+    .road {
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-6);
+    }
+    /* The line the stops sit on, drawn left to right. */
+    .road::before {
+      content: '';
+      position: absolute;
+      top: 120px;
+      left: 8%;
+      right: 8%;
+      height: var(--border-width);
+      background: linear-gradient(to right, var(--color-accent), var(--color-border) 45%);
+      transform-origin: left;
+      transition: transform 1.4s var(--ease-standard);
+    }
+    .js .road:not(.is-playing)::before {
+      transform: scaleX(0);
+    }
+  }
+  .stop {
     display: flex;
     flex-direction: column;
-    gap: var(--space-7);
-    padding-left: var(--space-7);
+    align-items: center;
+    text-align: center;
+    gap: var(--space-2);
   }
-  .steps::before {
-    content: '';
-    position: absolute;
-    left: 7px;
-    top: 10px;
-    bottom: 10px;
-    width: var(--border-width);
-    background: linear-gradient(to bottom, var(--color-accent-soft), var(--color-border-subtle));
-  }
-  .step {
+  .art {
     position: relative;
+    display: grid;
+    place-items: center;
+    width: 100%;
+    height: 240px;
+    margin-bottom: var(--space-4);
   }
-  .marker {
-    position: absolute;
-    left: calc(var(--space-7) * -1);
-    top: 5px;
-    width: 15px;
-    height: 15px;
+  .art > div {
+    display: grid;
+    place-items: center;
+    width: 180px;
+    height: 180px;
     border-radius: var(--radius-full);
-    background: var(--color-bg);
-    border: 1.5px solid var(--color-border);
+    background: var(--color-surface-raised);
+    border: var(--border-width) solid var(--color-border-subtle);
+    box-shadow: var(--shadow-sheet);
+    position: relative;
+    z-index: 1;
   }
-  .current .marker {
+  .current .art > div {
+    border-color: var(--color-accent-soft);
+    box-shadow:
+      0 0 0 10px var(--color-accent-wash),
+      var(--shadow-sheet);
+  }
+
+  /* v0: papers behind the eye */
+  .art-v0 .paper {
+    position: absolute;
+    width: 54px;
+    height: 70px;
+    background: var(--color-surface);
+    border: var(--border-width) solid var(--color-border);
+    border-radius: 6px;
+  }
+  .art-v0 .p1 {
+    rotate: -12deg;
+    translate: -30px 6px;
+  }
+  .art-v0 .p2 {
+    rotate: 9deg;
+    translate: 30px 4px;
+  }
+  .art-v0 :global(.symbol) {
+    position: relative;
+    color: var(--color-text);
+  }
+
+  /* v1: many offers, one fits */
+  .art-v1 {
+    grid-auto-flow: row;
+  }
+  .art-v1 .offer {
+    position: absolute;
+    width: 92px;
+    height: 20px;
+    border-radius: 5px;
+    background: var(--color-surface);
+    border: var(--border-width) solid var(--color-border);
+    translate: 0 calc((var(--k) - 2) * 26px);
+    opacity: 0.55;
+  }
+  .art-v1 .offer.fit {
+    width: 112px;
+    height: 26px;
+    opacity: 1;
+    background: var(--color-accent);
     border-color: var(--color-accent);
-    background: radial-gradient(circle, var(--color-accent) 0 3.5px, var(--color-bg) 4px);
+    z-index: 1;
   }
+
+  /* v2: agent to agent */
+  .art-v2 {
+    grid-template-columns: auto auto auto;
+    column-gap: var(--space-2);
+    align-content: center;
+    justify-content: center;
+    color: var(--color-text);
+  }
+  .art-v2 :global(.mirror) {
+    scale: -1 1;
+  }
+  .talk {
+    display: inline-flex;
+    gap: 4px;
+  }
+  .talk span {
+    width: 5px;
+    height: 5px;
+    border-radius: var(--radius-full);
+    background: var(--color-accent);
+    animation: talk 1.8s ease-in-out infinite;
+    animation-delay: calc(var(--d, 0) * 1s);
+  }
+  .talk span:nth-child(2) {
+    --d: 0.2;
+  }
+  .talk span:nth-child(3) {
+    --d: 0.4;
+  }
+  @keyframes talk {
+    0%,
+    100% {
+      opacity: 0.25;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+
   .meta {
     display: flex;
     align-items: center;
     gap: var(--space-3);
-    font-size: var(--text-body-sm);
   }
   .version {
     font-family: var(--font-mono);
@@ -78,28 +217,48 @@ const { c } = Astro.props;
     color: var(--color-text-faint);
   }
   .now {
+    padding: 2px var(--space-2);
     font-size: var(--text-label);
     font-weight: var(--weight-semibold);
     letter-spacing: var(--tracking-label);
     text-transform: uppercase;
     color: var(--color-accent-strong);
+    background: var(--color-accent-wash);
+    border-radius: var(--radius-sm);
   }
-  .step-title {
-    margin-top: var(--space-2);
+  .stop-title {
     font-size: var(--text-heading-md);
   }
-  .step-body {
-    margin-top: var(--space-2);
+  .stop-line {
+    max-width: 22ch;
     color: var(--color-text-muted);
-    text-wrap: pretty;
+    text-wrap: balance;
   }
   .extra {
-    margin-top: var(--space-4);
-    padding: var(--space-4) var(--space-5);
+    margin-top: var(--space-2);
+    padding: var(--space-1) var(--space-3);
     font-size: var(--text-body-sm);
+    font-weight: var(--weight-medium);
     color: var(--color-accent-strong);
-    background: var(--color-accent-wash);
-    border-radius: var(--radius-md);
-    text-wrap: pretty;
+    border: 1.5px dashed var(--color-accent-soft);
+    border-radius: var(--radius-full);
+  }
+
+  /* Stops arrive in order */
+  .js .road .stop {
+    transition:
+      opacity var(--motion-arrive) ease,
+      translate var(--motion-arrive) var(--ease-standard);
+    transition-delay: calc(0.3s + var(--i) * 0.35s);
+  }
+  .js .road:not(.is-playing) .stop {
+    opacity: 0;
+    translate: 0 12px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .talk span {
+      animation: none;
+      opacity: 0.8;
+    }
   }
 </style>

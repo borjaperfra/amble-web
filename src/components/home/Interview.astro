@@ -1,121 +1,266 @@
 ---
+// "Only what it couldn't read": two things the Rep read, what each told it,
+// and the one question neither answers. Lines draw from the clues to the
+// question, so the reason for asking is visible, not explained.
 import SectionIntro from '../SectionIntro.astro';
+import Symbol from '../Symbol.astro';
 import type { HomeContent } from '../../content/home';
 
 interface Props {
   c: HomeContent['interview'];
+  sourceNames: HomeContent['sourceNames'];
 }
 
-const { c } = Astro.props;
+const { c, sourceNames } = Astro.props;
 ---
 
 <section class="section container" aria-labelledby="interview-title">
-  <div class="split flip">
-    <SectionIntro id="interview-title" kicker={c.kicker} title={c.title} body={c.body} />
+  <SectionIntro id="interview-title" kicker={c.kicker} title={c.title} align="center" />
 
-    <figure class="sheet stage">
-      <p class="sheet-kicker">{c.rep}</p>
-      <div class="question" data-reveal>
-        <p class="context">{c.context}</p>
-        <p class="heading ask">{c.question}</p>
-        <p class="heading prompt">{c.prompt}</p>
-      </div>
+  <div class="scene" data-scene>
+    <div class="left">
+    <ul class="clues" role="list">
+      {
+        c.clues.map((clue, i) => (
+          <li class="clue" style={`--n:${i}`}>
+            <span class="source-tag">{sourceNames[clue.source]}</span>
+            <span class="clue-text">{clue.text}</span>
+            <span class="reads">→ {clue.reads}</span>
+          </li>
+        ))
+      }
+    </ul>
 
-      <details class="why" data-reveal style="--i:1">
-        <summary>{c.why}</summary>
-        <p>{c.whyBody}</p>
-      </details>
+    <svg class="threads" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M0 23 C 55 23, 45 50, 100 50" pathLength="1" />
+      <path d="M0 77 C 55 77, 45 50, 100 50" pathLength="1" />
+    </svg>
+    </div>
 
-      <div class="talk" data-reveal style="--i:2" aria-hidden="true">
-        <span class="mic"><span></span></span>
+    <figure class="sheet ask">
+      <p class="rep"><Symbol size={20} /> {c.rep}</p>
+      <p class="heading question">{c.question}</p>
+      <button class="talk" type="button" aria-label={c.talk}>
+        <span class="mic" aria-hidden="true">
+          {Array.from({ length: 5 }, (_, i) => <span class="bar" style={`--b:${i}`} />)}
+        </span>
         <span class="talk-label">{c.talk}</span>
-        <span class="or">{c.orType}</span>
-      </div>
+      </button>
     </figure>
   </div>
 </section>
 
 <style>
-  .stage {
-    display: flex;
-    flex-direction: column;
+  .scene {
+    display: grid;
     align-items: center;
-    text-align: center;
-    gap: var(--space-6);
-    padding-block: clamp(var(--space-7), 2rem + 4vw, var(--space-9));
+    gap: var(--space-5);
+    max-width: var(--width-wide);
+    margin: var(--space-8) auto 0;
   }
-  .question {
+  @media (min-width: 900px) {
+    .scene {
+      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+      gap: 0;
+    }
+    /* The clues leave room on their right for the threads. */
+    .left {
+      position: relative;
+      padding-right: 26%;
+    }
+  }
+
+  /* Clues */
+  .clues {
     display: flex;
     flex-direction: column;
-    gap: var(--space-4);
-    max-width: 26rem;
+    gap: var(--space-7);
   }
-  .context {
-    font-size: var(--text-body);
-    color: var(--color-text-muted);
+  .clue {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-2);
+    padding: var(--space-5);
+    background: var(--color-surface-raised);
+    border: var(--border-width) solid var(--color-border-subtle);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sheet);
   }
-  .ask {
-    font-size: var(--text-heading-md);
+  .clue-text {
+    font-size: var(--text-body-lg);
   }
-  .prompt {
-    font-size: var(--text-heading-md);
+  .reads {
+    font-family: var(--font-display);
     font-style: italic;
+    font-size: var(--text-heading-sm);
     color: var(--color-accent-strong);
   }
-  .why {
-    max-width: 24rem;
-    font-size: var(--text-body-sm);
-    color: var(--color-text-muted);
-  }
-  .why summary {
-    display: inline-flex;
-    min-height: var(--touch-target);
-    align-items: center;
-    cursor: pointer;
-    list-style: none;
-    text-decoration: underline;
-    text-decoration-color: var(--color-border);
-    text-underline-offset: 0.25em;
-    transition: color var(--motion-fast) ease;
-  }
-  .why summary::-webkit-details-marker {
+
+  /* Threads: two lines that meet at the question */
+  .threads {
     display: none;
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 26%;
+    height: 100%;
+    overflow: visible;
   }
-  .why summary:hover {
-    color: var(--color-text);
+  .threads path {
+    fill: none;
+    stroke: var(--color-accent);
+    stroke-width: 1.5;
+    vector-effect: non-scaling-stroke;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 0;
   }
-  .why p {
-    padding-top: var(--space-1);
-    text-wrap: pretty;
+  @media (min-width: 900px) {
+    .threads {
+      display: block;
+    }
   }
+
+  /* The question */
+  .ask {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-6);
+    text-align: center;
+    padding-block: var(--space-8);
+  }
+  .rep {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-label);
+    font-weight: var(--weight-semibold);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--color-text-faint);
+  }
+  .question {
+    font-size: var(--text-heading-xl);
+    max-width: 14ch;
+  }
+
+  /* Hold to talk: a toy, but a true one — the bars move while you hold. */
   .talk {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: var(--space-2);
+    gap: var(--space-3);
+    padding: 0;
+    background: none;
+    border: 0;
+    cursor: pointer;
+    touch-action: none;
+    -webkit-user-select: none;
+    user-select: none;
   }
   .mic {
-    display: grid;
-    place-items: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
     width: 64px;
     height: 64px;
     border-radius: var(--radius-full);
-    border: var(--border-width) solid var(--color-border);
     background: var(--color-surface);
+    border: var(--border-width) solid var(--color-border);
+    transition:
+      background var(--motion-default) ease,
+      border-color var(--motion-default) ease,
+      transform var(--motion-default) var(--ease-standard);
   }
-  .mic span {
-    width: 14px;
-    height: 14px;
-    border-radius: var(--radius-full);
+  .bar {
+    width: 3px;
+    height: 6px;
+    border-radius: 2px;
     background: var(--color-accent);
+    transition: height var(--motion-default) ease;
+  }
+  .talk:hover .mic {
+    border-color: var(--color-accent-soft);
+  }
+  .talk.is-held .mic {
+    background: var(--color-accent-wash);
+    border-color: var(--color-accent);
+    transform: scale(1.06);
+  }
+  .talk.is-held .bar {
+    animation: voice 0.9s ease-in-out infinite;
+    animation-delay: calc(var(--b) * -0.17s);
+  }
+  @keyframes voice {
+    0%,
+    100% {
+      height: 6px;
+    }
+    50% {
+      height: 26px;
+    }
   }
   .talk-label {
-    margin-top: var(--space-1);
     font-size: var(--text-body-sm);
     font-weight: var(--weight-medium);
+    color: var(--color-text-muted);
   }
-  .or {
-    font-size: var(--text-body-sm);
-    color: var(--color-text-faint);
+
+  /* Choreography: clues, what they tell, the threads, then the question. */
+  .js .scene:not(.is-playing) .clue,
+  .js .scene:not(.is-playing) .reads,
+  .js .scene:not(.is-playing) .ask,
+  .js .scene:not(.is-playing) .question {
+    opacity: 0;
+    translate: 0 8px;
+  }
+  .js .scene:not(.is-playing) .threads path {
+    stroke-dashoffset: 1;
+  }
+  .js .scene .clue,
+  .js .scene .reads,
+  .js .scene .ask,
+  .js .scene .question {
+    transition:
+      opacity var(--motion-arrive) ease,
+      translate var(--motion-arrive) var(--ease-standard);
+  }
+  .js .scene .clue {
+    transition-delay: calc(var(--n) * 500ms);
+  }
+  .js .scene .reads {
+    transition-delay: calc(350ms + var(--n) * 500ms);
+  }
+  .js .scene .threads path {
+    transition: stroke-dashoffset 1s var(--ease-standard) 1.2s;
+  }
+  .js .scene .threads path + path {
+    transition-delay: 1.35s;
+  }
+  .js .scene .ask {
+    transition-delay: 1.9s;
+  }
+  .js .scene .question {
+    transition-delay: 2.3s;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .talk.is-held .bar {
+      animation: none;
+      height: 16px;
+    }
   }
 </style>
+
+<script>
+  for (const talk of document.querySelectorAll<HTMLButtonElement>('.talk')) {
+    const hold = () => talk.classList.add('is-held');
+    const release = () => talk.classList.remove('is-held');
+    talk.addEventListener('pointerdown', hold);
+    talk.addEventListener('keydown', (e) => (e.key === ' ' || e.key === 'Enter') && hold());
+    for (const type of ['pointerup', 'pointerleave', 'pointercancel', 'keyup', 'blur']) {
+      talk.addEventListener(type, release);
+    }
+  }
+</script>

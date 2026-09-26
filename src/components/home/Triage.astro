@@ -1,4 +1,9 @@
 ---
+// Revealed intent (PRODUCT_SPEC §15.1) as a deck: three offers, each a real
+// trade-off. The candidate answers one at a time; every answer leaves a rule in
+// "What I learned". The server renders the finished deck, answers and rules
+// visible; with motion allowed, the script stacks the cards and plays the
+// answers when the scene comes into view.
 import SectionIntro from '../SectionIntro.astro';
 import type { HomeContent } from '../../content/home';
 
@@ -10,68 +15,105 @@ const { c } = Astro.props;
 ---
 
 <section class="section container" aria-labelledby="triage-title">
-  <div class="split flip">
-    <SectionIntro id="triage-title" kicker={c.kicker} title={c.title} body={c.body} />
+  <SectionIntro id="triage-title" kicker={c.kicker} title={c.title} body={c.line} align="center" />
 
-    <div class="stack">
-      <figure class="sheet">
-        <p class="sheet-kicker">{c.offerLabel}</p>
-        <p class="heading role">{c.offer.role}</p>
-        <p class="company">{c.offer.company}</p>
-        <ul class="facts" role="list">
-          {c.offer.facts.map((f) => <li>{f}</li>)}
-        </ul>
+  <div class="scene" data-scene data-triage>
+    <ol class="deck" role="list">
+      {
+        c.offers.map((o, i) => (
+          <li class="offer" style={`--i:${i}`}>
+            <p class="offer-role heading">{o.role}</p>
+            <p class="offer-company">{o.company}</p>
+            <ul class="facts" role="list">
+              {o.facts.map((f) => (
+                <li>{f}</li>
+              ))}
+            </ul>
+            <div class="verdicts" aria-hidden="true">
+              {c.verdicts.map((v) => (
+                <span class:list={['verdict', { chosen: v === o.verdict }]}>{v}</span>
+              ))}
+            </div>
+            <p class="reason">
+              <span class="who">{c.who}</span>
+              <span class="heading">{o.reason}</span>
+            </p>
+          </li>
+        ))
+      }
+    </ol>
 
-        <div class="verdicts" aria-hidden="true">
-          {c.verdicts.map((v, i) => <span class:list={['verdict', { chosen: i === c.chosen }]}>{v}</span>)}
-        </div>
-
-        <div class="reason" data-reveal>
-          <p class="who">{c.reasonLabel}</p>
-          <blockquote class="heading">{c.reason}</blockquote>
-        </div>
-      </figure>
-
-      <div class="learned" data-reveal style="--i:1">
-        <p class="sheet-kicker">{c.learnedLabel}</p>
-        <p class="learned-body">
-          <span class="learned-type">{c.learned.type}</span>
-          <span>{c.learned.text}</span>
-        </p>
-      </div>
+    <div class="learned">
+      <p class="kicker learned-label">{c.learnedLabel}</p>
+      <ul class="rules" role="list">
+        {
+          c.offers.map((o, i) => (
+            <li class="rule" style={`--i:${i}`}>
+              <span class="rule-type">{o.learned.type}</span>
+              <span class="rule-text heading">{o.learned.text}</span>
+            </li>
+          ))
+        }
+      </ul>
+      <button class="text-link replay" type="button" hidden>↻ {c.replay}</button>
     </div>
   </div>
 </section>
 
 <style>
-  .stack {
+  .scene {
+    display: grid;
+    gap: var(--space-8);
+    align-items: center;
+    max-width: var(--width-wide);
+    margin: var(--space-8) auto 0;
+  }
+  @media (min-width: 900px) {
+    .scene {
+      grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+      gap: var(--space-9);
+    }
+  }
+
+  /* ---------- The offers ---------- */
+  .deck {
+    display: grid;
+    gap: var(--space-4);
+  }
+  .offer {
     display: flex;
     flex-direction: column;
-    gap: var(--space-5);
+    gap: var(--space-2);
+    padding: clamp(var(--space-5), 1rem + 1.5vw, var(--space-6));
+    background: var(--color-surface-raised);
+    border: var(--border-width) solid var(--color-border-subtle);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sheet);
   }
-  .role {
-    margin-top: var(--space-4);
-    font-size: var(--text-heading-lg);
+  .offer-role {
+    font-size: var(--text-heading-md);
   }
-  .company {
-    margin-top: var(--space-1);
+  .offer-company {
     color: var(--color-text-muted);
   }
   .facts {
     display: flex;
-    flex-direction: column;
-    margin-top: var(--space-5);
-    font-size: var(--text-body-sm);
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-top: var(--space-3);
   }
   .facts li {
-    padding-block: var(--space-3);
-    border-top: var(--border-width) solid var(--color-border-subtle);
+    padding: var(--space-1) var(--space-3);
+    font-size: var(--text-body-sm);
+    background: var(--color-surface);
+    border: var(--border-width) solid var(--color-border-subtle);
+    border-radius: var(--radius-full);
   }
   .verdicts {
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-2);
-    margin-top: var(--space-5);
+    margin-top: var(--space-4);
   }
   .verdict {
     display: inline-flex;
@@ -82,43 +124,176 @@ const { c } = Astro.props;
     color: var(--color-text-muted);
     border: var(--border-width) solid var(--color-border);
     border-radius: var(--radius-md);
+    transition:
+      background var(--motion-default) ease,
+      color var(--motion-default) ease,
+      border-color var(--motion-default) ease,
+      transform var(--motion-fast) ease;
   }
-  .verdict.chosen {
+  .verdict.chosen,
+  .offer.is-answered .verdict.chosen {
     color: var(--color-text-inverse);
     background: var(--color-action);
     border-color: var(--color-action);
   }
   .reason {
-    margin-top: var(--space-6);
-    padding-top: var(--space-5);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    margin-top: var(--space-4);
+    padding-top: var(--space-4);
     border-top: var(--border-width) solid var(--color-border-subtle);
   }
   .who {
     font-size: var(--text-body-sm);
     font-weight: var(--weight-medium);
   }
-  .reason blockquote {
-    margin-top: var(--space-2);
+  .reason .heading {
     font-size: var(--text-heading-sm);
     line-height: var(--leading-tight);
   }
-  .learned {
-    padding: var(--space-5) clamp(var(--space-5), 1rem + 2vw, var(--space-7));
-    background: var(--color-accent-wash);
-    border-radius: var(--radius-lg);
+
+  /* Live: the offers become a deck, answered one by one. */
+  .scene.is-live .deck {
+    position: relative;
+    display: block;
+    min-height: var(--deck-height, 380px);
   }
-  .learned .sheet-kicker {
+  .scene.is-live .offer {
+    position: absolute;
+    inset: 0 0 auto 0;
+    transform-origin: 50% 0;
+  }
+  .scene.is-live .offer .verdict.chosen {
+    color: var(--color-text-muted);
+    background: transparent;
+    border-color: var(--color-border);
+  }
+  .scene.is-live .offer.is-answered .verdict.chosen {
+    color: var(--color-text-inverse);
+    background: var(--color-action);
+    border-color: var(--color-action);
+    transform: scale(0.96);
+  }
+
+  /* ---------- What I learned ---------- */
+  .learned {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+  }
+  .learned-label {
     color: var(--color-accent-strong);
   }
-  .learned-body {
+  .rules {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+  .rule {
     display: flex;
     flex-direction: column;
     gap: var(--space-1);
-    margin-top: var(--space-2);
+    min-height: 76px;
+    padding: var(--space-4) var(--space-5);
+    background: var(--color-accent-wash);
+    border: var(--border-width) solid var(--color-accent-soft);
+    border-radius: var(--radius-md);
   }
-  .learned-type {
-    font-family: var(--font-display);
-    font-size: var(--text-heading-sm);
+  .rule-type {
+    font-size: var(--text-label);
+    font-weight: var(--weight-semibold);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
     color: var(--color-accent-strong);
   }
+  .rule-text {
+    font-size: var(--text-heading-sm);
+  }
+  /* Empty slots wait, dashed, until an answer fills them. */
+  .scene.is-live .rule {
+    background: transparent;
+    border-style: dashed;
+    border-color: var(--color-border);
+  }
+  .scene.is-live .rule > * {
+    opacity: 0;
+  }
+  .scene.is-live .rule.is-filled {
+    background: var(--color-accent-wash);
+    border-style: solid;
+    border-color: var(--color-accent-soft);
+    transition:
+      background var(--motion-slow) ease,
+      border-color var(--motion-slow) ease;
+  }
+  .scene.is-live .rule.is-filled > * {
+    opacity: 1;
+    transition: opacity var(--motion-slow) ease 0.15s;
+  }
+  .replay[hidden] {
+    display: none;
+  }
+  .replay {
+    align-self: flex-start;
+    font-size: var(--text-body-sm);
+    background: none;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+  }
 </style>
+
+<script>
+  import { gsap, reducedMotion } from '../../scripts/motion';
+
+  const scene = document.querySelector<HTMLElement>('[data-triage]');
+
+  if (scene && !reducedMotion) {
+    const deck = scene.querySelector<HTMLElement>('.deck')!;
+    const offers = [...scene.querySelectorAll<HTMLElement>('.offer')];
+    const rules = [...scene.querySelectorAll<HTMLElement>('.rule')];
+    const replay = scene.querySelector<HTMLButtonElement>('.replay')!;
+
+    scene.classList.add('is-live');
+
+    // The deck is as tall as its tallest card, plus room for the cards behind it.
+    const measure = () => {
+      const tallest = Math.max(...offers.map((o) => o.offsetHeight));
+      deck.style.setProperty('--deck-height', `${tallest + 56}px`);
+    };
+
+    const stack = () => {
+      offers.forEach((o, i) => {
+        o.classList.remove('is-answered');
+        gsap.set(o, { x: 0, y: i * 26, scale: 1 - i * 0.04, rotate: 0, opacity: 1, zIndex: offers.length - i });
+        gsap.set(o.querySelector('.reason'), { opacity: 0, y: 6 });
+      });
+      rules.forEach((r) => r.classList.remove('is-filled'));
+    };
+
+    const play = () => {
+      stack();
+      replay.hidden = true;
+      const tl = gsap.timeline({ delay: 0.4, onComplete: () => (replay.hidden = false) });
+      offers.forEach((o, i) => {
+        const at = i * 3.1;
+        tl.call(() => o.classList.add('is-answered'), [], at + 0.9);
+        tl.to(o.querySelector('.reason'), { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out' }, at + 1.3);
+        tl.call(() => rules[i].classList.add('is-filled'), [], at + 2.0);
+        if (i < offers.length - 1) {
+          tl.to(o, { x: '-6%', y: -24, rotate: -4, opacity: 0, duration: 0.7, ease: 'power2.in' }, at + 2.7);
+          offers.slice(i + 1).forEach((next, j) => {
+            tl.to(next, { y: j * 26, scale: 1 - j * 0.04, duration: 0.6, ease: 'power3.out' }, at + 2.9);
+          });
+        }
+      });
+    };
+
+    measure();
+    stack();
+    window.addEventListener('resize', measure, { passive: true });
+    scene.addEventListener('scene:play', play, { once: true });
+    replay.addEventListener('click', play);
+  }
+</script>

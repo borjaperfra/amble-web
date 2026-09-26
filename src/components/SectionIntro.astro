@@ -1,9 +1,9 @@
 ---
-// The text half of every home section: kicker, serif title, one paragraph.
+// The head of every home section: kicker, serif title, at most one short line.
 interface Props {
   kicker: string;
   title: string;
-  body: string;
+  body?: string;
   id?: string;
   align?: 'start' | 'center';
 }
@@ -14,7 +14,7 @@ const { kicker, title, body, id, align = 'start' } = Astro.props;
 <div class:list={['intro', align]} data-reveal>
   <p class="kicker">{kicker}</p>
   <h2 class="heading title" id={id}>{title}</h2>
-  <p class="lede">{body}</p>
+  {body && <p class="lede">{body}</p>}
 </div>
 
 <style>

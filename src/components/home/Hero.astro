@@ -25,7 +25,6 @@ const { c } = Astro.props;
   <div class="form rise d3">
     <Waitlist id="hero" />
   </div>
-  <p class="building rise d4">{c.building}</p>
 </section>
 
 <style>
@@ -75,13 +74,6 @@ const { c } = Astro.props;
     justify-content: center;
     width: 100%;
     margin-top: var(--space-7);
-  }
-  .building {
-    margin-top: var(--space-7);
-    max-width: 28rem;
-    font-size: var(--text-body-sm);
-    color: var(--color-text-faint);
-    text-wrap: pretty;
   }
 
   .rise {
