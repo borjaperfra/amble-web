@@ -54,6 +54,13 @@
   --color-retracted: var(--clay-500);
   --color-retracted-soft: var(--clay-100);
 
+  /* Code shown on the page (defence scene): ink panel, paper text. */
+  --color-code-bg: var(--ink-900);
+  --color-code-text: #c9c7bd;
+  --color-code-faint: var(--ink-400);
+  --color-code-caution: #d6b77a;
+  --color-code-mark: rgb(221 227 216 / 0.16);
+
   --color-border: var(--line-300);
   --color-border-subtle: var(--line-200);
 

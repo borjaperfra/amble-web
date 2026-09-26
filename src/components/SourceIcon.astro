@@ -1,0 +1,80 @@
+---
+// Marks for where evidence comes from. GitHub's is its official mark (via
+// simple-icons, CC0); LinkedIn is a plain "in" monogram, since the brand isn't
+// distributed there; the rest are drawn in the site's 1.5px line style.
+import { siGithub } from 'simple-icons';
+import type { Source } from '../content/home';
+
+interface Props {
+  source: Source;
+  size?: number;
+  class?: string;
+}
+
+const { source, size = 16, class: className } = Astro.props;
+const maskId = `li-${Math.random().toString(36).slice(2, 8)}`;
+---
+
+<svg class:list={['source-icon', source, className]} width={size} height={size} viewBox="0 0 24 24" aria-hidden="true">
+  {source === 'gh' && <path class="fill" d={siGithub.path} />}
+  {
+    source === 'li' && (
+      <>
+        <mask id={maskId}>
+          <rect width="24" height="24" fill="white" />
+          <circle cx="7.3" cy="7.2" r="1.7" fill="black" />
+          <rect x="5.8" y="9.8" width="3" height="8.4" rx="0.4" fill="black" />
+          <path
+            d="M10.9 9.8h2.8v1.3c.5-.9 1.6-1.5 2.9-1.5 2.2 0 3.3 1.3 3.3 3.8v4.8h-3v-4.3c0-1.1-.4-1.8-1.4-1.8-1 0-1.6.7-1.6 1.9v4.2h-3z"
+            fill="black"
+          />
+        </mask>
+        <rect class="fill" x="1.5" y="1.5" width="21" height="21" rx="4.5" mask={`url(#${maskId})`} />
+      </>
+    )
+  }
+  {
+    source === 'cv' && (
+      <g class="line">
+        <path d="M6 2.8h8l4.5 4.5v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-16.5a1 1 0 0 1 1-1z" />
+        <path d="M13.8 2.8v4.7h4.7" />
+        <path d="M8.5 12h7M8.5 15.2h7M8.5 18.2h4" />
+      </g>
+    )
+  }
+  {
+    source === 'web' && (
+      <g class="line">
+        <circle cx="12" cy="12" r="9" />
+        <path d="M3 12h18" />
+        <path d="M12 3c2.6 2.6 3.8 5.6 3.8 9s-1.2 6.4-3.8 9c-2.6-2.6-3.8-5.6-3.8-9S9.4 5.6 12 3z" />
+      </g>
+    )
+  }
+  {
+    source === 'int' && (
+      <g class="line">
+        <rect x="9" y="3" width="6" height="11" rx="3" />
+        <path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3" />
+      </g>
+    )
+  }
+</svg>
+
+<style>
+  .source-icon {
+    flex: none;
+    display: inline-block;
+    vertical-align: -0.15em;
+  }
+  .fill {
+    fill: currentColor;
+  }
+  .line {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+</style>

@@ -3,7 +3,7 @@
 // the product's core idea, told as one pinned scene in four steps.
 //
 //   0  the sources arrive
-//   1  the Rep picks out claims, each still sitting in its source
+//   1  the Rep picks out claims; each gets a badge for where it was read
 //   2  the claims fly out of the documents into the capability they support
 //   3  each capability shows the strength of its evidence, and what's unknown
 //
@@ -11,8 +11,9 @@
 // without JavaScript or with reduced motion the scene reads complete. The
 // script moves each claim back into its source line and plays the steps as the
 // chapter scrolls by. Claims are real elements moved with GSAP Flip: the words
-// you see fly are the same words you read in the CV.
+// you see fly are the same words you read in the CV, badge and all.
 import EvidenceDots from '../EvidenceDots.astro';
+import SourceIcon from '../SourceIcon.astro';
 import type { HomeContent } from '../../content/home';
 
 interface Props {
@@ -41,11 +42,26 @@ const claims = c.sources.flatMap((src) =>
               <div class="caption" data-i={i}>
                 <p class="kicker">{step.kicker}</p>
                 {i === 0 ? (
-                  <h2 class="heading caption-title" id="story-title">{step.title}</h2>
+                  <h2 class="heading caption-title" id="story-title">
+                    {step.title}
+                  </h2>
                 ) : (
                   <p class="heading caption-title">{step.title}</p>
                 )}
                 <p class="lede caption-body">{step.body}</p>
+                {i === 1 && (
+                  <p class="legend">
+                    <span class="legend-item">
+                      <span class="legend-mark">Aa</span> {c.legend.claim}
+                    </span>
+                    <span class="legend-item">
+                      <span class="claim-badge">
+                        <SourceIcon source="cv" size={12} />
+                      </span>
+                      {c.legend.source}
+                    </span>
+                  </p>
+                )}
               </div>
             ))
           }
@@ -59,7 +75,10 @@ const claims = c.sources.flatMap((src) =>
               c.sources.map((src, d) => (
                 <article class="doc" data-doc={src.id} style={`--d:${d}`}>
                   <header class="doc-head">
-                    <span class="doc-source">{sourceNames[src.source]}</span>
+                    <span class:list={['doc-source', src.source]}>
+                      <SourceIcon source={src.source} size={18} />
+                      {sourceNames[src.source]}
+                    </span>
                     <span class="doc-title">{src.title}</span>
                   </header>
                   <div class="doc-body">
@@ -90,10 +109,15 @@ const claims = c.sources.flatMap((src) =>
                       .filter((cl) => cl.cap === cap.id)
                       .map((cl) => (
                         <li class="claim" data-claim={cl.id} data-cap={cl.cap} style={`--ci:${claims.indexOf(cl)}`}>
-                          <span class="claim-text">{cl.text}</span>
-                          <span class="claim-tags">
-                            <span class="source-tag">{sourceNames[cl.source]}</span>
-                            {cl.assisted && <span class="assisted">⚠ {c.assisted}</span>}
+                          <span class="claim-badge" title={sourceNames[cl.source]}>
+                            <SourceIcon source={cl.source} size={12} />
+                          </span>
+                          <span class="claim-body">
+                            <span class="claim-text">{cl.text}</span>
+                            <span class="claim-tags">
+                              <span class="claim-source">{sourceNames[cl.source]}</span>
+                              {cl.assisted && <span class="assisted">⚠ {c.assisted}</span>}
+                            </span>
                           </span>
                         </li>
                       ))}
@@ -127,7 +151,8 @@ const claims = c.sources.flatMap((src) =>
     display: flex;
     align-items: center;
     min-height: 100svh;
-    padding-block: var(--space-8);
+    /* room for the floating header bar */
+    padding-block: calc(60px + var(--space-4)) var(--space-6);
   }
   .story-grid {
     display: grid;
@@ -136,8 +161,8 @@ const claims = c.sources.flatMap((src) =>
   }
   @media (min-width: 960px) {
     .story-grid {
-      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-      gap: var(--space-9);
+      grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+      gap: var(--space-8);
     }
   }
 
@@ -157,6 +182,7 @@ const claims = c.sources.flatMap((src) =>
   .progress li {
     position: relative;
     padding-top: var(--space-3);
+    min-width: 2.5rem;
     transition: color var(--motion-slow) ease;
   }
   .progress li::before {
@@ -165,9 +191,9 @@ const claims = c.sources.flatMap((src) =>
     top: 0;
     left: 0;
     width: 100%;
-    height: 1.5px;
+    height: 2px;
+    border-radius: 2px;
     background: var(--color-border);
-    transform-origin: left;
     transition: background var(--motion-slow) ease;
   }
   .caption-stack {
@@ -183,7 +209,26 @@ const claims = c.sources.flatMap((src) =>
     font-size: var(--text-heading-xl);
   }
   .caption-body {
-    max-width: 28rem;
+    max-width: 24rem;
+  }
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3) var(--space-5);
+    margin-top: var(--space-2);
+    font-size: var(--text-body-sm);
+    color: var(--color-text-muted);
+  }
+  .legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+  .legend-mark {
+    padding: 0 0.3em;
+    font-weight: var(--weight-medium);
+    color: var(--color-text);
+    background: linear-gradient(transparent 55%, var(--color-accent-soft) 55%);
   }
 
   /* Live: one caption at a time, the progress follows the step. */
@@ -233,7 +278,7 @@ const claims = c.sources.flatMap((src) =>
 
   /* ---------- Stage: a scene that scales like an illustration ---------- */
   .stage-wrap {
-    width: min(100%, calc(80svh / 0.92));
+    width: min(100%, calc(86svh / 0.92));
     justify-self: center;
   }
   .stage {
@@ -241,8 +286,8 @@ const claims = c.sources.flatMap((src) =>
     container: stage / size;
     width: 100%;
     aspect-ratio: 100 / 92;
-    --doc-font: max(11.5px, 1.9cqw);
-    --cap-font: max(16px, 3cqw);
+    --doc-font: max(12px, 2.05cqw);
+    --cap-font: max(18px, 3.5cqw);
   }
 
   /* Documents: position (x, y, w, r) when read; (gx, gy, gr, gs) when piled aside. */
@@ -251,13 +296,15 @@ const claims = c.sources.flatMap((src) =>
     left: calc(var(--x) * 1cqw);
     top: calc(var(--y) * 1cqw);
     width: calc(var(--w) * 1cqw);
-    padding: 3.2cqw 3.4cqw;
+    padding: 3cqw 3.2cqw 3cqw 4.6cqw;
     font-size: var(--doc-font);
-    line-height: 1.55;
+    line-height: 1.5;
     background: var(--color-surface-raised);
     border: var(--border-width) solid var(--color-border-subtle);
     border-radius: 1.6cqw;
-    box-shadow: var(--shadow-sheet);
+    box-shadow:
+      0 1px 2px rgb(37 37 31 / 0.05),
+      0 14px 36px rgb(37 37 31 / 0.08);
     transform-origin: top left;
     transform: rotate(calc(var(--r) * 1deg));
     transition:
@@ -266,30 +313,36 @@ const claims = c.sources.flatMap((src) =>
       opacity var(--motion-arrive) ease;
     transition-delay: calc(var(--d) * 90ms);
   }
-  .doc[data-doc='cv'] { --x: 0; --y: 3; --w: 54; --r: -1.2; --gx: 0; --gy: 1; --gr: -2.5; --gs: 0.46; z-index: 1; }
-  .doc[data-doc='gh'] { --x: 58; --y: 0; --w: 42; --r: 1.4; --gx: 6; --gy: 20; --gr: 3; --gs: 0.5; }
-  .doc[data-doc='web'] { --x: 60; --y: 31; --w: 40; --r: -0.8; --gx: 2; --gy: 31; --gr: -2.2; --gs: 0.5; }
-  .doc[data-doc='li'] { --x: 56; --y: 62; --w: 44; --r: 1; --gx: 7; --gy: 42; --gr: 1.2; --gs: 0.5; }
+  .doc[data-doc='cv'] { --x: 0; --y: 2; --w: 56; --r: -1.2; --gx: 0; --gy: 2; --gr: -2.5; --gs: 0.56; z-index: 1; }
+  .doc[data-doc='gh'] { --x: 59; --y: 0; --w: 41; --r: 1.4; --gx: 5; --gy: 32; --gr: 3; --gs: 0.6; }
+  .doc[data-doc='web'] { --x: 61; --y: 32; --w: 39; --r: -0.8; --gx: 1; --gy: 47; --gr: -2.2; --gs: 0.6; }
+  .doc[data-doc='li'] { --x: 57; --y: 61; --w: 43; --r: 1; --gx: 6; --gy: 61; --gr: 1.4; --gs: 0.6; }
 
   .doc-head {
     display: flex;
-    align-items: baseline;
+    align-items: center;
     justify-content: space-between;
     gap: 2cqw;
-    padding-bottom: 1.6cqw;
-    margin-bottom: 1.6cqw;
+    padding-bottom: 1.5cqw;
+    margin: 0 0 1.5cqw -1.4cqw;
     border-bottom: var(--border-width) solid var(--color-border-subtle);
   }
   .doc-source {
-    font-size: 0.78em;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5em;
+    font-size: 0.82em;
     font-weight: var(--weight-semibold);
-    letter-spacing: var(--tracking-label);
-    text-transform: uppercase;
-    color: var(--color-text-faint);
+    letter-spacing: 0.04em;
+    color: var(--color-text);
+  }
+  .doc-source :global(.source-icon) {
+    width: 1.35em;
+    height: 1.35em;
   }
   .doc-title {
     font-family: var(--font-mono);
-    font-size: 0.82em;
+    font-size: 0.78em;
     color: var(--color-text-faint);
     overflow: hidden;
     text-overflow: ellipsis;
@@ -298,123 +351,196 @@ const claims = c.sources.flatMap((src) =>
   .doc-line {
     position: relative;
     color: var(--color-text-muted);
-    padding-block: 0.25em;
+    padding-block: 0.22em;
   }
   .doc-line.name {
     font-family: var(--font-display);
-    font-size: 1.7em;
+    font-size: 1.65em;
     line-height: 1.1;
     color: var(--color-text);
   }
   .doc-line.meta {
-    margin-top: 0.5em;
-    font-size: 0.86em;
+    margin-top: 0.45em;
+    font-size: 0.84em;
     color: var(--color-text-faint);
+  }
+  .line-text {
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+    border-radius: 3px;
+    transition:
+      color var(--motion-slow) ease,
+      background-color var(--motion-slow) ease,
+      opacity var(--motion-slow) ease;
+  }
+
+  /* Piled aside, the documents keep their shape but lose their words: text
+     becomes lines, the way a page reads from across a desk. */
+  .story[data-layout='group'] .doc .line-text {
+    color: transparent;
+    background-color: var(--color-border);
+  }
+  .story[data-layout='group'] .doc .name .line-text {
+    background-color: var(--color-text-faint);
+  }
+  .story[data-layout='group'] .doc .doc-title {
+    opacity: 0;
   }
 
   /* ---------- Claims ---------- */
+  /* Badge | text, with the tags tucked under the text. */
   .claim {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.4em 0.7em;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: start;
+    column-gap: 0.6em;
+    row-gap: 0.15em;
     font-size: var(--doc-font);
-    line-height: 1.45;
+    line-height: 1.4;
     color: var(--color-text);
+  }
+  .claim > .claim-badge {
+    margin-top: -0.05em;
+  }
+  /* Text and tags share one flow, so the source name sits at the end of the line. */
+  .claim-body > .claim-tags {
+    display: inline-flex;
+    margin-left: 0.6em;
+    vertical-align: 0.05em;
+  }
+  /* The badge: where this claim was read. It travels with the claim. */
+  .claim-badge {
+    display: inline-grid;
+    place-items: center;
+    width: 1.55em;
+    height: 1.55em;
+    flex: none;
+    color: var(--color-text-inverse);
+    background: var(--color-accent);
+    border-radius: var(--radius-full);
+    box-shadow: 0 0 0 2px var(--color-surface-raised);
+  }
+  .claim-badge :global(.source-icon) {
+    width: 0.95em;
+    height: 0.95em;
   }
   .claim-tags {
     display: inline-flex;
-    gap: 0.4em;
+    align-items: center;
+    gap: 0.6em;
   }
-  .claim .source-tag {
-    height: auto;
-    padding: 0.1em 0.5em;
-    font-size: 0.8em;
+  .claim-source {
+    font-size: 0.78em;
+    font-weight: var(--weight-medium);
+    color: var(--color-accent-strong);
   }
   .assisted {
-    font-size: 0.8em;
+    font-size: 0.78em;
     color: var(--color-caution);
   }
 
-  /* A claim sitting in its source line, laid exactly over the line's text. */
+  /* A claim sitting in its source line: laid over the line's text, badge in the gutter. */
   .doc-line > .claim {
     position: absolute;
-    top: 0.25em;
+    top: 0.22em;
     left: 0;
     right: 0;
     display: block;
     color: var(--color-text);
-    background-image: linear-gradient(var(--color-accent-soft), var(--color-accent-soft));
-    background-repeat: no-repeat;
-    background-position: 0 88%;
-    background-size: 0% 38%;
+    opacity: 0;
+    transition: opacity var(--motion-slow) ease;
+    transition-delay: calc(var(--ci) * 110ms);
+  }
+  .doc-line > .claim .claim-badge {
+    position: absolute;
+    left: -2.1em;
+    top: 0.05em;
+    scale: 0.4;
     opacity: 0;
     transition:
-      opacity var(--motion-slow) ease,
-      background-size 0.9s var(--ease-standard);
-    transition-delay: calc(var(--ci) * 120ms);
+      scale 0.5s cubic-bezier(0.3, 1.5, 0.5, 1),
+      opacity 0.3s ease;
+    transition-delay: calc(0.35s + var(--ci) * 110ms);
+  }
+  .doc-line > .claim .claim-text {
+    background-image: linear-gradient(var(--color-accent-soft), var(--color-accent-soft));
+    background-repeat: no-repeat;
+    background-position: 0 90%;
+    background-size: 0% 46%;
+    transition: background-size 0.8s var(--ease-standard);
+    transition-delay: calc(var(--ci) * 110ms);
   }
   .doc-line > .claim .claim-tags {
-    display: none;
-  }
-  .claim-text {
-    box-decoration-break: clone;
+    display: none !important;
   }
   .story[data-step='1'] .doc-line > .claim {
     opacity: 1;
-    background-size: 100% 38%;
+  }
+  .story[data-step='1'] .doc-line > .claim .claim-text {
+    background-size: 100% 46%;
+  }
+  .story[data-step='1'] .doc-line > .claim .claim-badge {
+    scale: 1;
+    opacity: 1;
   }
   /* The line underneath goes quiet once the claim has been picked out. */
   .story[data-step='1'] .doc-line[data-slot] > .line-text {
     opacity: 0;
-    transition: opacity var(--motion-slow) ease;
-    transition-delay: calc(var(--ci, 0) * 120ms);
+    transition-delay: calc(var(--ci, 0) * 110ms);
   }
 
   /* ---------- Capabilities ---------- */
   .caps {
     position: absolute;
     top: 0;
-    left: 38cqw;
-    width: 62cqw;
+    left: 40cqw;
+    width: 60cqw;
     display: flex;
     flex-direction: column;
-    gap: 3.6cqw;
+    gap: 3.2cqw;
   }
   .cap-head {
     display: flex;
     flex-direction: column;
-    gap: 0.6cqw;
+    gap: 0.8cqw;
     margin-bottom: 1.4cqw;
   }
   .cap-name {
     font-family: var(--font-display);
     font-weight: var(--weight-regular);
     font-size: var(--cap-font);
-    line-height: 1.15;
+    line-height: 1.1;
     letter-spacing: var(--tracking-heading);
   }
   .cap-meta {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 0.4em 1.2em;
+    gap: 0.4em 1em;
     font-size: var(--text-body-sm);
+  }
+  .cap-meta :global(.evidence) {
+    color: var(--color-text);
+    font-weight: var(--weight-medium);
+  }
+  .cap-meta :global(.dot) {
+    width: 9px;
+    height: 9px;
   }
   .cap-count {
     font-size: var(--text-body-sm);
-    color: var(--color-text-faint);
+    color: var(--color-accent-strong);
   }
   .cap-claims {
     display: flex;
     flex-direction: column;
-    gap: 0.9cqw;
-    padding-left: 1.6cqw;
-    border-left: 1.5px solid var(--color-accent-soft);
+    gap: 1cqw;
+    padding-left: 1.8cqw;
+    border-left: 2px solid var(--color-accent-soft);
   }
   .unknown {
     padding-top: 2.4cqw;
-    border-top: var(--border-width) dashed var(--color-border);
+    border-top: 1.5px dashed var(--color-border);
   }
   .unknown-label {
     margin-bottom: 1cqw;
@@ -422,7 +548,7 @@ const claims = c.sources.flatMap((src) =>
     font-weight: var(--weight-semibold);
     letter-spacing: var(--tracking-label);
     text-transform: uppercase;
-    color: var(--color-text-faint);
+    color: var(--color-caution);
   }
   .unknown-note {
     font-size: var(--doc-font);
@@ -430,37 +556,29 @@ const claims = c.sources.flatMap((src) =>
     max-width: 40ch;
   }
 
-  /* Step choreography (live only; not-live shows the final state). */
-  .story.is-live .doc {
-    opacity: 1;
-  }
+  /* ---------- Step choreography (live only; not-live shows the final state) ---------- */
   .story.is-live[data-step='-1'] .doc {
     opacity: 0;
     translate: 0 5cqw;
   }
-  .story.is-live[data-layout='group'] .doc {
-    transform: translate(calc((var(--gx) - var(--x)) * 1cqw), calc((var(--gy) - var(--y)) * 1cqw))
-      rotate(calc(var(--gr) * 1deg)) scale(var(--gs));
-    opacity: 0.55;
-    transition-delay: 0ms;
-  }
+  .story.is-live[data-layout='group'] .doc,
   .story:not(.is-live) .doc {
     transform: translate(calc((var(--gx) - var(--x)) * 1cqw), calc((var(--gy) - var(--y)) * 1cqw))
       rotate(calc(var(--gr) * 1deg)) scale(var(--gs));
-    opacity: 0.55;
+  }
+  .story.is-live[data-layout='group'] .doc {
+    transition-delay: 0ms;
   }
 
-  .story.is-live .cap-head,
-  .story.is-live .cap-claims {
+  .story.is-live .cap-head {
     transition: opacity var(--motion-slow) ease;
   }
-  .story.is-live[data-layout='read'] .cap-head,
-  .story.is-live[data-layout='read'] .cap-claims {
+  .story.is-live[data-layout='read'] .cap-head {
     opacity: 0;
   }
   .story.is-live[data-layout='group'] .cap-head {
     opacity: 1;
-    transition-delay: calc(0.5s + var(--k) * 120ms);
+    transition-delay: calc(0.35s + var(--k) * 120ms);
   }
   .story.is-live .cap-meta,
   .story.is-live .unknown {
@@ -479,19 +597,18 @@ const claims = c.sources.flatMap((src) =>
   .story.is-live[data-step='3'] .unknown {
     transition-delay: 520ms;
   }
-  .story[data-step='3'] .caps .claim {
-    color: var(--color-text-muted);
-    transition: color var(--motion-slow) ease;
-  }
 
-  /* ---------- Narrow stage (phones) ---------- */
+  /* ---------- Narrow stage (phones, small tablets) ---------- */
   @media (max-width: 959px) {
     .story-pin {
       align-items: flex-start;
-      padding-block: var(--space-6);
+      padding-block: calc(60px + var(--space-3)) var(--space-4);
     }
     .story-grid {
-      gap: var(--space-5);
+      gap: var(--space-4);
+    }
+    .captions {
+      gap: var(--space-4);
     }
     .caption-title {
       font-size: var(--text-heading-lg);
@@ -500,39 +617,54 @@ const claims = c.sources.flatMap((src) =>
       font-size: var(--text-body);
     }
     .stage-wrap {
-      width: min(100%, calc(62svh / 1.76));
+      width: min(100%, calc(64svh / 1.76));
     }
     .stage {
       aspect-ratio: 100 / 176;
-      --doc-font: max(11px, 3.3cqw);
-      --cap-font: max(16px, 5.4cqw);
+      --doc-font: max(11.5px, 3.4cqw);
+      --cap-font: max(16px, 5.2cqw);
     }
     .doc {
-      padding: 4cqw 4.4cqw;
+      padding: 4cqw 4cqw 4cqw 7cqw;
       border-radius: 3cqw;
     }
-    .doc[data-doc='cv'] { --x: 0; --y: 0; --w: 100; --r: -0.6; --gx: 0; --gy: 0; --gr: -2; --gs: 0.27; }
-    .doc[data-doc='gh'] { --x: 0; --y: 81; --w: 76; --r: 1; --gx: 25; --gy: 1; --gr: 2; --gs: 0.3; }
-    .doc[data-doc='web'] { --x: 24; --y: 116; --w: 76; --r: -1; --gx: 49; --gy: 0; --gr: -1.5; --gs: 0.3; }
-    .doc[data-doc='li'] { --x: 4; --y: 144; --w: 76; --r: 0.8; --gx: 73; --gy: 2; --gr: 1.8; --gs: 0.3; }
+    /* On phones the sources stack like a deck: the CV in front, the others'
+       headers peeking out behind it. */
+    .doc[data-doc='li'] { --x: 8; --y: 0; --w: 84; --r: 1.2; --gx: 73; --gy: 2; --gr: 1.8; --gs: 0.3; z-index: 1; }
+    .doc[data-doc='web'] { --x: 5; --y: 9; --w: 90; --r: -1; --gx: 49; --gy: 0; --gr: -1.5; --gs: 0.3; z-index: 2; }
+    .doc[data-doc='gh'] { --x: 2; --y: 18; --w: 96; --r: 0.8; --gx: 25; --gy: 1; --gr: 2; --gs: 0.3; z-index: 3; }
+    .doc[data-doc='cv'] { --x: 0; --y: 27; --w: 100; --r: -0.6; --gx: 0; --gy: 0; --gr: -2; --gs: 0.3; z-index: 4; }
+    .doc-head {
+      margin-left: -3cqw;
+    }
     .caps {
-      top: 30cqw;
+      top: 28cqw;
       left: 0;
       width: 100%;
-      gap: 5cqw;
+      gap: 3.4cqw;
     }
     .cap-claims {
-      gap: 1.6cqw;
+      gap: 1.4cqw;
       padding-left: 3cqw;
+    }
+    .unknown-note {
+      display: none;
     }
     .cap-head {
       margin-bottom: 2cqw;
+    }
+    /* On phones the badge says where it came from; the name would cost a line. */
+    .caps .claim-source {
+      display: none;
+    }
+    .caps .claim-tags:not(:has(.assisted)) {
+      display: none;
     }
   }
 </style>
 
 <script>
-  import { gsap, ScrollTrigger, Flip, reducedMotion } from '../../scripts/motion';
+  import { ScrollTrigger, Flip, reducedMotion } from '../../scripts/motion';
 
   const story = document.querySelector<HTMLElement>('.story');
 
@@ -552,18 +684,20 @@ const claims = c.sources.flatMap((src) =>
     story.dataset.step = '-1';
 
     let step = -1;
-    let flight: gsap.core.Timeline | undefined;
+    let flight: ReturnType<typeof Flip.from> | undefined;
 
+    // Claims fly into their capability. They join the list's layout straight
+    // away and are only transformed from where they were, so the headings
+    // below never collapse while the claims are in the air.
     const toCapabilities = () => {
       flight?.progress(1);
       const state = Flip.getState(claims);
       story.dataset.layout = 'group';
       for (const el of claims) list(el).append(el);
       flight = Flip.from(state, {
-        duration: 1.15,
+        duration: 1.1,
         ease: 'power3.inOut',
-        stagger: 0.07,
-        absolute: true,
+        stagger: 0.06,
         simple: true,
       });
     };
@@ -594,7 +728,7 @@ const claims = c.sources.flatMap((src) =>
       trigger: story,
       pin: story.querySelector('.story-pin'),
       start: 'top top',
-      end: '+=320%',
+      end: '+=340%',
       onUpdate: (self) => setStep(Math.min(3, Math.floor(self.progress * 4))),
       onLeaveBack: () => setStep(0),
     });

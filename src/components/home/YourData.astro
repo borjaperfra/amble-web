@@ -1,5 +1,10 @@
 ---
+// "Private by default", shown rather than promised: one of Maya's claims and
+// the four controls she has over it. Each control plays its effect on the card.
+// The scene cycles through them once it's in view, and hands over to the
+// visitor the moment they pick one.
 import SectionIntro from '../SectionIntro.astro';
+import SourceIcon from '../SourceIcon.astro';
 import type { HomeContent } from '../../content/home';
 
 interface Props {
@@ -7,6 +12,7 @@ interface Props {
 }
 
 const { c } = Astro.props;
+const d = c.demo;
 
 // Quiet 1.5px line icons (DESIGN_SYSTEM §26), drawn for these four only.
 const icons = {
@@ -20,50 +26,120 @@ const icons = {
 <section class="section container" aria-labelledby="data-title">
   <SectionIntro id="data-title" kicker={c.kicker} title={c.title} align="center" />
 
-  <ul class="items" role="list">
-    {
-      c.items.map((item, i) => (
-        <li class="item" data-reveal style={`--i:${i}`}>
-          <span class="icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" width="26" height="26" set:html={icons[item.icon]} />
-          </span>
-          <p class="heading item-title">{item.title}</p>
-          <p class="item-line">{item.line}</p>
-        </li>
-      ))
-    }
-  </ul>
+  <div class="scene" data-scene data-controls data-mode="why">
+    <div class="controls" role="tablist" aria-label={c.title}>
+      {
+        c.items.map((item) => (
+          <button class="control" type="button" role="tab" data-mode={item.icon} aria-selected={item.icon === 'why' ? 'true' : 'false'}>
+            <span class="icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="22" height="22" set:html={icons[item.icon]} />
+            </span>
+            <span class="control-text">
+              <span class="control-title">{item.title}</span>
+              <span class="control-line">{item.line}</span>
+            </span>
+          </button>
+        ))
+      }
+    </div>
+
+    <figure class="card" aria-live="polite">
+      <p class="private">
+        <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
+          <rect x="5" y="10.5" width="14" height="10" rx="2" />
+          <path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5" />
+        </svg>
+        {d.private}
+      </p>
+
+      <p class="claim">
+        <span class="badge"><SourceIcon source="cv" size={12} /></span>
+        <span class="claim-text">
+          <span class="w-before">{d.claim[0]}</span><span class="w-after">{d.correct.word}</span>{' '}{d.claim[1]}
+        </span>
+      </p>
+
+      <div class="effects">
+        <div class="effect" data-for="why">
+          <p class="file"><SourceIcon source="cv" size={14} /> {d.why.file}</p>
+          <p class="excerpt">{d.why.excerpt}</p>
+        </div>
+        <div class="effect" data-for="correct">
+          <p class="note">✓ {d.correct.note}</p>
+        </div>
+        <div class="effect" data-for="export">
+          <p class="export-file">
+            <span class="download" aria-hidden="true">↓</span>
+            <span class="mono">{d.export.file}</span>
+          </p>
+          <p class="note"><SourceIcon source="gh" size={14} /> {d.export.note}</p>
+        </div>
+        <div class="effect" data-for="delete">
+          <p class="gone heading">{d.deleted}</p>
+        </div>
+      </div>
+    </figure>
+  </div>
 </section>
 
 <style>
-  .items {
+  .scene {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: var(--space-7) var(--space-5);
+    gap: var(--space-6);
+    align-items: center;
     max-width: var(--width-wide);
     margin: var(--space-8) auto 0;
   }
   @media (min-width: 900px) {
-    .items {
-      grid-template-columns: repeat(4, 1fr);
+    .scene {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+      gap: var(--space-8);
     }
   }
-  .item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
+
+  /* ---------- Controls ---------- */
+  .controls {
+    display: grid;
     gap: var(--space-2);
+  }
+  .control {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-3) var(--space-4);
+    text-align: left;
+    background: transparent;
+    border: var(--border-width) solid transparent;
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    transition:
+      background var(--motion-default) ease,
+      border-color var(--motion-default) ease;
+  }
+  .control:hover {
+    background: var(--color-surface);
+  }
+  .control[aria-selected='true'] {
+    background: var(--color-surface-raised);
+    border-color: var(--color-border-subtle);
+    box-shadow: var(--shadow-sheet);
   }
   .icon {
     display: grid;
     place-items: center;
-    width: 72px;
-    height: 72px;
-    margin-bottom: var(--space-3);
+    flex: none;
+    width: 48px;
+    height: 48px;
     color: var(--color-accent-strong);
     background: var(--color-accent-wash);
     border-radius: var(--radius-full);
+    transition:
+      background var(--motion-default) ease,
+      color var(--motion-default) ease;
+  }
+  .control[aria-selected='true'] .icon {
+    color: var(--color-text-inverse);
+    background: var(--color-accent);
   }
   .icon svg {
     fill: none;
@@ -72,13 +148,227 @@ const icons = {
     stroke-linecap: round;
     stroke-linejoin: round;
   }
-  .item-title {
+  .control-text {
+    display: flex;
+    flex-direction: column;
+  }
+  .control-title {
+    font-family: var(--font-display);
     font-size: var(--text-heading-sm);
   }
-  .item-line {
-    max-width: 20ch;
+  .control-line {
     font-size: var(--text-body-sm);
     color: var(--color-text-muted);
-    text-wrap: balance;
+  }
+
+  /* ---------- The card ---------- */
+  .card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+    min-height: 300px;
+    padding: clamp(var(--space-5), 1rem + 2vw, var(--space-7));
+    background: var(--color-surface-raised);
+    border: var(--border-width) solid var(--color-border-subtle);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-sheet);
+  }
+  .private {
+    display: inline-flex;
+    align-items: center;
+    align-self: flex-start;
+    gap: var(--space-2);
+    padding: var(--space-1) var(--space-3);
+    font-size: var(--text-body-sm);
+    color: var(--color-accent-strong);
+    background: var(--color-accent-wash);
+    border-radius: var(--radius-full);
+  }
+  .private svg {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+  }
+  .claim {
+    position: relative;
+    padding-left: 40px;
+    font-family: var(--font-display);
+    font-size: var(--text-heading-lg);
+    line-height: var(--leading-tight);
+    transition:
+      opacity 0.5s ease,
+      filter 0.5s ease,
+      translate 0.5s var(--ease-standard);
+  }
+  .badge {
+    position: absolute;
+    left: 0;
+    top: 0.2em;
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    color: var(--color-text-inverse);
+    background: var(--color-accent);
+    border-radius: var(--radius-full);
+  }
+  .claim-text {
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+    transition: background-size var(--motion-slow) var(--ease-standard);
+    background: linear-gradient(transparent 62%, var(--color-accent-soft) 62%) no-repeat 0 0 / 0% 100%;
+  }
+  .w-after {
+    display: none;
+    color: var(--color-accent-strong);
+    background: linear-gradient(transparent 60%, var(--color-accent-soft) 60%);
+  }
+
+  .effects {
+    display: grid;
+  }
+  .effect {
+    grid-area: 1 / 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    opacity: 0;
+    translate: 0 8px;
+    pointer-events: none;
+    transition:
+      opacity var(--motion-slow) ease,
+      translate var(--motion-slow) var(--ease-standard);
+  }
+  .file,
+  .note,
+  .export-file {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-body-sm);
+    color: var(--color-text-muted);
+  }
+  .excerpt {
+    padding: var(--space-3) var(--space-4);
+    font-size: var(--text-body-sm);
+    color: var(--color-text);
+    background: var(--color-surface);
+    border-left: 2px solid var(--color-accent);
+    border-radius: var(--radius-sm);
+  }
+  .note {
+    color: var(--color-accent-strong);
+    font-weight: var(--weight-medium);
+  }
+  .export-file {
+    font-size: var(--text-body);
+    color: var(--color-text);
+  }
+  .mono {
+    font-family: var(--font-mono);
+  }
+  .download {
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    color: var(--color-text-inverse);
+    background: var(--color-action);
+    border-radius: var(--radius-md);
+  }
+  .gone {
+    font-size: var(--text-heading-md);
+    color: var(--color-text-muted);
+  }
+
+  /* ---------- Modes ---------- */
+  .scene[data-mode='why'] .effect[data-for='why'],
+  .scene[data-mode='correct'] .effect[data-for='correct'],
+  .scene[data-mode='export'] .effect[data-for='export'],
+  .scene[data-mode='delete'] .effect[data-for='delete'] {
+    opacity: 1;
+    translate: none;
+  }
+  .scene[data-mode='why'] .claim-text {
+    background-size: 100% 100%;
+  }
+  .scene[data-mode='correct'] .w-before {
+    display: none;
+  }
+  .scene[data-mode='correct'] .w-after {
+    display: inline;
+    animation: swap-in 0.5s var(--ease-standard);
+  }
+  @keyframes swap-in {
+    from {
+      opacity: 0;
+      translate: 0 -0.3em;
+    }
+  }
+  .scene[data-mode='export'] .download {
+    animation: drop 1.2s var(--ease-standard) both;
+  }
+  @keyframes drop {
+    0% {
+      translate: 0 -10px;
+      opacity: 0;
+    }
+    60% {
+      translate: 0 2px;
+      opacity: 1;
+    }
+    100% {
+      translate: 0 0;
+    }
+  }
+  .scene[data-mode='delete'] .claim {
+    opacity: 0.12;
+    filter: blur(3px);
+    translate: 0 6px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .scene[data-mode='export'] .download,
+    .scene[data-mode='correct'] .w-after {
+      animation: none;
+    }
   }
 </style>
+
+<script>
+  // Cycle through the four controls once the card is in view; stop as soon as
+  // the visitor takes over.
+  for (const scene of document.querySelectorAll<HTMLElement>('[data-controls]')) {
+    const buttons = [...scene.querySelectorAll<HTMLButtonElement>('.control')];
+    const modes = buttons.map((b) => b.dataset.mode!);
+    let timer = 0;
+
+    const select = (mode: string) => {
+      scene.dataset.mode = mode;
+      for (const b of buttons) b.setAttribute('aria-selected', String(b.dataset.mode === mode));
+    };
+
+    const stop = () => window.clearInterval(timer);
+
+    buttons.forEach((b) =>
+      b.addEventListener('click', () => {
+        stop();
+        select(b.dataset.mode!);
+      }),
+    );
+
+    scene.addEventListener(
+      'scene:play',
+      () => {
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        let i = 0;
+        timer = window.setInterval(() => {
+          i = (i + 1) % modes.length;
+          select(modes[i]);
+          if (i === 0) stop(); // one full round, then rest on "See why"
+        }, 2800);
+      },
+      { once: true },
+    );
+  }
+</script>

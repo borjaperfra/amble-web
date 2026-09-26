@@ -1,6 +1,8 @@
 ---
-// The road, drawn: three small scenes on one line. v0 is the Rep reading your
-// work; v1 many offers narrowing to one; v2 two eyes, yours and theirs, talking.
+// The road, drawn and alive: three small loops on one line.
+//   v0  your work drifts into the Rep's eye
+//   v1  offers stream past a window; only the one that fits lights up
+//   v2  two eyes, yours and theirs, passing messages back and forth
 import SectionIntro from '../SectionIntro.astro';
 import Symbol from '../Symbol.astro';
 import type { HomeContent } from '../../content/home';
@@ -20,36 +22,37 @@ const { c } = Astro.props;
       c.steps.map((step, i) => (
         <li class:list={['stop', { current: i === 0 }]} style={`--i:${i}`}>
           <div class="art" aria-hidden="true">
+            {i === 0 && <span class="here">{c.now}</span>}
             {i === 0 && (
-              <div class="art-v0">
+              <div class="disc v0">
                 <span class="paper p1" />
                 <span class="paper p2" />
-                <Symbol size={44} breathe />
+                <span class="paper p3" />
+                <Symbol size={72} breathe />
               </div>
             )}
             {i === 1 && (
-              <div class="art-v1">
-                {Array.from({ length: 5 }, (_, k) => (
-                  <span class:list={['offer', { fit: k === 2 }]} style={`--k:${k}`} />
-                ))}
+              <div class="disc v1">
+                <div class="stream">
+                  {Array.from({ length: 12 }, (_, k) => (
+                    <span class:list={['bar', { fit: k === 3 || k === 9 }]} />
+                  ))}
+                </div>
+                <span class="window" />
               </div>
             )}
             {i === 2 && (
-              <div class="art-v2">
-                <Symbol size={40} />
-                <span class="talk">
-                  <span />
-                  <span />
-                  <span />
+              <div class="disc v2">
+                <Symbol size={58} />
+                <span class="wire">
+                  <span class="msg m1" />
+                  <span class="msg m2" />
                 </span>
-                <Symbol size={40} class="mirror" />
+                <Symbol size={58} class="mirror" />
               </div>
             )}
           </div>
-          <p class="meta">
-            <span class="version">{step.version}</span>
-            {i === 0 && <span class="now">{c.now}</span>}
-          </p>
+          <p class="version">{step.version}</p>
           <p class="heading stop-title">{step.title}</p>
           <p class="stop-line">{step.line}</p>
           {step.extra && <p class="extra">{step.extra}</p>}
@@ -70,24 +73,36 @@ const { c } = Astro.props;
   @media (min-width: 860px) {
     .road {
       grid-template-columns: repeat(3, 1fr);
-      gap: var(--space-6);
+      gap: var(--space-5);
     }
-    /* The line the stops sit on, drawn left to right. */
-    .road::before {
+    /* The line the stops sit on: solid where we are, dashed where we're going. */
+    .road::before,
+    .road::after {
       content: '';
       position: absolute;
-      top: 120px;
-      left: 8%;
-      right: 8%;
-      height: var(--border-width);
-      background: linear-gradient(to right, var(--color-accent), var(--color-border) 45%);
+      top: 138px;
+      height: 2px;
       transform-origin: left;
-      transition: transform 1.4s var(--ease-standard);
+      transition: transform 1.4s var(--ease-standard) 0.2s;
     }
-    .js .road:not(.is-playing)::before {
+    .road::before {
+      left: 17%;
+      width: 16%;
+      background: var(--color-accent);
+    }
+    .road::after {
+      left: 33%;
+      right: 17%;
+      background-image: linear-gradient(to right, var(--color-border) 55%, transparent 0);
+      background-size: 12px 2px;
+      transition-delay: 0.7s;
+    }
+    .js .road:not(.is-playing)::before,
+    .js .road:not(.is-playing)::after {
       transform: scaleX(0);
     }
   }
+
   .stop {
     display: flex;
     flex-direction: column;
@@ -100,134 +115,225 @@ const { c } = Astro.props;
     display: grid;
     place-items: center;
     width: 100%;
-    height: 240px;
-    margin-bottom: var(--space-4);
+    height: 276px;
+    margin-bottom: var(--space-3);
   }
-  .art > div {
+  .here {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    translate: -50% 0;
+    padding: var(--space-1) var(--space-3);
+    font-size: var(--text-label);
+    font-weight: var(--weight-semibold);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--color-text-inverse);
+    background: var(--color-accent);
+    border-radius: var(--radius-full);
+    z-index: 2;
+  }
+  .here::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: -5px;
+    width: 10px;
+    height: 10px;
+    background: inherit;
+    translate: -50% 0;
+    rotate: 45deg;
+    border-radius: 2px;
+    z-index: -1;
+  }
+  .disc {
+    position: relative;
+    z-index: 1;
     display: grid;
     place-items: center;
-    width: 180px;
-    height: 180px;
+    width: 212px;
+    height: 212px;
     border-radius: var(--radius-full);
     background: var(--color-surface-raised);
     border: var(--border-width) solid var(--color-border-subtle);
     box-shadow: var(--shadow-sheet);
-    position: relative;
-    z-index: 1;
+    overflow: hidden;
+    color: var(--color-text);
   }
-  .current .art > div {
+  .current .disc {
     border-color: var(--color-accent-soft);
     box-shadow:
-      0 0 0 10px var(--color-accent-wash),
+      0 0 0 12px var(--color-accent-wash),
       var(--shadow-sheet);
   }
 
-  /* v0: papers behind the eye */
-  .art-v0 .paper {
+  /* v0: papers drift into the eye, one after another */
+  .v0 .paper {
     position: absolute;
-    width: 54px;
-    height: 70px;
-    background: var(--color-surface);
-    border: var(--border-width) solid var(--color-border);
+    width: 50px;
+    height: 64px;
+    background: var(--color-surface-raised);
+    border: 1.5px solid var(--color-text-faint);
     border-radius: 6px;
+    background-image: repeating-linear-gradient(
+      to bottom,
+      transparent 0 9px,
+      var(--color-text-faint) 9px 11px
+    );
+    background-size: 70% 100%;
+    background-position: center 8px;
+    background-repeat: no-repeat;
+    animation: drift 4.5s var(--ease-standard) infinite;
+    opacity: 0;
   }
-  .art-v0 .p1 {
-    rotate: -12deg;
-    translate: -30px 6px;
+  .v0 .p1 {
+    --from-x: -70px;
+    --from-y: -30px;
+    --r: -14deg;
   }
-  .art-v0 .p2 {
-    rotate: 9deg;
-    translate: 30px 4px;
+  .v0 .p2 {
+    --from-x: 70px;
+    --from-y: -20px;
+    --r: 12deg;
+    animation-delay: 1.5s;
   }
-  .art-v0 :global(.symbol) {
+  .v0 .p3 {
+    --from-x: -10px;
+    --from-y: 70px;
+    --r: 6deg;
+    animation-delay: 3s;
+  }
+  @keyframes drift {
+    0% {
+      opacity: 0;
+      translate: var(--from-x) var(--from-y);
+      rotate: var(--r);
+      scale: 1;
+    }
+    18% {
+      opacity: 1;
+    }
+    70% {
+      opacity: 0.9;
+      translate: 0 0;
+      rotate: 0deg;
+      scale: 0.35;
+    }
+    85%,
+    100% {
+      opacity: 0;
+      translate: 0 0;
+      scale: 0.2;
+    }
+  }
+  .v0 :global(.symbol) {
     position: relative;
-    color: var(--color-text);
-  }
-
-  /* v1: many offers, one fits */
-  .art-v1 {
-    grid-auto-flow: row;
-  }
-  .art-v1 .offer {
-    position: absolute;
-    width: 92px;
-    height: 20px;
-    border-radius: 5px;
-    background: var(--color-surface);
-    border: var(--border-width) solid var(--color-border);
-    translate: 0 calc((var(--k) - 2) * 26px);
-    opacity: 0.55;
-  }
-  .art-v1 .offer.fit {
-    width: 112px;
-    height: 26px;
-    opacity: 1;
-    background: var(--color-accent);
-    border-color: var(--color-accent);
     z-index: 1;
   }
 
-  /* v2: agent to agent */
-  .art-v2 {
-    grid-template-columns: auto auto auto;
-    column-gap: var(--space-2);
-    align-content: center;
-    justify-content: center;
-    color: var(--color-text);
+  /* v1: offers stream past a window; only the fitting one is moss */
+  .v1 .stream {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    animation: stream 7s linear infinite;
   }
-  .art-v2 :global(.mirror) {
-    scale: -1 1;
+  .v1 .bar {
+    display: block;
+    width: 112px;
+    height: 20px;
+    border-radius: 5px;
+    background: var(--color-surface-sunken);
   }
-  .talk {
-    display: inline-flex;
-    gap: 4px;
-  }
-  .talk span {
-    width: 5px;
-    height: 5px;
-    border-radius: var(--radius-full);
+  .v1 .bar.fit {
     background: var(--color-accent);
-    animation: talk 1.8s ease-in-out infinite;
-    animation-delay: calc(var(--d, 0) * 1s);
+    border-color: var(--color-accent);
   }
-  .talk span:nth-child(2) {
-    --d: 0.2;
+  .v1 .window {
+    position: absolute;
+    inset: 50% auto auto 50%;
+    width: 128px;
+    height: 36px;
+    translate: -50% -50%;
+    border: 2px solid var(--color-accent);
+    border-radius: 9px;
+    box-shadow: 0 0 0 999px rgb(253 252 249 / 0.6);
   }
-  .talk span:nth-child(3) {
-    --d: 0.4;
-  }
-  @keyframes talk {
-    0%,
-    100% {
-      opacity: 0.25;
+  @keyframes stream {
+    from {
+      translate: 0 -90px;
     }
-    50% {
-      opacity: 1;
+    to {
+      translate: 0 90px;
     }
   }
 
-  .meta {
-    display: flex;
-    align-items: center;
-    gap: var(--space-3);
+  /* v2: two eyes, messages passing */
+  .v2 {
+    grid-template-columns: auto 44px auto;
+    align-content: center;
+    justify-content: center;
+    column-gap: 6px;
   }
+  .v2 :global(.mirror) {
+    scale: -1 1;
+  }
+  .wire {
+    position: relative;
+    height: 2px;
+    background-image: linear-gradient(to right, var(--color-text-faint) 50%, transparent 0);
+    background-size: 6px 2px;
+  }
+  .msg {
+    position: absolute;
+    top: -4px;
+    width: 10px;
+    height: 10px;
+    border-radius: var(--radius-full);
+    background: var(--color-accent);
+    animation: to-them 2.4s var(--ease-standard) infinite;
+  }
+  .m2 {
+    background: var(--color-text);
+    animation-name: to-you;
+    animation-delay: 1.2s;
+  }
+  @keyframes to-them {
+    0% {
+      left: 0;
+      opacity: 0;
+    }
+    15%,
+    80% {
+      opacity: 1;
+    }
+    100% {
+      left: calc(100% - 10px);
+      opacity: 0;
+    }
+  }
+  @keyframes to-you {
+    0% {
+      left: calc(100% - 10px);
+      opacity: 0;
+    }
+    15%,
+    80% {
+      opacity: 1;
+    }
+    100% {
+      left: 0;
+      opacity: 0;
+    }
+  }
+
   .version {
     font-family: var(--font-mono);
     font-size: var(--text-mono);
     color: var(--color-text-faint);
   }
-  .now {
-    padding: 2px var(--space-2);
-    font-size: var(--text-label);
-    font-weight: var(--weight-semibold);
-    letter-spacing: var(--tracking-label);
-    text-transform: uppercase;
-    color: var(--color-accent-strong);
-    background: var(--color-accent-wash);
-    border-radius: var(--radius-sm);
-  }
   .stop-title {
-    font-size: var(--text-heading-md);
+    font-size: var(--text-heading-lg);
   }
   .stop-line {
     max-width: 22ch;
@@ -235,12 +341,12 @@ const { c } = Astro.props;
     text-wrap: balance;
   }
   .extra {
-    margin-top: var(--space-2);
+    margin-top: var(--space-3);
     padding: var(--space-1) var(--space-3);
     font-size: var(--text-body-sm);
     font-weight: var(--weight-medium);
     color: var(--color-accent-strong);
-    border: 1.5px dashed var(--color-accent-soft);
+    background: var(--color-accent-wash);
     border-radius: var(--radius-full);
   }
 
@@ -249,16 +355,23 @@ const { c } = Astro.props;
     transition:
       opacity var(--motion-arrive) ease,
       translate var(--motion-arrive) var(--ease-standard);
-    transition-delay: calc(0.3s + var(--i) * 0.35s);
+    transition-delay: calc(0.2s + var(--i) * 0.3s);
   }
   .js .road:not(.is-playing) .stop {
     opacity: 0;
     translate: 0 12px;
   }
   @media (prefers-reduced-motion: reduce) {
-    .talk span {
+    .v0 .paper,
+    .v1 .stream,
+    .msg {
       animation: none;
-      opacity: 0.8;
+    }
+    .v0 .paper {
+      opacity: 1;
+      translate: var(--from-x) var(--from-y);
+      rotate: var(--r);
+      scale: 0.7;
     }
   }
 </style>

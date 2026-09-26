@@ -75,7 +75,7 @@ const canonical = new URL(getRelativeLocaleUrl(lang, path), Astro.site);
       );
       items.forEach((el) => observer.observe(el));
 
-      // Scenes play once, when most of them is on screen.
+      // Scenes play once, when they reach the middle of the screen.
       const scenes = new IntersectionObserver(
         (entries) => {
           for (const entry of entries) {
@@ -85,7 +85,7 @@ const canonical = new URL(getRelativeLocaleUrl(lang, path), Astro.site);
             scenes.unobserve(entry.target);
           }
         },
-        { threshold: 0.35 },
+        { rootMargin: '-30% 0px -30% 0px' },
       );
       document.querySelectorAll('[data-scene]').forEach((el) => scenes.observe(el));
     </script>

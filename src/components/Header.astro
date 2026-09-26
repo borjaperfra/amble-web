@@ -25,6 +25,14 @@ const other: Lang = lang === 'en' ? 'es' : 'en';
   </nav>
 </header>
 
+<!-- A slim bar that floats in once the page header has scrolled away. -->
+<div class="float" data-float inert>
+  <div class="container float-inner">
+    <Logo size="sm" />
+    <a class="btn float-join" href={joinHref}>{t('nav.join')}</a>
+  </div>
+</div>
+
 <style>
   .header {
     display: flex;
@@ -42,6 +50,32 @@ const other: Lang = lang === 'en' ? 'es' : 'en';
     color: var(--color-text);
     font-weight: var(--weight-medium);
   }
+  .float {
+    position: fixed;
+    inset: 0 0 auto 0;
+    z-index: 50;
+    background: rgb(244 241 234 / 0.82);
+    -webkit-backdrop-filter: blur(12px) saturate(1.2);
+    backdrop-filter: blur(12px) saturate(1.2);
+    border-bottom: var(--border-width) solid var(--color-border-subtle);
+    translate: 0 -100%;
+    transition: translate var(--motion-slow) var(--ease-standard);
+  }
+  .float.is-shown {
+    translate: 0 0;
+  }
+  .float-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+  }
+  .float-join {
+    height: 38px;
+    padding: 0 var(--space-4);
+    font-size: var(--text-body-sm);
+  }
+
   /* On phones the language switch lives in the footer. */
   @media (max-width: 480px) {
     .lang {
@@ -49,3 +83,16 @@ const other: Lang = lang === 'en' ? 'es' : 'en';
     }
   }
 </style>
+
+<script>
+  // Show the floating bar once the page header is out of sight.
+  const bar = document.querySelector<HTMLElement>('[data-float]');
+  const header = document.querySelector<HTMLElement>('.header');
+  if (bar && header) {
+    new IntersectionObserver(([entry]) => {
+      const show = !entry.isIntersecting && entry.boundingClientRect.top < 0;
+      bar.classList.toggle('is-shown', show);
+      bar.inert = !show;
+    }).observe(header);
+  }
+</script>

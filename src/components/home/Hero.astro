@@ -11,7 +11,7 @@ const { c } = Astro.props;
 ---
 
 <section class="hero container" aria-labelledby="hero-title" id="join">
-  <Symbol size={76} watch breathe class="eye" />
+  <Symbol size={108} watch breathe class="eye" />
   <p class="tag rise">
     <span class="tag-dot" aria-hidden="true"></span>
     {c.tag}
@@ -25,6 +25,10 @@ const { c } = Astro.props;
   <div class="form rise d3">
     <Waitlist id="hero" />
   </div>
+  <a class="more text-link rise d4" href="#interlude-pdf">
+    {c.more}
+    <span class="arrow" aria-hidden="true">↓</span>
+  </a>
 </section>
 
 <style>
@@ -74,6 +78,25 @@ const { c } = Astro.props;
     justify-content: center;
     width: 100%;
     margin-top: var(--space-7);
+  }
+
+  .more {
+    margin-top: var(--space-8);
+    font-size: var(--text-body-sm);
+  }
+  .arrow {
+    display: inline-block;
+    animation: nudge 2.4s ease-in-out infinite;
+  }
+  @keyframes nudge {
+    50% {
+      translate: 0 3px;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .arrow {
+      animation: none;
+    }
   }
 
   .rise {

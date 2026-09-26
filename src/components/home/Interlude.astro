@@ -11,9 +11,9 @@ const { lines, body, id } = Astro.props;
 const words = (line: string) => line.split(' ');
 ---
 
-<section class="interlude" aria-labelledby={id}>
+<section class="interlude" id={id} aria-labelledby={id && `${id}-title`}>
   <div class="container">
-    <h2 class="display statement" id={id} data-ink>
+    <h2 class="display statement" id={id && `${id}-title`} data-ink>
       <span class="line">{words(lines[0]).map((w) => <span class="word">{w} </span>)}</span>
       <span class="line second">{words(lines[1]).map((w) => <span class="word">{w} </span>)}</span>
     </h2>

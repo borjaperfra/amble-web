@@ -1,9 +1,10 @@
 ---
-// "Only what it couldn't read": two things the Rep read, what each told it,
-// and the one question neither answers. Lines draw from the clues to the
-// question, so the reason for asking is visible, not explained.
+// "Then it asks what it couldn't read": two things the Rep read, what each told
+// it, and the one question neither answers. Threads draw from each clue and
+// meet at the question, so the reason for asking is seen, not explained.
 import SectionIntro from '../SectionIntro.astro';
 import Symbol from '../Symbol.astro';
+import SourceIcon from '../SourceIcon.astro';
 import type { HomeContent } from '../../content/home';
 
 interface Props {
@@ -17,13 +18,15 @@ const { c, sourceNames } = Astro.props;
 <section class="section container" aria-labelledby="interview-title">
   <SectionIntro id="interview-title" kicker={c.kicker} title={c.title} align="center" />
 
-  <div class="scene" data-scene>
-    <div class="left">
+  <div class="scene" data-scene data-threads>
     <ul class="clues" role="list">
       {
         c.clues.map((clue, i) => (
-          <li class="clue" style={`--n:${i}`}>
-            <span class="source-tag">{sourceNames[clue.source]}</span>
+          <li class="clue" style={`--n:${i}`} data-clue>
+            <span class="clue-source">
+              <SourceIcon source={clue.source} size={18} />
+              {sourceNames[clue.source]}
+            </span>
             <span class="clue-text">{clue.text}</span>
             <span class="reads">→ {clue.reads}</span>
           </li>
@@ -31,14 +34,15 @@ const { c, sourceNames } = Astro.props;
       }
     </ul>
 
-    <svg class="threads" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-      <path d="M0 23 C 55 23, 45 50, 100 50" pathLength="1" />
-      <path d="M0 77 C 55 77, 45 50, 100 50" pathLength="1" />
+    <svg class="threads" aria-hidden="true">
+      <path class="thread" />
+      <path class="thread" />
+      <circle class="knot" r="5" />
     </svg>
-    </div>
 
-    <figure class="sheet ask">
-      <p class="rep"><Symbol size={20} /> {c.rep}</p>
+    <figure class="sheet ask" data-ask>
+      <p class="gap">{c.gap}</p>
+      <p class="rep"><Symbol size={22} /> {c.rep}</p>
       <p class="heading question">{c.question}</p>
       <button class="talk" type="button" aria-label={c.talk}>
         <span class="mic" aria-hidden="true">
@@ -52,6 +56,7 @@ const { c, sourceNames } = Astro.props;
 
 <style>
   .scene {
+    position: relative;
     display: grid;
     align-items: center;
     gap: var(--space-5);
@@ -60,32 +65,36 @@ const { c, sourceNames } = Astro.props;
   }
   @media (min-width: 900px) {
     .scene {
-      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
-      gap: 0;
-    }
-    /* The clues leave room on their right for the threads. */
-    .left {
-      position: relative;
-      padding-right: 26%;
+      grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+      gap: var(--space-10);
     }
   }
 
   /* Clues */
   .clues {
+    position: relative;
+    z-index: 1;
     display: flex;
     flex-direction: column;
-    gap: var(--space-7);
+    gap: var(--space-8);
   }
   .clue {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     gap: var(--space-2);
-    padding: var(--space-5);
+    padding: var(--space-5) var(--space-6);
     background: var(--color-surface-raised);
     border: var(--border-width) solid var(--color-border-subtle);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-sheet);
+  }
+  .clue-source {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-body-sm);
+    font-weight: var(--weight-semibold);
   }
   .clue-text {
     font-size: var(--text-body-lg);
@@ -93,56 +102,68 @@ const { c, sourceNames } = Astro.props;
   .reads {
     font-family: var(--font-display);
     font-style: italic;
-    font-size: var(--text-heading-sm);
+    font-size: var(--text-heading-md);
     color: var(--color-accent-strong);
   }
 
-  /* Threads: two lines that meet at the question */
+  /* Threads: drawn in real pixels by the script, from each clue to the question. */
   .threads {
-    display: none;
     position: absolute;
-    top: 0;
-    right: 0;
-    width: 26%;
+    inset: 0;
+    width: 100%;
     height: 100%;
     overflow: visible;
+    pointer-events: none;
   }
-  .threads path {
+  .thread {
     fill: none;
     stroke: var(--color-accent);
-    stroke-width: 1.5;
-    vector-effect: non-scaling-stroke;
-    stroke-dasharray: 1;
-    stroke-dashoffset: 0;
+    stroke-width: 2;
+    stroke-linecap: round;
   }
-  @media (min-width: 900px) {
+  .knot {
+    fill: var(--color-accent);
+    stroke: var(--color-bg);
+    stroke-width: 3;
+  }
+  @media (max-width: 899px) {
     .threads {
-      display: block;
+      display: none;
     }
   }
 
   /* The question */
   .ask {
+    position: relative;
+    z-index: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: var(--space-6);
+    gap: var(--space-5);
     text-align: center;
     padding-block: var(--space-8);
+  }
+  .gap {
+    padding: var(--space-1) var(--space-3);
+    font-size: var(--text-body-sm);
+    color: var(--color-caution);
+    background: var(--color-caution-soft);
+    border-radius: var(--radius-full);
   }
   .rep {
     display: inline-flex;
     align-items: center;
     gap: var(--space-2);
+    margin-top: var(--space-2);
     font-size: var(--text-label);
     font-weight: var(--weight-semibold);
     letter-spacing: var(--tracking-label);
     text-transform: uppercase;
-    color: var(--color-text-faint);
+    color: var(--color-text-muted);
   }
   .question {
     font-size: var(--text-heading-xl);
-    max-width: 14ch;
+    max-width: 13ch;
   }
 
   /* Hold to talk: a toy, but a true one — the bars move while you hold. */
@@ -151,6 +172,7 @@ const { c, sourceNames } = Astro.props;
     flex-direction: column;
     align-items: center;
     gap: var(--space-3);
+    margin-top: var(--space-3);
     padding: 0;
     background: none;
     border: 0;
@@ -164,30 +186,29 @@ const { c, sourceNames } = Astro.props;
     align-items: center;
     justify-content: center;
     gap: 3px;
-    width: 64px;
-    height: 64px;
+    width: 68px;
+    height: 68px;
     border-radius: var(--radius-full);
-    background: var(--color-surface);
-    border: var(--border-width) solid var(--color-border);
+    background: var(--color-accent);
     transition:
       background var(--motion-default) ease,
-      border-color var(--motion-default) ease,
-      transform var(--motion-default) var(--ease-standard);
+      transform var(--motion-default) var(--ease-standard),
+      box-shadow var(--motion-default) ease;
   }
   .bar {
     width: 3px;
     height: 6px;
     border-radius: 2px;
-    background: var(--color-accent);
+    background: var(--color-text-inverse);
     transition: height var(--motion-default) ease;
   }
   .talk:hover .mic {
-    border-color: var(--color-accent-soft);
+    background: var(--color-accent-strong);
   }
   .talk.is-held .mic {
-    background: var(--color-accent-wash);
-    border-color: var(--color-accent);
-    transform: scale(1.06);
+    background: var(--color-accent-strong);
+    transform: scale(1.08);
+    box-shadow: 0 0 0 10px var(--color-accent-wash);
   }
   .talk.is-held .bar {
     animation: voice 0.9s ease-in-out infinite;
@@ -199,7 +220,7 @@ const { c, sourceNames } = Astro.props;
       height: 6px;
     }
     50% {
-      height: 26px;
+      height: 28px;
     }
   }
   .talk-label {
@@ -208,42 +229,45 @@ const { c, sourceNames } = Astro.props;
     color: var(--color-text-muted);
   }
 
-  /* Choreography: clues, what they tell, the threads, then the question. */
-  .js .scene:not(.is-playing) .clue,
-  .js .scene:not(.is-playing) .reads,
-  .js .scene:not(.is-playing) .ask,
-  .js .scene:not(.is-playing) .question {
-    opacity: 0;
-    translate: 0 8px;
-  }
-  .js .scene:not(.is-playing) .threads path {
-    stroke-dashoffset: 1;
-  }
+  /* Choreography: clues, what they tell, the threads meet, the question arrives. */
   .js .scene .clue,
   .js .scene .reads,
   .js .scene .ask,
-  .js .scene .question {
+  .js .scene .question,
+  .js .scene .gap,
+  .js .scene .knot {
     transition:
       opacity var(--motion-arrive) ease,
-      translate var(--motion-arrive) var(--ease-standard);
+      translate var(--motion-arrive) var(--ease-standard),
+      scale 0.5s cubic-bezier(0.3, 1.5, 0.5, 1);
+  }
+  .js .scene:not(.is-playing) :is(.clue, .reads, .ask, .question, .gap) {
+    opacity: 0;
+    translate: 0 10px;
+  }
+  .js .scene:not(.is-playing) .knot {
+    opacity: 0;
+    scale: 0;
   }
   .js .scene .clue {
-    transition-delay: calc(var(--n) * 500ms);
+    transition-delay: calc(var(--n) * 450ms);
   }
   .js .scene .reads {
-    transition-delay: calc(350ms + var(--n) * 500ms);
+    transition-delay: calc(350ms + var(--n) * 450ms);
   }
-  .js .scene .threads path {
-    transition: stroke-dashoffset 1s var(--ease-standard) 1.2s;
-  }
-  .js .scene .threads path + path {
-    transition-delay: 1.35s;
+  .js .scene .knot {
+    transform-box: fill-box;
+    transform-origin: center;
+    transition-delay: 2.1s;
   }
   .js .scene .ask {
-    transition-delay: 1.9s;
+    transition-delay: 2.2s;
+  }
+  .js .scene .gap {
+    transition-delay: 2.4s;
   }
   .js .scene .question {
-    transition-delay: 2.3s;
+    transition-delay: 2.65s;
   }
   @media (prefers-reduced-motion: reduce) {
     .talk.is-held .bar {
@@ -254,6 +278,49 @@ const { c, sourceNames } = Astro.props;
 </style>
 
 <script>
+  // Threads in real pixels: from the right edge of each clue to one knot just
+  // left of the question card. Redrawn on resize; drawn in when the scene plays.
+  for (const scene of document.querySelectorAll<HTMLElement>('[data-threads]')) {
+    const svg = scene.querySelector<SVGSVGElement>('.threads')!;
+    const paths = [...svg.querySelectorAll<SVGPathElement>('.thread')];
+    const knot = svg.querySelector<SVGCircleElement>('.knot')!;
+    const clues = [...scene.querySelectorAll<HTMLElement>('[data-clue]')];
+    const ask = scene.querySelector<HTMLElement>('[data-ask]')!;
+    const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const draw = () => {
+      const base = scene.getBoundingClientRect();
+      const target = ask.getBoundingClientRect();
+      const kx = target.left - base.left - 28;
+      const ky = target.top - base.top + target.height / 2;
+      knot.setAttribute('cx', String(kx));
+      knot.setAttribute('cy', String(ky));
+      clues.forEach((clue, i) => {
+        const r = clue.getBoundingClientRect();
+        const sx = r.right - base.left;
+        const sy = r.top - base.top + r.height / 2;
+        const mid = (sx + kx) / 2;
+        const d = `M${sx} ${sy} C ${mid} ${sy}, ${mid} ${ky}, ${kx} ${ky} L ${kx + 26} ${ky}`;
+        const path = paths[i];
+        path.setAttribute('d', d);
+        const length = path.getTotalLength();
+        path.style.strokeDasharray = `${length}`;
+        if (!scene.classList.contains('is-playing') && !still) path.style.strokeDashoffset = `${length}`;
+      });
+    };
+
+    const play = () => {
+      paths.forEach((path, i) => {
+        path.style.transition = `stroke-dashoffset 1.1s cubic-bezier(0.22, 1, 0.36, 1) ${1 + i * 0.2}s`;
+        path.style.strokeDashoffset = '0';
+      });
+    };
+
+    draw();
+    new ResizeObserver(draw).observe(scene);
+    scene.addEventListener('scene:play', play, { once: true });
+  }
+
   for (const talk of document.querySelectorAll<HTMLButtonElement>('.talk')) {
     const hold = () => talk.classList.add('is-held');
     const release = () => talk.classList.remove('is-held');

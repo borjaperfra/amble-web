@@ -45,6 +45,8 @@ const clipId = `lid-${Math.random().toString(36).slice(2, 8)}`;
   .symbol {
     flex: none;
     overflow: visible;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
   }
   .lid {
     fill: currentColor;
@@ -63,8 +65,8 @@ const clipId = `lid-${Math.random().toString(36).slice(2, 8)}`;
     animation: draw 1.5s var(--ease-standard) 0.15s both;
   }
   .watch .iris {
-    transition: transform 1.2s var(--ease-standard);
     animation: open var(--motion-arrive) ease 1.05s both;
+    will-change: transform;
   }
   @keyframes draw {
     from {
@@ -87,6 +89,32 @@ const clipId = `lid-${Math.random().toString(36).slice(2, 8)}`;
       opacity: 1;
     }
   }
+  /* Click or tap: the eye closes for a moment, then opens again. The lid comes
+     down and flattens; the iris folds into a line beneath it. */
+  .lid {
+    transform-origin: 24px 18px;
+  }
+  .symbol.is-shut .lid {
+    animation: lid-shut 1.3s var(--ease-standard);
+  }
+  .symbol.is-shut .dot {
+    transform-origin: 24.6px 35px;
+    animation: iris-shut 1.3s var(--ease-standard);
+  }
+  @keyframes lid-shut {
+    22%,
+    70% {
+      transform: translateY(9px) scaleY(0.5);
+    }
+  }
+  @keyframes iris-shut {
+    22%,
+    70% {
+      transform: scale(1.05, 0.1);
+      opacity: 0.9;
+    }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .breathe .dot,
     .watch .draw,
@@ -97,29 +125,81 @@ const clipId = `lid-${Math.random().toString(36).slice(2, 8)}`;
 </style>
 
 <script>
-  // The iris drifts at most a couple of units toward the pointer, slowly.
-  const eyes = document.querySelectorAll<SVGSVGElement>('svg.symbol.watch');
+  // Any eye closes when clicked or tapped. Inside a link (the logo), the eye
+  // itself only blinks; the wordmark still navigates.
+  document.addEventListener('click', (event) => {
+    const eye = (event.target as Element | null)?.closest?.('svg.symbol');
+    if (!eye) return;
+    if (eye.closest('a')) event.preventDefault();
+    eye.classList.remove('is-shut');
+    void (eye as SVGElement).getBoundingClientRect();
+    eye.classList.add('is-shut');
+    eye.addEventListener('animationend', () => eye.classList.remove('is-shut'), { once: true });
+  });
+
+  // The iris follows the pointer: quickly enough to feel alive, eased so it
+  // never jitters. It travels inside the eye — mostly sideways, a little down,
+  // never up past the lid — and settles back to centre when the pointer leaves.
+  const eyes = [...document.querySelectorAll<SVGSVGElement>('svg.symbol.watch')];
   const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
   if (eyes.length && !still) {
-    let frame = 0;
-    window.addEventListener(
-      'pointermove',
-      (event) => {
-        cancelAnimationFrame(frame);
-        frame = requestAnimationFrame(() => {
-          for (const eye of eyes) {
-            const box = eye.getBoundingClientRect();
-            const dx = event.clientX - (box.left + box.width / 2);
-            const dy = event.clientY - (box.top + box.height / 2);
-            const reach = Math.min(1, Math.hypot(dx, dy) / 600);
-            const angle = Math.atan2(dy, dx);
-            const x = Math.cos(angle) * 2.2 * reach;
-            const y = Math.max(-0.6, Math.sin(angle) * 1.6 * reach);
-            eye.querySelector<SVGGElement>('.iris')!.style.transform = `translate(${x.toFixed(2)}px, ${y.toFixed(2)}px)`;
-          }
-        });
-      },
-      { passive: true },
-    );
+    const RANGE_X = 5.2; // viewBox units
+    const RANGE_UP = 1.2;
+    const RANGE_DOWN = 3;
+    const FULL_AT = 260; // px from the eye where the iris reaches its edge
+
+    const state = eyes.map((eye) => ({
+      iris: eye.querySelector<SVGGElement>('.iris')!,
+      eye,
+      x: 0,
+      y: 0,
+      tx: 0,
+      ty: 0,
+    }));
+    let pointer: { x: number; y: number } | null = null;
+    let running = false;
+
+    const aim = () => {
+      for (const s of state) {
+        if (!pointer) {
+          s.tx = 0;
+          s.ty = 0;
+          continue;
+        }
+        const box = s.eye.getBoundingClientRect();
+        const dx = pointer.x - (box.left + box.width / 2);
+        const dy = pointer.y - (box.top + box.height * 0.57);
+        const dist = Math.hypot(dx, dy) || 1;
+        const reach = Math.min(1, dist / FULL_AT);
+        s.tx = (dx / dist) * RANGE_X * reach;
+        const vy = (dy / dist) * reach;
+        s.ty = vy < 0 ? vy * RANGE_UP : vy * RANGE_DOWN;
+      }
+    };
+
+    const tick = () => {
+      let moving = false;
+      for (const s of state) {
+        s.x += (s.tx - s.x) * 0.16;
+        s.y += (s.ty - s.y) * 0.16;
+        if (Math.abs(s.tx - s.x) > 0.01 || Math.abs(s.ty - s.y) > 0.01) moving = true;
+        s.iris.style.transform = `translate(${s.x.toFixed(2)}px, ${s.y.toFixed(2)}px)`;
+      }
+      running = moving;
+      if (moving) requestAnimationFrame(tick);
+    };
+
+    const wake = () => {
+      aim();
+      if (!running) {
+        running = true;
+        requestAnimationFrame(tick);
+      }
+    };
+
+    window.addEventListener('pointermove', (e) => ((pointer = { x: e.clientX, y: e.clientY }), wake()), { passive: true });
+    window.addEventListener('scroll', wake, { passive: true });
+    document.documentElement.addEventListener('pointerleave', () => ((pointer = null), wake()));
   }
 </script>

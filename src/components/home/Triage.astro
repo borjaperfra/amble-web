@@ -55,7 +55,6 @@ const { c } = Astro.props;
           ))
         }
       </ul>
-      <button class="text-link replay" type="button" hidden>↻ {c.replay}</button>
     </div>
   </div>
 </section>
@@ -231,17 +230,6 @@ const { c } = Astro.props;
     opacity: 1;
     transition: opacity var(--motion-slow) ease 0.15s;
   }
-  .replay[hidden] {
-    display: none;
-  }
-  .replay {
-    align-self: flex-start;
-    font-size: var(--text-body-sm);
-    background: none;
-    border: 0;
-    padding: 0;
-    cursor: pointer;
-  }
 </style>
 
 <script>
@@ -253,7 +241,6 @@ const { c } = Astro.props;
     const deck = scene.querySelector<HTMLElement>('.deck')!;
     const offers = [...scene.querySelectorAll<HTMLElement>('.offer')];
     const rules = [...scene.querySelectorAll<HTMLElement>('.rule')];
-    const replay = scene.querySelector<HTMLButtonElement>('.replay')!;
 
     scene.classList.add('is-live');
 
@@ -274,8 +261,7 @@ const { c } = Astro.props;
 
     const play = () => {
       stack();
-      replay.hidden = true;
-      const tl = gsap.timeline({ delay: 0.4, onComplete: () => (replay.hidden = false) });
+      const tl = gsap.timeline({ delay: 0.3 });
       offers.forEach((o, i) => {
         const at = i * 3.1;
         tl.call(() => o.classList.add('is-answered'), [], at + 0.9);
@@ -294,6 +280,5 @@ const { c } = Astro.props;
     stack();
     window.addEventListener('resize', measure, { passive: true });
     scene.addEventListener('scene:play', play, { once: true });
-    replay.addEventListener('click', play);
   }
 </script>

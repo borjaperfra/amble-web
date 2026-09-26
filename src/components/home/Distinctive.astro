@@ -17,7 +17,7 @@ const { c } = Astro.props;
       c.words.map((w, i) => (
         <>
           {i > 0 && (
-            <span class="times" aria-hidden="true">
+            <span class:list={['times', `x${i}`]} aria-hidden="true">
               <span class="word">×</span>
             </span>
           )}
@@ -58,11 +58,29 @@ const { c } = Astro.props;
   .t2 {
     align-self: flex-end;
   }
+  /* Each × sits on the diagonal between the two terms it joins, with the
+     same breathing room above and below. */
   .times {
-    align-self: center;
-    margin-block: 0.05em;
-    font-size: 0.5em;
+    align-self: flex-start;
+    font-size: 0.6em;
+    line-height: 0.9;
+    margin-block: 0.08em 0;
+    font-style: normal;
     color: var(--color-accent);
+  }
+  .x1 {
+    margin-left: 30%;
+  }
+  .x2 {
+    margin-left: 64%;
+  }
+  @media (max-width: 640px) {
+    .x1 {
+      margin-left: 22%;
+    }
+    .x2 {
+      margin-left: 56%;
+    }
   }
   .line {
     align-self: flex-end;

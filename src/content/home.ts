@@ -28,6 +28,7 @@ export interface HomeContent {
     tag: string;
     title: [string, string]; // second line gets the italic "Amble"
     subtitle: string;
+    more: string;
   };
   story: {
     interlude: [string, string];
@@ -37,6 +38,8 @@ export interface HomeContent {
     caps: { id: string; name: string; strength: Strength; count: string }[];
     unknown: { label: string; name: string; strength: Strength; note: string };
     assisted: string;
+    // Shown with step 02, so the highlight reads as "this, read here".
+    legend: { claim: string; source: string };
   };
   interview: {
     kicker: string;
@@ -45,6 +48,7 @@ export interface HomeContent {
     // What the Rep read, and what it concluded it couldn't tell.
     clues: { source: Source; text: string; reads: string }[];
     question: string;
+    gap: string;
     talk: string;
   };
   defence: {
@@ -52,12 +56,15 @@ export interface HomeContent {
     title: string;
     line: string;
     cases: {
+      file: string;
+      code: { text: string; key?: boolean }[];
       claim: string;
       assisted: string;
       ask: string;
       answer: string;
       verdict: 'defended' | 'retracted';
       stamp: string;
+      outcome: string;
     }[];
   };
   distinctive: {
@@ -80,7 +87,6 @@ export interface HomeContent {
       learned: { type: string; text: string };
     }[];
     learnedLabel: string;
-    replay: string;
   };
   listening: {
     kicker: string;
@@ -107,6 +113,15 @@ export interface HomeContent {
     kicker: string;
     title: string;
     items: { icon: 'why' | 'correct' | 'export' | 'delete'; title: string; line: string }[];
+    // The demo card the four controls act on.
+    demo: {
+      private: string;
+      claim: [string, string]; // [first word, rest] — the first word is what gets corrected
+      why: { file: string; excerpt: string };
+      correct: { word: string; note: string };
+      export: { file: string; note: string };
+      deleted: string;
+    };
   };
   finale: {
     title: string;
@@ -121,6 +136,7 @@ const en: HomeContent = {
     tag: 'Closed beta',
     title: ['I’m not looking.', 'is.'],
     subtitle: 'Meet your professional Rep. It listens for the offers worth your time, and negotiates them for you.',
+    more: 'See how it works',
   },
   story: {
     interlude: ['You’re more than', 'a PDF.'],
@@ -188,16 +204,18 @@ const en: HomeContent = {
       note: 'Mentoring two engineers isn’t leading a team. I can’t tell yet.',
     },
     assisted: 'co-produced',
+    legend: { claim: 'a claim', source: 'where it was read' },
   },
   interview: {
-    kicker: 'Then it asks',
-    title: 'Only what it couldn’t read.',
+    kicker: 'The interview',
+    title: 'Then it asks what it couldn’t read.',
     rep: 'Your Rep',
     clues: [
       { source: 'cv', text: 'Led the evaluation pipeline', reads: 'she led it' },
       { source: 'gh', text: 'tern · 92% of commits', reads: 'she wrote it' },
     ],
     question: 'Who decided what to measure?',
+    gap: 'Neither says who decided.',
     talk: 'Hold to talk',
   },
   defence: {
@@ -206,20 +224,32 @@ const en: HomeContent = {
     line: 'Defend it, and it stays. If you can’t, your Rep stops claiming it.',
     cases: [
       {
-        claim: 'Traces stay local, only scores leave',
+        file: 'tern/export.py',
+        code: [
+          { text: 'traces.save(local=True)', key: true },
+          { text: 'upload(scores)  # never traces' },
+        ],
+        claim: 'Keeps traces local, ships only scores',
         assisted: 'co-produced',
         ask: 'Why is the line there?',
         answer: '“Traces carry customer prompts. Scores don’t.”',
         verdict: 'defended',
         stamp: 'Defended',
+        outcome: 'Now evidence of her own judgment.',
       },
       {
+        file: 'tern/cache.py',
+        code: [
+          { text: 'key = sha256(prompt)', key: true },
+          { text: 'return store.get(key)' },
+        ],
         claim: 'Designed the caching strategy',
         assisted: 'co-produced',
         ask: 'Why cache by prompt hash?',
         answer: '“Honestly, the agent picked that.”',
         verdict: 'retracted',
         stamp: 'Retracted',
+        outcome: 'Kept on record. No longer claimed.',
       },
     ],
   },
@@ -261,7 +291,6 @@ const en: HomeContent = {
       },
     ],
     learnedLabel: 'What I learned',
-    replay: 'Play again',
   },
   listening: {
     kicker: 'Then it listens',
@@ -308,6 +337,14 @@ const en: HomeContent = {
       { icon: 'export', title: 'Take it', line: 'Export, or sync to your GitHub.' },
       { icon: 'delete', title: 'Delete it', line: 'Gone means gone.' },
     ],
+    demo: {
+      private: 'Only you can see this',
+      claim: ['Led', 'the evaluation pipeline for support agents.'],
+      why: { file: 'CV_Maya_Lindqvist_2026.pdf · page 1', excerpt: '“…Led the evaluation pipeline for support agents at Lantern Labs…”' },
+      correct: { word: 'Co-led', note: 'Corrected by Maya' },
+      export: { file: 'career.md', note: 'Synced to github.com/mlindqvist/career' },
+      deleted: 'Gone. Nothing kept.',
+    },
   },
   finale: {
     title: 'Remove applications.',
@@ -328,6 +365,7 @@ const es: HomeContent = {
     tag: 'Beta cerrada',
     title: ['Yo no busco.', 'sí.'],
     subtitle: 'Conoce a tu Rep profesional. Escucha las ofertas que merecen tu tiempo y las negocia por ti.',
+    more: 'Mira cómo funciona',
   },
   story: {
     interlude: ['Eres más que', 'un PDF.'],
@@ -395,16 +433,18 @@ const es: HomeContent = {
       note: 'Ser mentora de dos ingenieros no es liderar un equipo. Aún no lo sé.',
     },
     assisted: 'co-producido',
+    legend: { claim: 'una afirmación', source: 'dónde se leyó' },
   },
   interview: {
-    kicker: 'Luego pregunta',
-    title: 'Solo lo que no pudo leer.',
+    kicker: 'La entrevista',
+    title: 'Luego pregunta lo que no pudo leer.',
     rep: 'Tu Rep',
     clues: [
       { source: 'cv', text: 'Lideró el pipeline de evaluación', reads: 'lo lideró' },
       { source: 'gh', text: 'sonda · 92 % de los commits', reads: 'lo escribió' },
     ],
     question: '¿Quién decidió qué medir?',
+    gap: 'Ninguno dice quién decidió.',
     talk: 'Mantén para hablar',
   },
   defence: {
@@ -413,20 +453,32 @@ const es: HomeContent = {
     line: 'Si lo defiendes, se queda. Si no puedes, tu Rep deja de afirmarlo.',
     cases: [
       {
-        claim: 'Las trazas se quedan en local, solo salen las puntuaciones',
+        file: 'sonda/export.py',
+        code: [
+          { text: 'traces.save(local=True)', key: true },
+          { text: 'upload(scores)  # nunca trazas' },
+        ],
+        claim: 'Deja las trazas en local y solo envía puntuaciones',
         assisted: 'co-producido',
         ask: '¿Por qué está la línea ahí?',
         answer: '«Las trazas llevan prompts de clientes. Las puntuaciones no.»',
         verdict: 'defended',
         stamp: 'Defendida',
+        outcome: 'Ahora es evidencia de su propio criterio.',
       },
       {
+        file: 'sonda/cache.py',
+        code: [
+          { text: 'key = sha256(prompt)', key: true },
+          { text: 'return store.get(key)' },
+        ],
         claim: 'Diseñó la estrategia de caché',
         assisted: 'co-producido',
         ask: '¿Por qué cachear por hash del prompt?',
         answer: '«La verdad, eso lo eligió el agente.»',
         verdict: 'retracted',
         stamp: 'Retirada',
+        outcome: 'Queda registrada. Ya no se afirma.',
       },
     ],
   },
@@ -468,7 +520,6 @@ const es: HomeContent = {
       },
     ],
     learnedLabel: 'Lo que he aprendido',
-    replay: 'Ver otra vez',
   },
   listening: {
     kicker: 'Y escucha',
@@ -515,6 +566,14 @@ const es: HomeContent = {
       { icon: 'export', title: 'Llévatelo', line: 'Exporta o sincroniza con tu GitHub.' },
       { icon: 'delete', title: 'Bórralo', line: 'Borrado es borrado.' },
     ],
+    demo: {
+      private: 'Solo tú puedes verlo',
+      claim: ['Lideró', 'el pipeline de evaluación de los agentes de soporte.'],
+      why: { file: 'CV_Marta_Quiroga_2026.pdf · página 1', excerpt: '«…Lideró el pipeline de evaluación de los agentes de soporte en Farolillo Labs…»' },
+      correct: { word: 'Co-lideró', note: 'Corregido por Marta' },
+      export: { file: 'career.md', note: 'Sincronizado con github.com/mquiroga/career' },
+      deleted: 'Borrado. No queda nada.',
+    },
   },
   finale: {
     title: 'Adiós a las candidaturas.',
