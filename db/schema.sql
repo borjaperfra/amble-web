@@ -34,3 +34,6 @@ do $$ begin
 exception when duplicate_object then null; end $$;
 alter table waitlist drop constraint if exists waitlist_email_normalized_key;
 create unique index if not exists waitlist_email_audience_idx on waitlist (email_normalized, audience);
+
+-- No double opt-in: the form is the consent, and one welcome email goes out.
+alter table waitlist add column if not exists welcome_sent_at timestamptz;

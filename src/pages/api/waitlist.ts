@@ -1,10 +1,9 @@
 import type { APIRoute } from 'astro';
 import { getRelativeLocaleUrl } from 'astro:i18n';
-import { SITE_URL } from 'astro:env/server';
 import type { Lang } from '../../i18n/ui';
 import { parseEmail } from '../../lib/email-rules';
-import { join, releaseCooldown } from '../../lib/waitlist';
-import { sendConfirmation } from '../../lib/email';
+import { join, markWelcomed, releaseCooldown } from '../../lib/waitlist';
+import { sendWelcome } from '../../lib/email';
 import { allow } from '../../lib/rate-limit';
 import { bump } from '../../lib/counts';
 
@@ -67,23 +66,16 @@ export const POST: APIRoute = async ({ request, clientAddress, redirect }) => {
 
   try {
     const result = await join(parsed.email, parsed.normalized, lang, audienceField);
-    // Already confirmed or just sent: same answer, so the form can't be used to
-    // find out who is on the list.
+    // Already on the list: same answer, so the form can't be used to find out
+    // who is on it.
     if (result.kind === 'quiet') return reply('ok', 200);
 
-    const link = new URL('/api/waitlist/confirm', SITE_URL);
-    link.searchParams.set('token', result.token);
-    link.searchParams.set('l', lang);
-    const sent = await sendConfirmation(
-      parsed.email,
-      lang,
-      link.toString(),
-      `waitlist-confirm/${result.token.slice(0, 32)}`,
-    );
+    const sent = await sendWelcome(parsed.email, lang, audienceField, `waitlist-welcome/${result.id}`);
     if (!sent) {
       await releaseCooldown(result.id);
       return reply('error', 502);
     }
+    await markWelcomed(result.id);
     await bump('join', lang, audienceField === 'company' ? 'company' : '').catch(() => {});
     return reply('ok', 200);
   } catch (err) {

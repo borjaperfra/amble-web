@@ -1,0 +1,22 @@
+---
+// The public page while Amble is in closed beta: the hero and the form.
+import Base from '../../layouts/Base.astro';
+import Hero from '../home/Hero.astro';
+import { home } from '../../content/home';
+import type { Lang } from '../../i18n/ui';
+
+const lang = (Astro.currentLocale ?? 'en') as Lang;
+const c = home[lang];
+---
+
+<Base>
+  <main class="launch">
+    <Hero c={c.hero} more={false} />
+  </main>
+</Base>
+
+<style>
+  .launch {
+    min-height: 70svh;
+  }
+</style>

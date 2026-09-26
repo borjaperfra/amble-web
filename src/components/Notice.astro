@@ -6,10 +6,11 @@ import Logo from './Logo.astro';
 import Symbol from './Symbol.astro';
 import { useTranslations, type Lang } from '../i18n/ui';
 
-// The quiet pages after the waitlist form: "joined" and "confirmed". They are
-// static, so the error variants are picked from the query string on the client.
+// The quiet page after the waitlist form without JavaScript. It is static, so
+// the error variant is picked from the query string on the client. Joining is
+// the activation: the eye wakes.
 interface Props {
-  kind: 'joined' | 'confirmed';
+  kind: 'joined';
 }
 
 const { kind } = Astro.props;
@@ -27,20 +28,10 @@ const errors = {
     <Logo />
 
     <section data-variant="default">
-      {kind === 'confirmed' && <Symbol size={120} wake watch breathe class="awake" />}
+      <Symbol size={120} wake watch breathe class="awake" />
       <h1 class="heading">{t(`${kind}.title`)}</h1>
       <p>{t(`${kind}.body`)}</p>
     </section>
-
-    {
-      kind === 'confirmed' && (
-        <section data-variant="invalid" hidden>
-          <h1 class="heading">{t('confirmed.invalidTitle')}</h1>
-          <p>{t('confirmed.invalidBody')}</p>
-          <Waitlist id="retry" />
-        </section>
-      )
-    }
 
     {
       kind === 'joined' && (
@@ -98,7 +89,6 @@ const errors = {
       s.hidden = s.dataset.variant !== variant;
     }
   };
-  if (params.has('invalid')) show('invalid');
   const error = params.get('error');
   const target = document.querySelector<HTMLElement>('[data-error-text]');
   if (error && target) {

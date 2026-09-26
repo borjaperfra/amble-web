@@ -1,5 +1,7 @@
 ---
+import { SITE_MODE } from 'astro:env/server';
 import Home from '../../components/home/Home.astro';
+import Launch from '../../components/launch/Launch.astro';
 ---
 
-<Home />
+{SITE_MODE === 'launch' ? <Launch /> : <Home />}

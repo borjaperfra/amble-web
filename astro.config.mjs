@@ -8,6 +8,10 @@ export default defineConfig({
   site: 'https://amble.fyi',
   adapter: node({ mode: 'middleware' }),
   integrations: [mdx()],
+  // Railway's proxy terminates TLS. Trust its X-Forwarded-Proto/Host for our
+  // domain only, so the request URL is https://amble.fyi and Astro's origin
+  // check accepts the form's own posts.
+  security: { allowedDomains: [{ hostname: 'amble.fyi', protocol: 'https' }] },
   // Small site, one stylesheet per page: inline it and skip the render-blocking request.
   build: { inlineStylesheets: 'always' },
   // Pre-bundle the motion libraries at dev start, so a later install doesn't
@@ -22,6 +26,9 @@ export default defineConfig({
       RESEND_API_KEY: envField.string({ context: 'server', access: 'secret', optional: true }),
       WAITLIST_FROM: envField.string({ context: 'server', access: 'secret', default: 'Amble <rep@amble.fyi>' }),
       SITE_URL: envField.string({ context: 'server', access: 'secret', default: 'https://amble.fyi' }),
+      // "launch": the public site is only the hero and the form (plus privacy).
+      // Read at build time, so pages are prerendered for the mode.
+      SITE_MODE: envField.enum({ context: 'server', access: 'public', values: ['full', 'launch'], default: 'full' }),
     },
   },
   i18n: {
