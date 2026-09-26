@@ -16,6 +16,7 @@ interface Props {
   // Header and footer. The quiet pages (joined, confirmed) go without.
   chrome?: boolean;
   joinHref?: string;
+  stages?: { id: string; label: string }[];
 }
 
 const lang = (Astro.currentLocale ?? 'en') as Lang;
@@ -26,6 +27,7 @@ const {
   path = '',
   chrome = true,
   joinHref,
+  stages,
 } = Astro.props;
 const canonical = new URL(getRelativeLocaleUrl(lang, path), Astro.site);
 ---
@@ -73,7 +75,7 @@ const canonical = new URL(getRelativeLocaleUrl(lang, path), Astro.site);
     </script>
   </head>
   <body>
-    {chrome && <Header path={path} joinHref={joinHref} />}
+    {chrome && <Header path={path} joinHref={joinHref} stages={stages} />}
     <slot />
     {chrome && <Footer path={path} />}
 

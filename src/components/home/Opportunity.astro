@@ -1,0 +1,421 @@
+---
+// "Your Rep found something" (PRODUCT_SPEC §17), closing the loop on screen:
+// the week's offers pass the Rep's filter — each rejected for a reason it
+// learned from Maya — one gets through, and the Rep writes to her about it,
+// with why it's showing it and the one thing to consider. v1: marked as coming.
+import SectionIntro from '../SectionIntro.astro';
+import Symbol from '../Symbol.astro';
+import type { HomeContent } from '../../content/home';
+
+interface Props {
+  c: HomeContent['opportunity'];
+}
+
+const { c } = Astro.props;
+const readThisWeek = 37;
+---
+
+<section class="section container" aria-labelledby="opportunity-title">
+  <p class="badge-row" data-reveal><span class="version-badge">{c.badge}</span></p>
+  <SectionIntro id="opportunity-title" kicker={c.kicker} title={c.title} body={c.line} align="center" />
+
+  <div class="scene" data-scene data-opportunity data-total={readThisWeek}>
+    <!-- The filter -->
+    <div class="filter">
+      <p class="counter"><span class="count heading">{readThisWeek}</span> {c.counter}</p>
+      <ol class="stream" role="list">
+        {
+          c.stream.map((o, i) => (
+            <li class="offer" style={`--i:${i}`}>
+              <span class="offer-main">
+                <span class="offer-role">{o.role}</span>
+                <span class="offer-company">{o.company}</span>
+              </span>
+              <span class="reason">✕ {o.reason}</span>
+            </li>
+          ))
+        }
+        <li class="offer match" style={`--i:${c.stream.length}`}>
+          <span class="offer-main">
+            <span class="offer-role">{c.match.role}</span>
+            <span class="offer-company">{c.match.company}</span>
+          </span>
+          <span class="fits" aria-hidden="true">✓</span>
+        </li>
+      </ol>
+    </div>
+
+    <!-- The phone: the Rep writes to you -->
+    <figure class="phone">
+      <div class="phone-top">
+        <span class="avatar"><Symbol size={22} /></span>
+        <span class="phone-from">{c.notify.from}</span>
+        <span class="phone-time">{c.notify.time}</span>
+      </div>
+      <div class="chat">
+        <p class="msg first">{c.notify.text}</p>
+        <div class="msg card">
+          <p class="card-role heading">{c.match.role}</p>
+          <p class="card-company">{c.match.company}</p>
+          <ul class="card-facts" role="list">
+            {c.match.facts.map((f) => <li>{f}</li>)}
+          </ul>
+          <p class="card-label">{c.whyLabel}</p>
+          <ul class="why" role="list">
+            {
+              c.why.map((w, i) => (
+                <li style={`--w:${i}`}>
+                  <span>{w.text}</span>
+                  <span class="why-src">{w.src}</span>
+                </li>
+              ))
+            }
+          </ul>
+          <div class="consider">
+            <p class="card-label">{c.considerLabel}</p>
+            <p>{c.consider}</p>
+          </div>
+          <p class="actions" aria-hidden="true">
+            <span class="act yes">{c.actions[0]}</span>
+            <span class="act no">{c.actions[1]}</span>
+          </p>
+        </div>
+      </div>
+      <figcaption class="channel">{c.notify.channel}</figcaption>
+    </figure>
+  </div>
+</section>
+
+<style>
+  .badge-row {
+    display: flex;
+    justify-content: center;
+    margin-bottom: var(--space-4);
+  }
+  .version-badge {
+    padding: var(--space-1) var(--space-3);
+    font-size: var(--text-label);
+    font-weight: var(--weight-semibold);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--color-accent-strong);
+    border: 1.5px dashed var(--color-accent-soft);
+    border-radius: var(--radius-full);
+  }
+  .scene {
+    display: grid;
+    gap: var(--space-8);
+    align-items: center;
+    max-width: var(--width-wide);
+    margin: var(--space-8) auto 0;
+  }
+  @media (min-width: 960px) {
+    .scene {
+      grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+      gap: var(--space-9);
+    }
+  }
+
+  /* ---------- Filter ---------- */
+  .counter {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-3);
+    margin-bottom: var(--space-5);
+    color: var(--color-text-muted);
+  }
+  .count {
+    font-size: var(--text-display-lg);
+    line-height: 1;
+    color: var(--color-text);
+    font-variant-numeric: tabular-nums;
+  }
+  .stream {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+  .offer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding: var(--space-3) var(--space-5);
+    background: var(--color-surface-raised);
+    border: var(--border-width) solid var(--color-border-subtle);
+    border-radius: var(--radius-md);
+    transition:
+      opacity var(--motion-slow) ease,
+      translate var(--motion-arrive) var(--ease-standard),
+      background var(--motion-slow) ease;
+  }
+  .offer-main {
+    display: flex;
+    flex-direction: column;
+  }
+  .offer-role {
+    font-weight: var(--weight-medium);
+  }
+  .offer-company {
+    font-size: var(--text-body-sm);
+    color: var(--color-text-muted);
+  }
+  .reason {
+    flex: none;
+    font-size: var(--text-body-sm);
+    color: var(--color-retracted);
+    transition: opacity var(--motion-slow) ease;
+  }
+  .offer:not(.match) {
+    opacity: 0.62;
+  }
+  .offer:not(.match) .offer-role {
+    text-decoration: line-through;
+    text-decoration-color: var(--color-retracted);
+  }
+  .match {
+    background: var(--color-accent-wash);
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 4px var(--color-accent-wash);
+  }
+  .fits {
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    color: var(--color-text-inverse);
+    background: var(--color-accent);
+    border-radius: var(--radius-full);
+  }
+
+  /* ---------- Phone ---------- */
+  .phone {
+    justify-self: center;
+    width: min(100%, 380px);
+    padding: var(--space-3);
+    background: var(--color-code-bg);
+    border-radius: 40px;
+    box-shadow: 0 30px 60px rgb(37 37 31 / 0.18);
+  }
+  .phone-top {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-5);
+    background: var(--color-surface-raised);
+    border-radius: 30px 30px 0 0;
+    border-bottom: var(--border-width) solid var(--color-border-subtle);
+  }
+  .avatar {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    color: var(--color-text);
+    background: var(--color-bg);
+    border-radius: var(--radius-full);
+  }
+  .phone-from {
+    flex: 1;
+    font-weight: var(--weight-semibold);
+  }
+  .phone-time {
+    font-size: var(--text-body-sm);
+    color: var(--color-text-muted);
+  }
+  .chat {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    min-height: 520px;
+    padding: var(--space-5) var(--space-4);
+    background: var(--color-bg);
+    border-radius: 0 0 30px 30px;
+  }
+  .msg {
+    max-width: 92%;
+    padding: var(--space-3) var(--space-4);
+    background: var(--color-surface-raised);
+    border: var(--border-width) solid var(--color-border-subtle);
+    border-radius: 18px 18px 18px 6px;
+    box-shadow: 0 1px 2px rgb(37 37 31 / 0.05);
+  }
+  .first {
+    font-family: var(--font-display);
+    font-size: var(--text-heading-sm);
+  }
+  .card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+  .card-role {
+    font-size: var(--text-heading-md);
+  }
+  .card-company {
+    font-size: var(--text-body-sm);
+    color: var(--color-text-muted);
+  }
+  .card-facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+    margin: var(--space-1) 0 var(--space-2);
+  }
+  .card-facts li {
+    padding: 2px var(--space-2);
+    font-size: var(--text-body-sm);
+    background: var(--color-surface);
+    border-radius: var(--radius-full);
+  }
+  .card-label {
+    margin-top: var(--space-2);
+    font-size: var(--text-label);
+    font-weight: var(--weight-semibold);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--color-accent-strong);
+  }
+  .why {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+  .why li {
+    display: flex;
+    flex-direction: column;
+    padding-left: var(--space-3);
+    border-left: 2px solid var(--color-accent);
+    font-size: var(--text-body-sm);
+    line-height: var(--leading-tight);
+  }
+  .why-src {
+    margin-top: 2px;
+    font-size: var(--text-label);
+    color: var(--color-accent-strong);
+  }
+  .consider {
+    margin-top: var(--space-2);
+    padding: var(--space-3);
+    font-size: var(--text-body-sm);
+    background: var(--color-caution-soft);
+    border-radius: var(--radius-md);
+  }
+  .consider .card-label {
+    margin-top: 0;
+    color: var(--color-caution);
+  }
+  .actions {
+    display: flex;
+    gap: var(--space-2);
+    margin-top: var(--space-2);
+  }
+  .act {
+    flex: 1;
+    padding: var(--space-2);
+    text-align: center;
+    font-size: var(--text-body-sm);
+    font-weight: var(--weight-medium);
+    border-radius: var(--radius-md);
+  }
+  .act.yes {
+    color: var(--color-text-inverse);
+    background: var(--color-action);
+  }
+  .act.no {
+    color: var(--color-text-muted);
+    border: var(--border-width) solid var(--color-border);
+  }
+  .channel {
+    padding-top: var(--space-3);
+    text-align: center;
+    font-size: var(--text-body-sm);
+    color: var(--color-code-text);
+  }
+
+  /* ---------- Choreography ---------- */
+  .js .scene .offer,
+  .js .scene .reason,
+  .js .scene .msg,
+  .js .scene .why li,
+  .js .scene .consider,
+  .js .scene .actions {
+    transition:
+      opacity var(--motion-slow) ease,
+      translate var(--motion-arrive) var(--ease-standard);
+  }
+  .js .scene:not(.is-playing) .offer {
+    opacity: 0;
+    translate: -14px 0;
+  }
+  .js .scene:not(.is-playing) .reason,
+  .js .scene:not(.is-playing) :is(.msg, .why li, .consider, .actions) {
+    opacity: 0;
+    translate: 0 8px;
+  }
+  .js .scene:not(.is-playing) .offer:not(.match) .offer-role {
+    text-decoration-color: transparent;
+  }
+  .js .scene .offer {
+    transition-delay: calc(0.2s + var(--i) * 0.45s);
+  }
+  .js .scene .offer:not(.match) {
+    transition-delay: calc(0.2s + var(--i) * 0.45s), calc(0.2s + var(--i) * 0.45s), 0s;
+  }
+  .js .scene .reason {
+    transition-delay: calc(0.55s + var(--i) * 0.45s);
+  }
+  .js .scene .offer-role {
+    transition: text-decoration-color var(--motion-slow) ease;
+    transition-delay: calc(0.55s + var(--i) * 0.45s);
+  }
+  .js .scene .msg.first {
+    transition-delay: 3.3s;
+  }
+  .js .scene .msg.card {
+    transition-delay: 3.9s;
+  }
+  .js .scene .why li {
+    transition-delay: calc(4.3s + var(--w) * 0.25s);
+  }
+  .js .scene .consider {
+    transition-delay: 5.2s;
+  }
+  .js .scene .actions {
+    transition-delay: 5.5s;
+  }
+  .js .scene.is-playing .match {
+    animation: land 0.8s var(--ease-standard) 2.9s both;
+  }
+  @keyframes land {
+    from {
+      box-shadow: 0 0 0 0 var(--color-accent-soft);
+    }
+    to {
+      box-shadow: 0 0 0 4px var(--color-accent-wash);
+    }
+  }
+</style>
+
+<script>
+  // The counter runs up while the week's offers are read.
+  for (const scene of document.querySelectorAll<HTMLElement>('[data-opportunity]')) {
+    const out = scene.querySelector<HTMLElement>('.count')!;
+    const total = Number(scene.dataset.total ?? 0);
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) continue;
+    out.textContent = '0';
+    scene.addEventListener(
+      'scene:play',
+      () => {
+        const start = performance.now();
+        const run = (now: number) => {
+          const t = Math.min(1, (now - start) / 2800);
+          out.textContent = String(Math.round(total * (1 - Math.pow(1 - t, 2))));
+          if (t < 1) requestAnimationFrame(run);
+        };
+        requestAnimationFrame(run);
+      },
+      { once: true },
+    );
+  }
+</script>

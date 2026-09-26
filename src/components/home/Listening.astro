@@ -28,12 +28,14 @@ const { c } = Astro.props;
     <ul class="items" role="list">
       {
         c.items.map((item, i) => (
-          <li data-reveal style={`--i:${i}`}>
-            {item}
+          <li class:list={{ learned: item.learned }} data-reveal style={`--i:${i}`}>
+            {item.learned && <span class="mark" aria-hidden="true" />}
+            {item.text}
           </li>
         ))
       }
     </ul>
+    <p class="learned-note" data-reveal><span class="mark" aria-hidden="true"></span>{c.learnedNote}</p>
 
     <p class="empty" data-reveal>
       <span class="heading">{c.empty[0]}</span>
@@ -110,6 +112,36 @@ const { c } = Astro.props;
     font-size: var(--text-heading-sm);
     border: var(--border-width) solid rgb(250 248 243 / 0.28);
     border-radius: var(--radius-full);
+  }
+  /* Learned, not declared: the rules the triage revealed, marked as such. */
+  .items li {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+  .learned-note .mark {
+    margin-right: var(--space-3);
+  }
+  .items li.learned {
+    background: rgb(250 248 243 / 0.1);
+    border-color: var(--color-accent-soft);
+  }
+  .mark {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    flex: none;
+    vertical-align: 0.1em;
+    border-radius: var(--radius-full);
+    background: var(--color-accent-soft);
+    box-shadow: 0 0 0 3px rgb(221 227 216 / 0.25);
+  }
+  .learned-note {
+    margin-top: var(--space-5);
+    max-width: 34rem;
+    font-size: var(--text-body);
+    color: var(--color-accent-soft);
+    text-wrap: balance;
   }
   .empty {
     display: flex;

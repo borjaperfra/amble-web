@@ -9,6 +9,8 @@ import Defence from './Defence.astro';
 import Distinctive from './Distinctive.astro';
 import Triage from './Triage.astro';
 import Listening from './Listening.astro';
+import Opportunity from './Opportunity.astro';
+import Agents from './Agents.astro';
 import Roadmap from './Roadmap.astro';
 import CareerMd from './CareerMd.astro';
 import YourData from './YourData.astro';
@@ -20,20 +22,34 @@ const lang = (Astro.currentLocale ?? 'en') as Lang;
 const c = home[lang];
 ---
 
-<Base joinHref="#join">
+<Base joinHref="#join" stages={c.stages}>
   <main>
     <Hero c={c.hero} />
-    <Interlude lines={c.story.interlude} body={c.story.interludeBody} id="interlude-pdf" />
-    <Story c={c.story} strength={c.strength} sourceNames={c.sourceNames} />
-    <YourTurn c={c.yourTurn} />
-    <Interview c={c.interview} sourceNames={c.sourceNames} />
-    <Defence c={c.defence} />
-    <Distinctive c={c.distinctive} />
-    <Triage c={c.triage} />
-    <Listening c={c.listening} />
+    <div data-stage="reads" id="stage-reads">
+      <Interlude lines={c.story.interlude} body={c.story.interludeBody} id="interlude-pdf" />
+      <Story c={c.story} strength={c.strength} sourceNames={c.sourceNames} />
+      <Distinctive c={c.distinctive} />
+    </div>
+    <div data-stage="asks" id="stage-asks">
+      <Interview c={c.interview} sourceNames={c.sourceNames} />
+    </div>
+    <div data-stage="checks" id="stage-checks">
+      <Defence c={c.defence} />
+    </div>
+    <div data-stage="learns" id="stage-learns">
+      <Triage c={c.triage} />
+    </div>
+    <div data-stage="listens" id="stage-listens">
+      <Listening c={c.listening} />
+    </div>
+    <div data-stage="tells" id="stage-tells">
+      <Opportunity c={c.opportunity} />
+      <Agents c={c.agents} />
+    </div>
     <Roadmap c={c.roadmap} />
     <CareerMd c={c.career} />
     <YourData c={c.data} />
+    <YourTurn c={c.yourTurn} />
     <Finale c={c.finale} />
   </main>
 </Base>

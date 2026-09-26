@@ -24,11 +24,14 @@ export interface StorySource {
 }
 
 export interface HomeContent {
+  // The agent's loop, shown as a rail beside the page. Sections carry data-stage.
+  stages: { id: 'reads' | 'asks' | 'checks' | 'learns' | 'listens' | 'tells'; label: string }[];
   hero: {
     tag: string;
     title: [string, string]; // second line gets the italic "Amble"
     subtitle: string;
     more: string;
+    status: { prefix: string; words: string[] };
   };
   story: {
     interlude: [string, string];
@@ -56,6 +59,7 @@ export interface HomeContent {
     questions: string[];
     join: string;
     again: string;
+    noGithub: string;
   };
   interview: {
     kicker: string;
@@ -103,13 +107,41 @@ export interface HomeContent {
       learned: { type: string; text: string };
     }[];
     learnedLabel: string;
+    toListening: string;
   };
   listening: {
     kicker: string;
     title: string;
     status: string;
-    items: string[];
+    // learned: revealed by the triage, not declared. Shown as such.
+    items: { text: string; learned?: boolean }[];
+    learnedNote: string;
     empty: [string, string];
+  };
+  opportunity: {
+    kicker: string;
+    title: string;
+    line: string;
+    badge: string;
+    counter: string;
+    stream: { role: string; company: string; reason: string }[];
+    match: { role: string; company: string; facts: string[] };
+    notify: { from: string; text: string; time: string; channel: string };
+    whyLabel: string;
+    why: { text: string; src: string }[];
+    considerLabel: string;
+    consider: string;
+    actions: [string, string];
+  };
+  agents: {
+    kicker: string;
+    title: string;
+    line: string;
+    badge: string;
+    theirs: string;
+    yours: string;
+    messages: { from: 'theirs' | 'yours'; text: string; evidence?: string; private?: string }[];
+    outcome: string;
   };
   roadmap: {
     kicker: string;
@@ -148,11 +180,21 @@ export interface HomeContent {
 }
 
 const en: HomeContent = {
+  stages: [
+    { id: 'reads', label: 'Reads' },
+    { id: 'asks', label: 'Asks' },
+    { id: 'checks', label: 'Checks' },
+    { id: 'learns', label: 'Learns' },
+    { id: 'listens', label: 'Listens' },
+    { id: 'tells', label: 'Tells you' },
+  ],
   hero: {
     tag: 'Closed beta',
     title: ['I’m not looking.', 'is.'],
-    subtitle: 'Meet your professional Rep. It listens for the offers worth your time, and negotiates them for you.',
+    subtitle:
+      'Meet your Rep: a professional agent that knows your work, listens for the offers worth your time, and negotiates them for you.',
     more: 'See how it works',
+    status: { prefix: 'Your Rep is', words: ['reading your work.', 'asking what it couldn’t read.', 'listening.'] },
   },
   story: {
     interlude: ['You’re more than', 'a PDF.'],
@@ -259,6 +301,7 @@ const en: HomeContent = {
     ],
     join: 'Want your Rep to read the rest? Join the beta',
     again: 'Try another',
+    noGithub: 'No GitHub? In the beta, your Rep starts with your CV.',
   },
   interview: {
     kicker: 'The interview',
@@ -345,13 +388,63 @@ const en: HomeContent = {
       },
     ],
     learnedLabel: 'What I learned',
+    toListening: 'I’ll listen for these →',
   },
   listening: {
     kicker: 'Then it listens',
     title: 'Silence is a feature.',
     status: 'Listening',
-    items: ['AI evaluation', 'Staff or senior', 'Remote', '€115K+', 'No solo on-call'],
+    items: [
+      { text: 'AI evaluation' },
+      { text: 'Staff or senior' },
+      { text: 'Remote, Europe', learned: true },
+      { text: '€115K+', learned: true },
+      { text: 'No solo on-call', learned: true },
+    ],
+    learnedNote: 'Three of these Maya never said. She showed them, in her choices.',
     empty: ['Nothing worth bothering you with.', 'I’m still listening.'],
+  },
+  opportunity: {
+    kicker: 'Then it tells you',
+    title: 'Most weeks, nothing. Then this.',
+    line: 'Your Rep reads the offers so you don’t, and only interrupts you for one that fits.',
+    badge: 'Coming in v1',
+    counter: 'read this week · 1 worth your time',
+    stream: [
+      { role: 'Senior ML Engineer', company: 'Adtech · Series D', reason: 'Office 5 days a week' },
+      { role: 'Founding AI Engineer', company: 'Seed · 6 people', reason: 'Solo on-call' },
+      { role: 'LLM Platform Engineer', company: 'Fintech · 300 people', reason: '€95K, below the floor' },
+      { role: 'AI Engineer', company: 'Agency', reason: 'Not evaluation work' },
+      { role: 'Staff AI Engineer', company: 'Series C · Berlin', reason: 'Relocation required' },
+    ],
+    match: { role: 'Evaluation Lead', company: 'Kestrel · Series A · 40 people', facts: ['Remote, Europe', '€125K + 0.4%', 'Owns evals end to end'] },
+    notify: { from: 'Amble', text: 'I found something worth hearing.', time: '09:41', channel: 'On WhatsApp or Telegram' },
+    whyLabel: 'Why I’m showing you this',
+    why: [
+      { text: 'They need someone to own LLM evaluation. It’s your strongest evidence.', src: 'Your map · ●●●●' },
+      { text: 'Remote in Europe, and no solo on-call.', src: 'Your choices' },
+      { text: '€125K is above the floor you showed me.', src: 'Your choices' },
+    ],
+    considerLabel: 'One thing to consider',
+    consider: 'You’d be their first eval hire. That means setting direction, and I haven’t seen you do that yet.',
+    actions: ['I’d hear them out', 'Not for me'],
+  },
+  agents: {
+    kicker: 'Then it talks for you',
+    title: 'Your agent talks to theirs.',
+    line: 'It answers with evidence, keeps what’s private private, and only brings you what both sides want.',
+    badge: 'Coming in v2',
+    theirs: 'Kestrel’s agent',
+    yours: 'Maya’s Rep',
+    messages: [
+      { from: 'theirs', text: 'Can she own evaluation for our agents?' },
+      { from: 'yours', text: 'Yes. She built and ran Lantern’s eval pipeline, and defended its design.', evidence: 'CV · GitHub · Interview' },
+      { from: 'theirs', text: 'What’s her salary floor?' },
+      { from: 'yours', text: 'Your range works. The number stays with her.', private: 'Private' },
+      { from: 'theirs', text: 'We’d like to talk.' },
+      { from: 'yours', text: 'So would she. I’ll set it up.' },
+    ],
+    outcome: 'Both sides want the conversation. Maya decides.',
   },
   roadmap: {
     kicker: 'Where it’s going',
@@ -415,11 +508,21 @@ const en: HomeContent = {
 };
 
 const es: HomeContent = {
+  stages: [
+    { id: 'reads', label: 'Lee' },
+    { id: 'asks', label: 'Pregunta' },
+    { id: 'checks', label: 'Comprueba' },
+    { id: 'learns', label: 'Aprende' },
+    { id: 'listens', label: 'Escucha' },
+    { id: 'tells', label: 'Te avisa' },
+  ],
   hero: {
     tag: 'Beta cerrada',
     title: ['Yo no busco.', 'sí.'],
-    subtitle: 'Conoce a tu Rep profesional. Escucha las ofertas que merecen tu tiempo y las negocia por ti.',
+    subtitle:
+      'Conoce a tu Rep: un agente profesional que conoce tu trabajo, escucha las ofertas que merecen tu tiempo y las negocia por ti.',
     more: 'Mira cómo funciona',
+    status: { prefix: 'Tu Rep está', words: ['leyendo tu trabajo.', 'preguntando lo que no pudo leer.', 'escuchando.'] },
   },
   story: {
     interlude: ['Eres más que', 'un PDF.'],
@@ -526,6 +629,7 @@ const es: HomeContent = {
     ],
     join: '¿Quieres que tu Rep lea el resto? Entra en la beta',
     again: 'Probar otro',
+    noGithub: '¿Sin GitHub? En la beta, tu Rep empieza por tu CV.',
   },
   interview: {
     kicker: 'La entrevista',
@@ -612,13 +716,63 @@ const es: HomeContent = {
       },
     ],
     learnedLabel: 'Lo que he aprendido',
+    toListening: 'Esto es lo que escucharé →',
   },
   listening: {
     kicker: 'Y escucha',
     title: 'El silencio es una función.',
     status: 'Escuchando',
-    items: ['Evaluación de IA', 'Staff o senior', 'Remoto', '115.000 €+', 'Sin guardias en solitario'],
+    items: [
+      { text: 'Evaluación de IA' },
+      { text: 'Staff o senior' },
+      { text: 'Remoto, Europa', learned: true },
+      { text: '115.000 €+', learned: true },
+      { text: 'Sin guardias en solitario', learned: true },
+    ],
+    learnedNote: 'Tres de estas Marta nunca las dijo. Las enseñó con sus decisiones.',
     empty: ['Nada que merezca molestarte.', 'Sigo escuchando.'],
+  },
+  opportunity: {
+    kicker: 'Y te avisa',
+    title: 'Casi todas las semanas, nada. Hasta que llega esto.',
+    line: 'Tu Rep lee las ofertas por ti y solo te interrumpe por una que encaja.',
+    badge: 'Llega en la v1',
+    counter: 'leídas esta semana · 1 merece tu tiempo',
+    stream: [
+      { role: 'Senior ML Engineer', company: 'Adtech · Serie D', reason: 'Oficina 5 días' },
+      { role: 'Founding AI Engineer', company: 'Seed · 6 personas', reason: 'Guardias en solitario' },
+      { role: 'LLM Platform Engineer', company: 'Fintech · 300 personas', reason: '95.000 €, bajo el suelo' },
+      { role: 'AI Engineer', company: 'Agencia', reason: 'No es evaluación' },
+      { role: 'Staff AI Engineer', company: 'Serie C · Berlín', reason: 'Exige mudarse' },
+    ],
+    match: { role: 'Evaluation Lead', company: 'Kestrel · Serie A · 40 personas', facts: ['Remoto, Europa', '125.000 € + 0,4 %', 'Evaluación de principio a fin'] },
+    notify: { from: 'Amble', text: 'He encontrado algo que merece la pena.', time: '09:41', channel: 'Por WhatsApp o Telegram' },
+    whyLabel: 'Por qué te lo enseño',
+    why: [
+      { text: 'Necesitan a alguien que lleve la evaluación de LLMs. Es tu evidencia más sólida.', src: 'Tu mapa · ●●●●' },
+      { text: 'Remoto en Europa y sin guardias en solitario.', src: 'Tus decisiones' },
+      { text: '125.000 € está por encima del suelo que me enseñaste.', src: 'Tus decisiones' },
+    ],
+    considerLabel: 'Una cosa a tener en cuenta',
+    consider: 'Serías su primera contratación en evaluación. Eso implica marcar la dirección, y aún no te he visto hacerlo.',
+    actions: ['Les escucharía', 'No es para mí'],
+  },
+  agents: {
+    kicker: 'Y habla por ti',
+    title: 'Tu agente habla con el suyo.',
+    line: 'Responde con evidencia, guarda lo privado y solo te trae lo que quieren los dos lados.',
+    badge: 'Llega en la v2',
+    theirs: 'Agente de Kestrel',
+    yours: 'Rep de Marta',
+    messages: [
+      { from: 'theirs', text: '¿Puede llevar la evaluación de nuestros agentes?' },
+      { from: 'yours', text: 'Sí. Construyó y operó el pipeline de evaluación de Farolillo, y defendió su diseño.', evidence: 'CV · GitHub · Entrevista' },
+      { from: 'theirs', text: '¿Cuál es su suelo salarial?' },
+      { from: 'yours', text: 'Vuestro rango encaja. La cifra se queda con ella.', private: 'Privado' },
+      { from: 'theirs', text: 'Nos gustaría hablar.' },
+      { from: 'yours', text: 'A ella también. Lo organizo.' },
+    ],
+    outcome: 'Los dos lados quieren la conversación. Marta decide.',
   },
   roadmap: {
     kicker: 'Hacia dónde va',

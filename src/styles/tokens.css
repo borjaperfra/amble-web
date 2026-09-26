@@ -30,6 +30,9 @@
   --ochre-500: #795e30; /* AA as text on paper and on its soft wash (spec #A0834F is 3.2:1) */
   --ochre-100: #eee7d6;
 
+  --slate-500: #667074;
+  --slate-100: #e1e5e5;
+
   --line-300: #dcd8ce;
   --line-200: #e8e4db;
 
@@ -63,6 +66,10 @@
   --color-code-faint: #a8a69c;
   --color-code-caution: #d6b77a;
   --color-code-mark: rgb(221 227 216 / 0.16);
+
+  /* The other side: a company's agent, in slate, never moss. */
+  --color-other: var(--slate-500);
+  --color-other-soft: var(--slate-100);
 
   --color-border: var(--line-300);
   --color-border-subtle: var(--line-200);

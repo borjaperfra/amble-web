@@ -55,6 +55,7 @@ const { c } = Astro.props;
           ))
         }
       </ul>
+      <a class="text-link to-listening" href="#stage-listens">{c.toListening}</a>
     </div>
   </div>
 </section>
@@ -229,6 +230,19 @@ const { c } = Astro.props;
   .scene.is-live .rule.is-filled > * {
     opacity: 1;
     transition: opacity var(--motion-slow) ease 0.15s;
+  }
+  .to-listening {
+    align-self: flex-start;
+    color: var(--color-accent-strong);
+    font-weight: var(--weight-medium);
+  }
+  .scene.is-live .to-listening {
+    opacity: 0;
+    transition: opacity var(--motion-slow) ease;
+  }
+  .scene.is-live:has(.rule:last-child.is-filled) .to-listening {
+    opacity: 1;
+    transition-delay: 0.4s;
   }
 </style>
 

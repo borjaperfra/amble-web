@@ -73,6 +73,15 @@ Needs many reviews first; it will happen, not for launch.
 - Social cards, background-tab title and closed-eye favicon, bilingual 404.
 - Legibility: nothing under 13px, body 17px, all text colours AA. Lighthouse: home 97/100/100/100, manifesto 100 across.
 
+## Done (evening of 2026-09-26)
+
+- The loop, made visible: six stages (Reads · Asks · Checks · Learns · Listens · Tells you) in the floating bar, following the scroll.
+- "Your Rep found something" (v1): the week's offers filtered with reasons from Maya's rules, one match, the Rep's message on the phone with why and one thing to consider.
+- Agent to agent (v2): evidence in every answer, the salary floor kept private, Maya decides.
+- Triage rules marked as learned in Listening ("Three of these Maya never said"); hero defines the Rep and shows what it's doing.
+- "Your turn" moved to just before the close, with a line for people without GitHub.
+- Tests: `npm test` (email rules, rate limit, eye geometry).
+
 ## Open points
 
 - Legal entity for the privacy page (`src/config/legal.ts`): name, tax ID, address.

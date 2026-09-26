@@ -7,11 +7,13 @@ interface Props {
   path?: string;
   // The home already has the form in the hero; other pages link back to it.
   joinHref?: string;
+  // The agent's loop, on the home: shown in the floating bar as you scroll.
+  stages?: { id: string; label: string }[];
 }
 
 const lang = (Astro.currentLocale ?? 'en') as Lang;
 const t = useTranslations(lang);
-const { path = '', joinHref = `${getRelativeLocaleUrl(lang)}#join` } = Astro.props;
+const { path = '', joinHref = `${getRelativeLocaleUrl(lang)}#join`, stages } = Astro.props;
 const other: Lang = lang === 'en' ? 'es' : 'en';
 ---
 
@@ -31,6 +33,23 @@ const other: Lang = lang === 'en' ? 'es' : 'en';
 <div class="float" data-float inert>
   <div class="container float-inner">
     <Logo size="sm" />
+    {
+      stages && (
+        <nav class="loop" aria-label="Amble">
+          <ol role="list">
+            {stages.map((st, i) => (
+              <li data-stage-link={st.id}>
+                <a href={`#stage-${st.id}`}>
+                  <span class="loop-n">{i + 1}</span>
+                  {st.label}
+                </a>
+              </li>
+            ))}
+          </ol>
+          <span class="loop-now" aria-hidden="true" />
+        </nav>
+      )
+    }
     <a class="btn float-join" href={joinHref}>{t('nav.join')}</a>
   </div>
 </div>
@@ -72,6 +91,75 @@ const other: Lang = lang === 'en' ? 'es' : 'en';
     justify-content: space-between;
     height: 60px;
   }
+  /* The loop: where you are in what the Rep does. */
+  .loop {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    min-width: 0;
+  }
+  .loop ol {
+    display: flex;
+    gap: var(--space-1);
+  }
+  .loop a {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--text-body-sm);
+    color: var(--color-text-muted);
+    text-decoration: none;
+    border-radius: var(--radius-full);
+    transition:
+      color var(--motion-default) ease,
+      background var(--motion-default) ease;
+  }
+  .loop a:hover {
+    color: var(--color-text);
+  }
+  .loop-n {
+    display: grid;
+    place-items: center;
+    width: 20px;
+    height: 20px;
+    font-size: var(--text-label);
+    font-weight: var(--weight-semibold);
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--radius-full);
+    transition: all var(--motion-default) ease;
+  }
+  .loop li.is-past .loop-n {
+    color: var(--color-accent-strong);
+    border-color: var(--color-accent-soft);
+    background: var(--color-accent-wash);
+  }
+  .loop li.is-active a {
+    color: var(--color-text);
+    font-weight: var(--weight-medium);
+    background: var(--color-accent-wash);
+  }
+  .loop li.is-active .loop-n {
+    color: var(--color-text-inverse);
+    background: var(--color-accent);
+    border-color: var(--color-accent);
+  }
+  .loop-now {
+    display: none;
+    font-size: var(--text-body-sm);
+    font-weight: var(--weight-medium);
+    color: var(--color-accent-strong);
+  }
+  @media (max-width: 1080px) {
+    .loop ol {
+      display: none;
+    }
+    .loop-now {
+      display: inline;
+    }
+  }
+
   .float-join {
     height: 38px;
     padding: 0 var(--space-4);
@@ -96,6 +184,35 @@ const other: Lang = lang === 'en' ? 'es' : 'en';
 </style>
 
 <script>
+  // The loop: the stage whose section holds the middle of the screen is active.
+  const links = [...document.querySelectorAll<HTMLElement>('[data-stage-link]')];
+  const now = document.querySelector<HTMLElement>('.loop-now');
+  if (links.length) {
+    const order = links.map((l) => l.dataset.stageLink!);
+    const setActive = (id: string | null) => {
+      const at = id ? order.indexOf(id) : -1;
+      links.forEach((l, i) => {
+        l.classList.toggle('is-active', i === at);
+        l.classList.toggle('is-past', at >= 0 && i < at);
+      });
+      if (now) now.textContent = at >= 0 ? `${at + 1}/${order.length} · ${links[at].textContent?.replace(/^\s*\d+/, '').trim()}` : '';
+    };
+    // On each scroll: the stage whose section holds the middle of the screen.
+    const sections = [...document.querySelectorAll<HTMLElement>('[data-stage]')];
+    const update = () => {
+      const mid = window.innerHeight / 2;
+      const hit = sections.find((el) => {
+        const r = el.getBoundingClientRect();
+        return r.top <= mid && r.bottom >= mid;
+      });
+      setActive(hit?.dataset.stage ?? null);
+    };
+    // Six rectangles per scroll event: cheap enough to run directly.
+    window.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update, { passive: true });
+    update();
+  }
+
   // Show the floating bar once the page header is out of sight.
   const bar = document.querySelector<HTMLElement>('[data-float]');
   const header = document.querySelector<HTMLElement>('.header');
