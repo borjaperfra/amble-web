@@ -55,15 +55,25 @@ const { c } = Astro.props;
     font-size: var(--text-body-sm);
     color: var(--color-text-muted);
   }
-  /* The phrases share one cell, as wide as the longest, so nothing around them
-     moves when they change: the prefix stays put, the phrase fades in place. */
+  /* Two centred lines: the prefix as a quiet label, the phrase beneath it.
+     The phrases share one centred cell, so nothing shifts when they change. */
   .live {
-    display: inline-flex;
-    gap: 0.35em;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-1);
+  }
+  .live-prefix {
+    font-size: var(--text-label);
+    font-weight: var(--weight-semibold);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--color-text-faint);
   }
   .live-words {
-    display: inline-grid;
-    text-align: left;
+    display: grid;
+    justify-items: center;
+    text-align: center;
   }
   .live-word {
     grid-area: 1 / 1;

@@ -9,23 +9,25 @@ interface Props {
   joinHref?: string;
   // The agent's loop, on the home: shown in the floating bar as you scroll.
   stages?: { id: string; label: string }[];
+  joinLabel?: string;
 }
 
 const lang = (Astro.currentLocale ?? 'en') as Lang;
 const t = useTranslations(lang);
-const { path = '', joinHref = `${getRelativeLocaleUrl(lang)}#join`, stages } = Astro.props;
+const { path = '', joinHref = `${getRelativeLocaleUrl(lang)}#join`, stages, joinLabel = t('nav.join') } = Astro.props;
 const other: Lang = lang === 'en' ? 'es' : 'en';
 ---
 
 <header class="header container">
   <Logo />
   <nav class="nav" aria-label={t('nav.label')}>
+    <a class="page text-link" href={getRelativeLocaleUrl(lang, 'companies')}>{t('nav.companies')}</a>
     <a class="page text-link" href={getRelativeLocaleUrl(lang, 'manifesto')}>{t('nav.manifesto')}</a>
     <a class="page text-link" href={getRelativeLocaleUrl(lang, 'how-its-built')}>{t('nav.howBuilt')}</a>
     <a class="lang text-link" href={getRelativeLocaleUrl(other, path)} hreflang={other} lang={other}>
       {t('nav.otherLang')}
     </a>
-    <a class="join text-link" href={joinHref}>{t('nav.join')} <span aria-hidden="true">→</span></a>
+    <a class="join text-link" href={joinHref}>{joinLabel} <span aria-hidden="true">→</span></a>
   </nav>
 </header>
 
@@ -50,7 +52,7 @@ const other: Lang = lang === 'en' ? 'es' : 'en';
         </nav>
       )
     }
-    <a class="btn float-join" href={joinHref}>{t('nav.join')}</a>
+    <a class="btn float-join" href={joinHref}>{joinLabel}</a>
   </div>
 </div>
 
@@ -171,7 +173,7 @@ const other: Lang = lang === 'en' ? 'es' : 'en';
     view-transition-name: logo;
   }
   /* On small screens the other pages and the language switch live in the footer. */
-  @media (max-width: 860px) {
+  @media (max-width: 1080px) {
     .page {
       display: none;
     }

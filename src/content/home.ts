@@ -124,6 +124,7 @@ export interface HomeContent {
     line: string;
     badge: string;
     counter: string;
+    salary: string;
     stream: { role: string; company: string; reason: string }[];
     match: { role: string; company: string; facts: string[] };
     notify: { from: string; text: string; time: string; channel: string };
@@ -157,11 +158,10 @@ export interface HomeContent {
     // flag marks assisted-undefended lines; retracted marks lines the Rep stopped claiming.
     lines: { text: string; tags?: string; flag?: string; retracted?: boolean; kind: 'h1' | 'h2' | 'p' | 'li' | 'blank' }[];
   };
-  // career.md and the privacy controls, told together.
-  yours: { kicker: string; title: string; body: string };
   data: {
     kicker: string;
     title: string;
+    line: string;
     items: { icon: 'why' | 'correct' | 'export' | 'delete'; title: string; line: string }[];
     // The demo card the four controls act on.
     demo: {
@@ -332,7 +332,7 @@ const en: HomeContent = {
         claim: 'Keeps traces local, ships only scores',
         assisted: 'co-produced',
         ask: 'Why is the line there?',
-        answer: '“Traces carry customer prompts. Scores don’t.”',
+        answer: 'Because traces carry our customers’ prompts. Scores don’t.',
         verdict: 'defended',
         stamp: 'Defended',
         outcome: 'Now evidence of her own judgment.',
@@ -346,7 +346,7 @@ const en: HomeContent = {
         claim: 'Designed the caching strategy',
         assisted: 'co-produced',
         ask: 'Why cache by prompt hash?',
-        answer: '“Honestly, the agent picked that.”',
+        answer: 'Honestly? The agent picked that. I never checked why.',
         verdict: 'retracted',
         stamp: 'Retracted',
         outcome: 'Kept on record. No longer claimed.',
@@ -413,6 +413,7 @@ const en: HomeContent = {
     line: 'Your Rep reads the offers so you don’t, and only interrupts you for one that fits.',
     badge: 'Coming in v1',
     counter: 'read this week · 1 worth your time',
+    salary: 'Whenever an offer states a salary, you see it, and your Rep uses it. No “competitive”.',
     stream: [
       { role: 'Senior ML Engineer', company: 'Adtech · Series D', reason: 'Office 5 days a week' },
       { role: 'Founding AI Engineer', company: 'Seed · 6 people', reason: 'Solo on-call' },
@@ -462,7 +463,7 @@ const en: HomeContent = {
   career: {
     kicker: 'career.md',
     title: 'A profile you can carry.',
-    line: 'Plain text. Every line has a source.',
+    line: 'Everything your Rep knows about you, written into one plain file. Every line says where it came from; co-produced work is flagged until you defend it, and what you retracted stays on record. Read it, correct it, take it anywhere.',
     file: 'career.md',
     lines: [
       { kind: 'h1', text: '# Maya Lindqvist' },
@@ -478,14 +479,10 @@ const en: HomeContent = {
       { kind: 'li', text: '- Designed the caching strategy for model calls.', flag: 'retracted in interview', retracted: true },
     ],
   },
-  yours: {
-    kicker: 'Yours',
-    title: 'Yours to carry. Yours to delete.',
-    body: 'Everything your Rep knows about you is written into career.md: a plain file you can read, correct and take anywhere, with a source on every line. It stays private until you share it, and you can see, fix or delete any of it, any time.',
-  },
   data: {
     kicker: 'Your data is yours',
     title: 'Private by default.',
+    line: 'Your map, your intent and your answers are yours. You can always see why your Rep thinks something, and change it.',
     items: [
       { icon: 'why', title: 'See why', line: 'Every claim, its source.' },
       { icon: 'correct', title: 'Correct it', line: 'Dispute, fix, add context.' },
@@ -670,7 +667,7 @@ const es: HomeContent = {
         claim: 'Deja las trazas en local y solo envía puntuaciones',
         assisted: 'co-producido',
         ask: '¿Por qué está la línea ahí?',
-        answer: '«Las trazas llevan prompts de clientes. Las puntuaciones no.»',
+        answer: 'Porque las trazas llevan los prompts de nuestros clientes. Las puntuaciones no.',
         verdict: 'defended',
         stamp: 'Defendida',
         outcome: 'Ahora es evidencia de su propio criterio.',
@@ -684,7 +681,7 @@ const es: HomeContent = {
         claim: 'Diseñó la estrategia de caché',
         assisted: 'co-producido',
         ask: '¿Por qué cachear por hash del prompt?',
-        answer: '«La verdad, eso lo eligió el agente.»',
+        answer: '¿Sinceramente? Lo eligió el agente. Nunca revisé por qué.',
         verdict: 'retracted',
         stamp: 'Retirada',
         outcome: 'Queda registrada. Ya no se afirma.',
@@ -751,6 +748,7 @@ const es: HomeContent = {
     line: 'Tu Rep lee las ofertas por ti y solo te interrumpe por una que encaja.',
     badge: 'Llega en la v1',
     counter: 'leídas esta semana · 1 merece tu tiempo',
+    salary: 'Siempre que una oferta publique el salario, lo verás y tu Rep lo usará. Nada de «competitivo».',
     stream: [
       { role: 'Senior ML Engineer', company: 'Adtech · Serie D', reason: 'Oficina 5 días' },
       { role: 'Founding AI Engineer', company: 'Seed · 6 personas', reason: 'Guardias en solitario' },
@@ -800,7 +798,7 @@ const es: HomeContent = {
   career: {
     kicker: 'career.md',
     title: 'Un perfil que te llevas.',
-    line: 'Texto plano. Cada línea con su fuente.',
+    line: 'Todo lo que tu Rep sabe de ti, escrito en un único fichero de texto. Cada línea dice de dónde sale; el trabajo co-producido va marcado hasta que lo defiendes y lo que retiraste queda registrado. Léelo, corrígelo, llévatelo donde quieras.',
     file: 'career.md',
     lines: [
       { kind: 'h1', text: '# Marta Quiroga' },
@@ -816,14 +814,10 @@ const es: HomeContent = {
       { kind: 'li', text: '- Diseñó la estrategia de caché de las llamadas al modelo.', flag: 'retirado en la entrevista', retracted: true },
     ],
   },
-  yours: {
-    kicker: 'Tuyo',
-    title: 'Tuyo para llevártelo. Tuyo para borrarlo.',
-    body: 'Todo lo que tu Rep sabe de ti se escribe en career.md: un fichero de texto que puedes leer, corregir y llevarte a cualquier sitio, con una fuente en cada línea. Es privado hasta que decides compartirlo, y puedes ver, arreglar o borrar cualquier parte cuando quieras.',
-  },
   data: {
     kicker: 'Tus datos son tuyos',
     title: 'Privado por defecto.',
+    line: 'Tu mapa, tu intención y tus respuestas son tuyos. Siempre puedes ver por qué tu Rep piensa algo, y cambiarlo.',
     items: [
       { icon: 'why', title: 'Mira el porqué', line: 'Cada afirmación, su fuente.' },
       { icon: 'correct', title: 'Corrígelo', line: 'Discute, arregla, añade contexto.' },

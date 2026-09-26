@@ -25,3 +25,12 @@ create table if not exists site_counts (
   n      integer not null default 0,
   primary key (day, event, stage, locale)
 );
+
+-- Two waitlists in one table: candidates and companies. The same address can
+-- be on both.
+alter table waitlist add column if not exists audience text not null default 'candidate';
+do $$ begin
+  alter table waitlist add constraint waitlist_audience_check check (audience in ('candidate', 'company'));
+exception when duplicate_object then null; end $$;
+alter table waitlist drop constraint if exists waitlist_email_normalized_key;
+create unique index if not exists waitlist_email_audience_idx on waitlist (email_normalized, audience);

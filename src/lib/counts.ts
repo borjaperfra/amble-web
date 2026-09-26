@@ -1,7 +1,7 @@
 import { db } from './db';
 import type { Lang } from '../i18n/ui';
 
-export const STAGES = ['reads', 'asks', 'checks', 'learns', 'listens', 'tells', 'yours', 'turn', 'finale'] as const;
+export const STAGES = ['reads', 'asks', 'checks', 'learns', 'listens', 'tells', 'yours', 'turn', 'finale', 'company'] as const;
 export type CountEvent = 'view' | 'stage' | 'join';
 
 export async function bump(event: CountEvent, locale: Lang, stage = '') {

@@ -15,7 +15,9 @@ export type JoinResult =
   | { kind: 'send'; token: string; id: number }
   | { kind: 'quiet' }; // already confirmed, or resent too recently
 
-export async function join(email: string, normalized: string, locale: Lang): Promise<JoinResult> {
+export type Audience = 'candidate' | 'company';
+
+export async function join(email: string, normalized: string, locale: Lang, audience: Audience = 'candidate'): Promise<JoinResult> {
   const sql = db();
   await sql`
     delete from waitlist
@@ -28,10 +30,10 @@ export async function join(email: string, normalized: string, locale: Lang): Pro
   // Insert, or refresh the token of a pending signup. Confirmed rows and rows
   // inside the cooldown are left untouched and return nothing.
   const rows = await sql<{ id: number }[]>`
-    insert into waitlist (email, email_normalized, locale, token_hash, token_expires_at, last_sent_at)
-    values (${email}, ${normalized}, ${locale}, ${tokenHash},
+    insert into waitlist (email, email_normalized, locale, audience, token_hash, token_expires_at, last_sent_at)
+    values (${email}, ${normalized}, ${locale}, ${audience}, ${tokenHash},
             now() + make_interval(days => ${TOKEN_TTL_DAYS}), now())
-    on conflict (email_normalized) do update set
+    on conflict (email_normalized, audience) do update set
       locale = excluded.locale,
       token_hash = excluded.token_hash,
       token_expires_at = excluded.token_expires_at,

@@ -13,7 +13,7 @@ export const prerender = false;
 type Outcome = 'ok' | 'invalid' | 'error' | 'slow-down';
 
 // The form sends these and nothing else. Anything more is not our form.
-const ALLOWED_FIELDS = new Set(['email', 'locale', 'website']);
+const ALLOWED_FIELDS = new Set(['email', 'locale', 'website', 'audience']);
 const LOCALES = new Set<Lang>(['en', 'es']);
 const MAX_BODY_BYTES = 1024;
 
@@ -51,6 +51,8 @@ export const POST: APIRoute = async ({ request, clientAddress, redirect }) => {
 
   if (!form) return reply('invalid', 400);
   if (localeField !== null && !LOCALES.has(localeField as Lang)) return reply('invalid', 400);
+  const audienceField = form.get('audience') ?? 'candidate';
+  if (audienceField !== 'candidate' && audienceField !== 'company') return reply('invalid', 400);
 
   // Honeypot: bots fill every field. Pretend it worked.
   if (form.get('website')) return reply('ok', 200);
@@ -64,7 +66,7 @@ export const POST: APIRoute = async ({ request, clientAddress, redirect }) => {
   if (!parsed) return reply('invalid', 400);
 
   try {
-    const result = await join(parsed.email, parsed.normalized, lang);
+    const result = await join(parsed.email, parsed.normalized, lang, audienceField);
     // Already confirmed or just sent: same answer, so the form can't be used to
     // find out who is on the list.
     if (result.kind === 'quiet') return reply('ok', 200);
@@ -82,7 +84,7 @@ export const POST: APIRoute = async ({ request, clientAddress, redirect }) => {
       await releaseCooldown(result.id);
       return reply('error', 502);
     }
-    await bump('join', lang).catch(() => {});
+    await bump('join', lang, audienceField === 'company' ? 'company' : '').catch(() => {});
     return reply('ok', 200);
   } catch (err) {
     console.error('[waitlist] join failed', err instanceof Error ? err.message : err);

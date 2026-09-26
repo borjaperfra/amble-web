@@ -1,7 +1,7 @@
 ---
 // career.md, writing itself line by line: every line with its source, the
-// co-produced line flagged, the retracted one kept on record. Used inside the
-// "Yours" section.
+// co-produced line flagged, the retracted one kept on record.
+import SectionIntro from '../SectionIntro.astro';
 import type { HomeContent } from '../../content/home';
 
 interface Props {
@@ -11,6 +11,9 @@ interface Props {
 const { c } = Astro.props;
 ---
 
+<section class="section container" aria-labelledby="career-title">
+  <div class="split">
+    <SectionIntro id="career-title" kicker={c.kicker} title={c.title} body={c.line} />
 <figure class="file" data-scene>
   <figcaption class="file-bar">
     <span class="file-dots" aria-hidden="true"><span></span><span></span><span></span></span>
@@ -32,6 +35,8 @@ const { c } = Astro.props;
     }
   </div>
 </figure>
+  </div>
+</section>
 
 <style>
   .file {

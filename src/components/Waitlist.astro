@@ -6,11 +6,13 @@ import Symbol from './Symbol.astro';
 
 interface Props {
   id?: string;
+  audience?: 'candidate' | 'company';
+  cta?: string;
 }
 
 const lang = (Astro.currentLocale ?? 'en') as Lang;
 const t = useTranslations(lang);
-const { id = 'waitlist' } = Astro.props;
+const { id = 'waitlist', audience = 'candidate', cta } = Astro.props;
 const messages = {
   ok: t('waitlist.ok'),
   invalid: t('waitlist.invalid'),
@@ -32,6 +34,7 @@ const statusId = `${id}-status`;
   data-pattern={EMAIL_PATTERN}
 >
   <input type="hidden" name="locale" value={lang} />
+  <input type="hidden" name="audience" value={audience} />
   <div class="honeypot" aria-hidden="true">
     <label>Website <input type="text" name="website" tabindex="-1" autocomplete="off" /></label>
   </div>
@@ -53,7 +56,7 @@ const statusId = `${id}-status`;
       placeholder={t('waitlist.placeholder')}
       aria-describedby={statusId}
     />
-    <button class="btn" type="submit">{t('waitlist.cta')}</button>
+    <button class="btn" type="submit">{cta ?? t('waitlist.cta')}</button>
   </div>
   <div class="done" role="status" aria-live="polite">
     <Symbol size={48} breathe />
@@ -203,6 +206,7 @@ const statusId = `${id}-status`;
     const button = form.querySelector<HTMLButtonElement>('button')!;
     const locale = form.querySelector<HTMLInputElement>('input[name="locale"]')!;
     const honeypot = form.querySelector<HTMLInputElement>('input[name="website"]')!;
+    const audience = form.querySelector<HTMLInputElement>('input[name="audience"]')!;
 
     const show = (state: string) => {
       form.dataset.state = state;
@@ -234,7 +238,7 @@ const statusId = `${id}-status`;
       let outcome = 'error';
       try {
         // Exactly the fields the server accepts, nothing else.
-        const body = new URLSearchParams({ email, locale: locale.value, website: honeypot.value });
+        const body = new URLSearchParams({ email, locale: locale.value, website: honeypot.value, audience: audience.value });
         const res = await fetch(form.action, {
           method: 'POST',
           body,

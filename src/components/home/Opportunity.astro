@@ -43,6 +43,7 @@ const readThisWeek = 37;
           <span class="fits" aria-hidden="true">✓</span>
         </li>
       </ol>
+      <p class="salary"><span class="salary-mark" aria-hidden="true">€</span>{c.salary}</p>
     </div>
 
     <!-- The phone: the Rep writes to you -->
@@ -188,6 +189,29 @@ const readThisWeek = 37;
     border-radius: var(--radius-full);
   }
 
+  .salary {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-top: var(--space-5);
+    padding: var(--space-3) var(--space-4);
+    font-size: var(--text-body-sm);
+    color: var(--color-accent-strong);
+    background: var(--color-accent-wash);
+    border-radius: var(--radius-md);
+  }
+  .salary-mark {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 26px;
+    height: 26px;
+    font-weight: var(--weight-semibold);
+    color: var(--color-text-inverse);
+    background: var(--color-accent);
+    border-radius: var(--radius-full);
+  }
+
   /* ---------- Phone ---------- */
   .phone {
     justify-self: center;
@@ -324,18 +348,24 @@ const readThisWeek = 37;
     margin-top: 0;
     color: var(--color-caution);
   }
+  /* Two quiet buttons of equal height; labels never wrap. */
   .actions {
     display: flex;
+    flex-wrap: wrap;
     gap: var(--space-2);
     margin-top: var(--space-2);
   }
   .act {
-    flex: 1;
-    padding: var(--space-2);
-    text-align: center;
+    flex: 1 1 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 42px;
+    padding: 0 var(--space-3);
     font-size: var(--text-body-sm);
     font-weight: var(--weight-medium);
-    border-radius: var(--radius-md);
+    white-space: nowrap;
+    border-radius: 999px;
   }
   .act.yes {
     color: var(--color-text-inverse);

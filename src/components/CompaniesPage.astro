@@ -1,0 +1,489 @@
+---
+// For companies: how the hiring side works, the salary rule at its centre,
+// and an early-access waitlist (audience "company").
+import Base from '../layouts/Base.astro';
+import Waitlist from './Waitlist.astro';
+import Symbol from './Symbol.astro';
+import SectionIntro from './SectionIntro.astro';
+import { companies } from '../content/companies';
+import type { Lang } from '../i18n/ui';
+
+const lang = (Astro.currentLocale ?? 'en') as Lang;
+const c = companies[lang];
+---
+
+<Base title={c.meta.title} description={c.meta.description} path="companies" joinHref="#company-join" joinLabel={c.cta}>
+  <main>
+    <!-- Hero -->
+    <section class="hero container" id="company-join" aria-labelledby="co-title">
+      <p class="badge">{c.badge}</p>
+      <p class="kicker">{c.kicker}</p>
+      <h1 class="display title" id="co-title">
+        {c.title[0]}
+        <br />
+        <em>{c.title[1]}</em>
+      </h1>
+      <p class="lede">{c.lede}</p>
+      <div class="form"><Waitlist id="company-hero" audience="company" cta={c.cta} /></div>
+      <p class="note">{c.formNote}</p>
+    </section>
+
+    <!-- How it works -->
+    <section class="section container" aria-labelledby="co-how">
+      <div class="head"><SectionIntro id="co-how" kicker={c.how.kicker} title={c.how.title} /></div>
+      <ol class="steps" role="list" data-scene>
+        {
+          c.how.steps.map((s, i) => (
+            <li class="step" style={`--i:${i}`}>
+              <span class="step-n">{s.n}</span>
+              <p class="heading step-title">{s.title}</p>
+              <p class="step-body">{s.body}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </section>
+
+    <!-- The salary rule -->
+    <section class="salary" aria-labelledby="co-salary">
+      <div class="container salary-grid">
+        <div>
+          <p class="kicker s-kicker">{c.salary.kicker}</p>
+          <h2 class="display s-title" id="co-salary">{c.salary.title}</h2>
+          <p class="s-body">{c.salary.body}</p>
+          <ul class="rules" role="list">
+            {c.salary.rules.map((r) => <li><span class="tick" aria-hidden="true">✓</span>{r}</li>)}
+          </ul>
+        </div>
+
+        <figure class="match" data-scene>
+          <div class="side company">
+            <p class="side-label">{c.salary.demo.role}</p>
+            <p class="range"><span class="blur">{c.salary.demo.range}</span></p>
+            <p class="lock"><svg class="lock-i" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2" /><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5" /></svg> {c.salary.demo.hidden}</p>
+          </div>
+          <div class="bridge" aria-hidden="true">
+            <span class="face other"><Symbol size={26} class="mirror" /></span>
+            <span class="wire"><span class="pulse" /></span>
+            <span class="face"><Symbol size={26} /></span>
+          </div>
+          <div class="side candidate">
+            <p class="side-label">{c.salary.demo.candidateLabel}</p>
+            <p class="range"><span class="blur">€ ••••</span></p>
+            <p class="lock"><svg class="lock-i" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2" /><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5" /></svg> {c.salary.demo.candidateHidden}</p>
+          </div>
+          <p class="verdict"><span class="ok" aria-hidden="true">✓</span> {c.salary.demo.fits}</p>
+          <p class="told">{c.salary.demo.told}</p>
+        </figure>
+      </div>
+    </section>
+
+    <!-- What your agent sees -->
+    <section class="section container" aria-labelledby="co-sees">
+      <div class="head"><SectionIntro id="co-sees" kicker={c.sees.kicker} title={c.sees.title} /></div>
+      <ul class="sees" role="list">
+        {
+          c.sees.items.map((it, i) => (
+            <li data-reveal style={`--i:${i}`}>
+              <p class="heading sees-title">{it.title}</p>
+              <p class="sees-body">{it.body}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <!-- What it never does -->
+    <section class="never" aria-labelledby="co-never">
+      <div class="container never-grid">
+        <SectionIntro id="co-never" kicker={c.never.kicker} title={c.never.title} />
+        <ul class="never-list" role="list">
+          {c.never.items.map((it, i) => <li data-reveal style={`--i:${i}`}><span class="x" aria-hidden="true">✕</span>{it}</li>)}
+        </ul>
+      </div>
+    </section>
+
+    <!-- Close -->
+    <section class="finale container" aria-labelledby="co-finale">
+      <Symbol size={40} breathe />
+      <h2 class="display f-title" id="co-finale">{c.finale.title}</h2>
+      <p class="lede">{c.finale.body}</p>
+      <div class="form"><Waitlist id="company-finale" audience="company" cta={c.cta} /></div>
+    </section>
+  </main>
+</Base>
+
+<style>
+  .hero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding-block: var(--space-10) var(--space-section);
+  }
+  .badge {
+    padding: var(--space-1) var(--space-3);
+    font-size: var(--text-label);
+    font-weight: var(--weight-semibold);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--color-accent-strong);
+    border: 1.5px dashed var(--color-accent-soft);
+    border-radius: var(--radius-full);
+  }
+  .hero .kicker {
+    margin-top: var(--space-7);
+  }
+  .title {
+    margin-top: var(--space-4);
+    font-size: var(--text-display-xl);
+  }
+  .hero .lede {
+    max-width: 38rem;
+    margin-top: var(--space-6);
+  }
+  .form {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin-top: var(--space-7);
+  }
+  .note {
+    margin-top: var(--space-5);
+    font-size: var(--text-body-sm);
+    color: var(--color-text-muted);
+  }
+  .head {
+    max-width: var(--width-wide);
+    margin-inline: auto;
+  }
+
+  /* How it works */
+  .steps {
+    display: grid;
+    gap: var(--space-5);
+    max-width: var(--width-wide);
+    margin: var(--space-8) auto 0;
+    counter-reset: step;
+  }
+  @media (min-width: 900px) {
+    .steps {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+  .step {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding-top: var(--space-5);
+    border-top: 2px solid var(--color-accent);
+  }
+  .step-n {
+    font-family: var(--font-mono);
+    font-size: var(--text-mono);
+    color: var(--color-accent-strong);
+  }
+  .step-title {
+    font-size: var(--text-heading-md);
+  }
+  .step-body {
+    color: var(--color-text-muted);
+    text-wrap: pretty;
+  }
+  :global(.motion) .steps:not(.is-playing) .step {
+    opacity: 0;
+    translate: 0 10px;
+  }
+  .step {
+    transition:
+      opacity var(--motion-slow) ease,
+      translate var(--motion-arrive) var(--ease-standard);
+    transition-delay: calc(var(--i) * 0.2s);
+  }
+
+  /* The salary rule: the page's moss moment */
+  .salary {
+    padding-block: var(--space-section);
+    color: var(--color-text-inverse);
+    background: var(--color-accent-strong);
+  }
+  .salary-grid {
+    display: grid;
+    gap: var(--space-8);
+    align-items: center;
+  }
+  @media (min-width: 960px) {
+    .salary-grid {
+      grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+      gap: var(--space-9);
+    }
+  }
+  .s-kicker {
+    color: var(--color-accent-soft);
+  }
+  .s-title {
+    margin-top: var(--space-4);
+    font-size: var(--text-display-lg);
+  }
+  .s-body {
+    margin-top: var(--space-5);
+    max-width: 34rem;
+    font-size: var(--text-body-lg);
+    color: var(--color-accent-soft);
+  }
+  .rules {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin-top: var(--space-6);
+  }
+  .rules li {
+    display: flex;
+    gap: var(--space-3);
+    align-items: flex-start;
+  }
+  .tick {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 22px;
+    height: 22px;
+    margin-top: 0.15em;
+    font-size: var(--text-label);
+    color: var(--color-accent-strong);
+    background: var(--color-accent-soft);
+    border-radius: var(--radius-full);
+  }
+
+  .match {
+    display: grid;
+    gap: var(--space-4);
+    padding: var(--space-6);
+    color: var(--color-text);
+    background: var(--color-surface-raised);
+    border-radius: var(--radius-xl);
+    box-shadow: 0 24px 60px rgb(0 0 0 / 0.25);
+  }
+  .side {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    padding: var(--space-4) var(--space-5);
+    border-radius: var(--radius-lg);
+  }
+  .company {
+    background: var(--color-other-soft);
+  }
+  .candidate {
+    background: var(--color-accent-wash);
+  }
+  .side-label {
+    font-size: var(--text-body-sm);
+    font-weight: var(--weight-semibold);
+  }
+  .range {
+    font-family: var(--font-display);
+    font-size: var(--text-heading-lg);
+  }
+  .blur {
+    filter: blur(7px);
+    user-select: none;
+    transition: filter 0.9s var(--ease-standard);
+  }
+  .lock {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-body-sm);
+    color: var(--color-text-muted);
+  }
+  .lock-i {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+  }
+  .bridge {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding-inline: var(--space-3);
+  }
+  .face {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    color: var(--color-text);
+    background: var(--color-accent-wash);
+    border-radius: var(--radius-full);
+  }
+  .face.other {
+    --symbol-iris: var(--color-other);
+    color: var(--color-other);
+    background: var(--color-other-soft);
+  }
+  .face :global(.mirror) {
+    scale: -1 1;
+  }
+  .wire {
+    position: relative;
+    flex: 1;
+    height: 2px;
+    background-image: linear-gradient(to right, var(--color-border) 50%, transparent 0);
+    background-size: 8px 2px;
+  }
+  .pulse {
+    position: absolute;
+    top: -4px;
+    left: 0;
+    width: 10px;
+    height: 10px;
+    border-radius: var(--radius-full);
+    background: var(--color-accent);
+    animation: travel 2.6s var(--ease-standard) infinite;
+  }
+  @keyframes travel {
+    0% {
+      left: 0;
+      opacity: 0;
+    }
+    15%,
+    85% {
+      opacity: 1;
+    }
+    100% {
+      left: calc(100% - 10px);
+      opacity: 0;
+    }
+  }
+  .verdict {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    font-family: var(--font-display);
+    font-size: var(--text-heading-sm);
+    color: var(--color-accent-strong);
+  }
+  .ok {
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    font-size: var(--text-body-sm);
+    color: var(--color-text-inverse);
+    background: var(--color-accent);
+    border-radius: var(--radius-full);
+  }
+  .told {
+    font-size: var(--text-body-sm);
+    color: var(--color-text-muted);
+  }
+  /* The range stays blurred until the agents agree they overlap. */
+  .match.is-playing .company .blur {
+    filter: blur(0);
+    transition-delay: 2.2s;
+  }
+  :global(.motion) .match:not(.is-playing) :is(.verdict, .told) {
+    opacity: 0;
+    translate: 0 8px;
+  }
+  .verdict,
+  .told {
+    transition:
+      opacity var(--motion-slow) ease,
+      translate var(--motion-arrive) var(--ease-standard);
+  }
+  .verdict {
+    transition-delay: 1.5s;
+  }
+  .told {
+    transition-delay: 2.4s;
+  }
+
+  /* What your agent sees */
+  .sees {
+    display: grid;
+    gap: var(--space-6);
+    max-width: var(--width-wide);
+    margin: var(--space-8) auto 0;
+  }
+  @media (min-width: 760px) {
+    .sees {
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-7) var(--space-8);
+    }
+  }
+  .sees li {
+    padding-left: var(--space-5);
+    border-left: 2px solid var(--color-accent-soft);
+  }
+  .sees-title {
+    font-size: var(--text-heading-md);
+  }
+  .sees-body {
+    margin-top: var(--space-2);
+    color: var(--color-text-muted);
+  }
+
+  /* What it never does: a sunken band */
+  .never {
+    padding-block: var(--space-section);
+    background: var(--color-surface-sunken);
+  }
+  .never-grid {
+    display: grid;
+    gap: var(--space-7);
+    max-width: calc(var(--width-wide) + var(--gutter) * 2);
+  }
+  @media (min-width: 900px) {
+    .never-grid {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+      align-items: center;
+    }
+  }
+  .never-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+  .never-list li {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-4) var(--space-5);
+    font-size: var(--text-body-lg);
+    background: var(--color-surface-raised);
+    border-radius: var(--radius-md);
+  }
+  .x {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 26px;
+    height: 26px;
+    font-size: var(--text-body-sm);
+    color: var(--color-retracted);
+    background: var(--color-retracted-soft);
+    border-radius: var(--radius-full);
+  }
+
+  .finale {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-4);
+    text-align: center;
+    padding-block: var(--space-section) var(--space-8);
+  }
+  .f-title {
+    font-size: var(--text-display-lg);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .pulse {
+      animation: none;
+    }
+    .blur {
+      filter: none;
+    }
+  }
+</style>
