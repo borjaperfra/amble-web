@@ -49,14 +49,14 @@ const { c, strength } = Astro.props;
   .title {
     max-width: 18ch;
     margin-top: var(--space-4);
-    font-size: var(--text-display-lg);
+    font-size: var(--text-chapter);
   }
   .cols {
     display: grid;
     gap: var(--space-5);
     width: 100%;
     max-width: var(--width-wide);
-    margin-top: var(--space-8);
+    margin-top: var(--space-scene);
     text-align: left;
   }
   @media (min-width: 860px) {
@@ -64,25 +64,20 @@ const { c, strength } = Astro.props;
       grid-template-columns: repeat(3, 1fr);
     }
   }
+  /* Columns separated by hairlines, no surfaces. */
   .col {
     display: flex;
     flex-direction: column;
     gap: var(--space-5);
-    padding: var(--space-6);
-    background: var(--color-surface-raised);
-    border: var(--border-width) solid var(--color-border-subtle);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-sheet);
+    padding-top: var(--space-5);
+    border-top: 1.5px solid var(--color-text);
     transition:
       opacity var(--motion-slow) ease,
       translate var(--motion-arrive) var(--ease-standard);
     transition-delay: calc(var(--i) * 0.18s);
   }
   .col.unknown {
-    background: transparent;
-    border-style: dashed;
-    border-color: var(--color-border);
-    box-shadow: none;
+    border-top: 1.5px dashed var(--color-text-faint);
   }
   :global(.motion) .cols:not(.is-playing) .col {
     opacity: 0;

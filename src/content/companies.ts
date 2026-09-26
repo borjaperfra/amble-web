@@ -23,9 +23,7 @@ export interface CompaniesContent {
     title: string;
     agent: string;
     rep: string;
-    rows: { ask: string; answer: string }[];
-    blocker: { ask: string; no: string; yes: string; toggle: string; toggleBack: string };
-    hold: string;
+    signals: string[];
     mutual: string;
     question: string;
   };
@@ -40,6 +38,7 @@ export interface CompaniesContent {
     privateFloor: string;
     overlap: string;
     works: string;
+    worksSub: string;
   };
   never: { kicker: string; title: string; items: string[] };
   finale: { title: string; body: string };
@@ -102,13 +101,7 @@ const en: CompaniesContent = {
     title: 'Not keyword matching. Two representatives checking whether it’s worth human time.',
     agent: 'Company agent',
     rep: 'Her Rep',
-    rows: [
-      { ask: 'LLM evaluation?', answer: 'Strong evidence · 3 sources' },
-      { ask: 'Remote, Europe?', answer: 'Yes' },
-      { ask: 'Range €110–135K', answer: 'Conditions overlap' },
-    ],
-    blocker: { ask: 'Solo on-call?', no: 'No', yes: 'Yes', toggle: 'Change to shared on-call', toggleBack: 'Back to solo on-call' },
-    hold: 'Hold',
+    signals: ['evidence', 'conditions', 'range'],
     mutual: 'Mutual intent',
     question: 'Talk to each other?',
   },
@@ -127,7 +120,8 @@ const en: CompaniesContent = {
     privateRange: 'private range',
     privateFloor: 'private floor',
     overlap: 'overlap',
-    works: 'Your range works. The number stays with her.',
+    works: 'The range works.',
+    worksSub: 'Neither side had to reveal their number.',
   },
   never: {
     kicker: 'What it never does',
@@ -202,13 +196,7 @@ const es: CompaniesContent = {
     title: 'No es buscar palabras clave. Son dos representantes comprobando si merece la pena el tiempo de las personas.',
     agent: 'Agente de empresa',
     rep: 'Su Rep',
-    rows: [
-      { ask: '¿Evaluación de LLMs?', answer: 'Evidencia sólida · 3 fuentes' },
-      { ask: '¿Remoto, Europa?', answer: 'Sí' },
-      { ask: 'Rango 110–135.000 €', answer: 'Las condiciones se solapan' },
-    ],
-    blocker: { ask: '¿Guardias en solitario?', no: 'No', yes: 'Sí', toggle: 'Cambiar a guardias compartidas', toggleBack: 'Volver a guardias en solitario' },
-    hold: 'En espera',
+    signals: ['evidencia', 'condiciones', 'rango'],
     mutual: 'Intención mutua',
     question: '¿Hablamos?',
   },
@@ -227,7 +215,8 @@ const es: CompaniesContent = {
     privateRange: 'rango privado',
     privateFloor: 'suelo privado',
     overlap: 'se solapan',
-    works: 'Vuestro rango encaja. La cifra se queda con ella.',
+    works: 'El rango encaja.',
+    worksSub: 'Ninguna parte tuvo que revelar su cifra.',
   },
   never: {
     kicker: 'Lo que nunca hace',

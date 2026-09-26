@@ -11,13 +11,6 @@ interface Props {
 
 const { c, career } = Astro.props;
 
-// Quiet 1.5px line icons (DESIGN_SYSTEM §26).
-const icons = {
-  read: '<path d="M2.5 12s3.5-6.5 9.5-6.5S21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/>',
-  correct: '<path d="M4 20h4L19 9a2.1 2.1 0 0 0-3-3L5 17z"/><path d="m14.5 7.5 3 3"/>',
-  export: '<path d="M12 15V4"/><path d="m7.5 8.5 4.5-4.5 4.5 4.5"/><path d="M5 13v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/>',
-  delete: '<path d="M4 7h16"/><path d="M9.5 7V4.8h5V7"/><path d="M6.5 7l.9 12a2 2 0 0 0 2 1.8h5.2a2 2 0 0 0 2-1.8l.9-12"/>',
-};
 ---
 
 <section class="own container" aria-labelledby="own-title">
@@ -35,18 +28,14 @@ const icons = {
 
     <div class="side">
       <p class="heading subtitle" data-reveal>{c.subtitle}</p>
-      <ul class="actions" role="list">
-        {
-          c.actions.map((a, i) => (
-            <li data-reveal style={`--i:${i}`}>
-              <span class="icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" width="22" height="22" set:html={icons[a.icon]} />
-              </span>
-              {a.label}
-            </li>
-          ))
-        }
-      </ul>
+      <p class="actions" data-reveal>
+        {c.actions.map((a, i) => (
+          <>
+            {i > 0 && <span class="sep" aria-hidden="true">·</span>}
+            <span>{a.label}</span>
+          </>
+        ))}
+      </p>
       <ul class="lines" role="list">
         {c.lines.map((l, i) => <li data-reveal style={`--i:${i + 4}`}>{l}</li>)}
       </ul>
@@ -62,18 +51,22 @@ const icons = {
   }
   .title {
     margin-top: var(--space-4);
-    font-size: var(--text-display-lg);
+    font-size: var(--text-observation);
   }
   .grid {
     display: grid;
     gap: var(--space-7);
     align-items: center;
-    margin-top: var(--space-8);
+    margin-top: var(--space-scene);
   }
   @media (min-width: 900px) {
     .grid {
-      grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+      grid-template-columns: minmax(0, 5fr) minmax(0, 5fr);
       gap: var(--space-9);
+    }
+    .grid > :global(.file) {
+      max-width: 440px;
+      rotate: -1deg;
     }
   }
   .side {
@@ -82,38 +75,23 @@ const icons = {
     gap: var(--space-5);
   }
   .subtitle {
-    font-size: var(--text-heading-lg);
+    font-size: var(--text-heading-md);
   }
   .actions {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--space-3);
-  }
-  .actions li {
     display: flex;
-    align-items: center;
-    gap: var(--space-3);
-    padding: var(--space-3) var(--space-4);
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-3);
+    font-size: var(--text-body);
     font-weight: var(--weight-medium);
-    background: var(--color-surface-raised);
-    border: var(--border-width) solid var(--color-border-subtle);
-    border-radius: var(--radius-md);
   }
-  .icon {
-    display: grid;
-    place-items: center;
-    width: 36px;
-    height: 36px;
-    color: var(--color-accent-strong);
-    background: var(--color-accent-wash);
-    border-radius: var(--radius-full);
+  .sep {
+    color: var(--color-text-faint);
   }
-  .icon svg {
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 1.5;
-    stroke-linecap: round;
-    stroke-linejoin: round;
+  @media (max-width: 640px) {
+    /* Tighter, so the four verbs stay on one line on a phone. */
+    .actions {
+      gap: var(--space-2);
+    }
   }
   .lines {
     display: flex;

@@ -62,6 +62,8 @@ const canonical = new URL(getRelativeLocaleUrl(lang, path), Astro.site);
     <Font cssVariable="--font-newsreader" preload />
     <script is:inline define:vars={{ away: t('tab.away') }}>
       document.documentElement.classList.add('js');
+      // Scenes animate on every page, unless the reader asked for calm.
+      if (!matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentElement.classList.add('motion');
       // In the background the tab says so, and its eye closes.
       document.addEventListener('visibilitychange', () => {
         const icon = document.querySelector('link[rel="icon"][type="image/svg+xml"]');

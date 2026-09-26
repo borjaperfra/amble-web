@@ -1,6 +1,6 @@
 ---
-// Two ranges nobody reveals: the company's and the person's, both blurred.
-// The agents only find out that they overlap.
+// Two hairline ranges drawn straight on the moss, numbers obscured. All the
+// agents learn is that they overlap.
 import type { CompaniesContent } from '../../content/companies';
 
 interface Props {
@@ -11,131 +11,128 @@ const { c } = Astro.props;
 ---
 
 <figure class="ranges" data-scene>
-  <div class="track company">
-    <p class="who">{c.company}</p>
-    <div class="bar"><span class="fill" /></div>
-    <p class="private">{c.privateRange}</p>
+  <div class="tracks">
+    <div class="track">
+      <span class="who">{c.company}</span>
+      <span class="line"><span class="span company"><span class="num">€ •••</span><span class="num">€ •••</span></span></span>
+    </div>
+    <div class="track">
+      <span class="who">{c.person}</span>
+      <span class="line"><span class="span person"><span class="num">€ •••</span></span></span>
+    </div>
+    <span class="overlap" aria-hidden="true"><span class="overlap-label">{c.overlap}</span></span>
   </div>
-  <div class="overlap" aria-hidden="true">
-    <span class="zone" />
-    <span class="dot" />
-    <span class="label">{c.overlap}</span>
-  </div>
-  <div class="track person">
-    <p class="who">{c.person}</p>
-    <div class="bar"><span class="fill" /></div>
-    <p class="private">{c.privateFloor}</p>
-  </div>
-  <figcaption class="heading">{c.works}</figcaption>
+  <figcaption>
+    <span class="works heading">{c.works}</span>
+    <span class="sub">{c.worksSub}</span>
+  </figcaption>
 </figure>
 
 <style>
   .ranges {
+    --col: 6rem;
+  }
+  .tracks {
+    position: relative;
     display: flex;
     flex-direction: column;
-    gap: var(--space-3);
-    padding: var(--space-6);
-    color: var(--color-text);
-    background: var(--color-surface-raised);
-    border-radius: var(--radius-xl);
-    box-shadow: 0 24px 60px rgb(0 0 0 / 0.25);
+    gap: var(--space-6);
   }
   .track {
     display: grid;
-    grid-template-columns: 6rem 1fr;
+    grid-template-columns: var(--col) 1fr;
     align-items: center;
-    column-gap: var(--space-4);
+    gap: var(--space-4);
   }
   .who {
     font-size: var(--text-label);
     font-weight: var(--weight-semibold);
     letter-spacing: var(--tracking-label);
     text-transform: uppercase;
-    color: var(--color-text-muted);
+    color: var(--color-accent-soft);
   }
-  .bar {
+  .line {
     position: relative;
-    height: 22px;
-    background: var(--color-surface-sunken);
-    border-radius: var(--radius-full);
-    overflow: hidden;
+    height: 1px;
+    background: rgb(221 227 216 / 0.3);
   }
-  .fill {
+  .span {
     position: absolute;
-    top: 0;
-    bottom: 0;
-    border-radius: var(--radius-full);
-    filter: blur(2px);
+    top: -1px;
+    height: 3px;
+    display: flex;
+    justify-content: space-between;
+    background: var(--color-text-inverse);
+    border-radius: 2px;
   }
-  .company .fill {
-    left: 30%;
+  .span.company {
+    left: 25%;
     width: 50%;
-    background: repeating-linear-gradient(45deg, var(--color-other) 0 6px, var(--color-other-soft) 6px 12px);
   }
-  .person .fill {
-    left: 55%;
-    right: 0;
-    background: repeating-linear-gradient(45deg, var(--color-accent) 0 6px, var(--color-accent-soft) 6px 12px);
+  .span.person {
+    left: 58%;
+    right: 4%;
   }
-  .private {
-    grid-column: 2;
-    margin-top: 2px;
-    font-size: var(--text-body-sm);
-    color: var(--color-text-muted);
-  }
-  .overlap {
+  .num {
     position: relative;
-    height: 44px;
-    margin-left: calc(6rem + var(--space-4));
+    top: -22px;
+    font-size: var(--text-label);
+    letter-spacing: 0.08em;
+    color: var(--color-accent-soft);
+    filter: blur(1.5px);
+    user-select: none;
   }
-  .zone {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 55%;
-    width: 25%;
-    background: var(--color-accent-wash);
-    border-inline: 1.5px dashed var(--color-accent);
+  /* Numbers sit outside the overlap: the company's at its ends, above the
+     line; the person's floor just before it, below the line. */
+  .company .num:first-child {
+    translate: calc(-100% - 6px) 0;
   }
-  .dot {
-    position: absolute;
-    top: 50%;
-    left: 67.5%;
-    width: 16px;
-    height: 16px;
-    translate: -50% -50%;
-    background: var(--color-accent);
-    border-radius: var(--radius-full);
-    box-shadow: 0 0 0 5px var(--color-accent-soft);
+  .company .num:last-child {
+    translate: calc(100% + 6px) 0;
   }
-  .label {
-    position: absolute;
-    top: 50%;
-    left: calc(67.5% + 18px);
-    translate: 0 -50%;
-    font-size: var(--text-body-sm);
-    font-weight: var(--weight-semibold);
-    color: var(--color-accent-strong);
+  .company .num {
+    top: -9px;
   }
-  figcaption {
-    margin-top: var(--space-4);
-    font-size: var(--text-heading-md);
-    color: var(--color-accent-strong);
+  .person .num {
+    top: -9px;
+    translate: calc(-100% - 6px) 0;
   }
-  .overlap,
-  figcaption {
-    transition:
-      opacity 0.6s ease,
-      translate 0.7s var(--ease-standard);
-  }
+
+  /* The overlap: a faint band where both lines agree. */
   .overlap {
-    transition-delay: 1s;
+    position: absolute;
+    top: -14px;
+    bottom: -14px;
+    left: calc(var(--col) + var(--space-4) + (100% - var(--col) - var(--space-4)) * 0.58);
+    width: calc((100% - var(--col) - var(--space-4)) * 0.17);
+    border-inline: 1px dashed var(--color-accent-soft);
+    background: rgb(221 227 216 / 0.04);
+    transition: opacity 0.8s ease 0.8s;
+  }
+  .overlap-label {
+    position: absolute;
+    bottom: -22px;
+    left: 50%;
+    translate: -50% 0;
+    font-size: var(--text-label);
+    white-space: nowrap;
+    color: var(--color-text-inverse);
   }
   figcaption {
-    transition-delay: 1.8s;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    margin-top: var(--space-8);
+    transition: opacity 0.8s ease 1.4s;
+  }
+  .works {
+    font-size: var(--text-observation);
+    color: var(--color-text-inverse);
+  }
+  .sub {
+    color: var(--color-accent-soft);
   }
   :global(.motion) .ranges:not(.is-playing) :is(.overlap, figcaption) {
     opacity: 0;
-    translate: 0 6px;
   }
 </style>

@@ -18,8 +18,9 @@ export interface ManifestoContent {
   principles: { title: string; body: string }[];
   future: Block[];
   figures: {
-    loop: { ai: string; applications: string; application: string; filters: string[]; noise: string; lines: [string, string]; cut: string };
-    iceberg: { looking: string; notLooking: string; question: string; tags: string[] };
+    // The page fills with applications and filters, then clears to these two lines.
+    loop: { application: string; filters: string[]; before: string; statement: string };
+    iceberg: { looking: string; notLooking: string; question: string; tags: string[]; statement: string };
     architecture: {
       today: string;
       todaySteps: string[];
@@ -76,8 +77,6 @@ const manifestoEn: ManifestoContent = {
     },
     { kind: 'beat', text: 'More applications. More filters. More noise.' },
     { kind: 'figure', figure: 'loop' },
-    { kind: 'p', text: 'We don’t think the answer is a better application.' },
-    { kind: 'beat', text: 'We think the application is the problem.' },
 
     { kind: 'chapter', text: 'Most people aren’t looking.' },
     { kind: 'p', text: 'And that’s the part the current system handles badly.' },
@@ -164,19 +163,17 @@ const manifestoEn: ManifestoContent = {
   ],
   figures: {
     loop: {
-      ai: 'AI',
-      applications: 'Applications',
-      application: 'Application',
-      filters: ['Filter', 'Screen', 'Rank', 'Filter', 'Screen', 'Rank'],
-      noise: 'More noise',
-      lines: ['More applications create more filtering.', 'More filtering creates more applications.'],
-      cut: 'Remove applications.',
+      application: 'application',
+      filters: ['filter', 'screen', 'rank'],
+      before: 'We don’t think the answer is a better application.',
+      statement: 'We think the application is the problem.',
     },
     iceberg: {
       looking: 'Looking',
       notLooking: 'Not looking',
       question: 'but would they move?',
-      tags: ['right work', 'right team', 'right ownership', 'right number'],
+      tags: ['right work', 'more ownership', 'remote', 'the right number', 'the right problem'],
+      statement: 'Not looking ≠ not listening.',
     },
     architecture: {
       today: 'Today',
@@ -226,8 +223,6 @@ const manifestoEs: ManifestoContent = {
     },
     { kind: 'beat', text: 'Más candidaturas. Más filtros. Más ruido.' },
     { kind: 'figure', figure: 'loop' },
-    { kind: 'p', text: 'No creemos que la respuesta sea una candidatura mejor.' },
-    { kind: 'beat', text: 'Creemos que el problema es la candidatura.' },
 
     { kind: 'chapter', text: 'La mayoría de la gente no está buscando.' },
     { kind: 'p', text: 'Y esa es la parte que el sistema actual gestiona peor.' },
@@ -314,19 +309,17 @@ const manifestoEs: ManifestoContent = {
   ],
   figures: {
     loop: {
-      ai: 'IA',
-      applications: 'Candidaturas',
-      application: 'Candidatura',
-      filters: ['Filtrar', 'Cribar', 'Ordenar', 'Filtrar', 'Cribar', 'Ordenar'],
-      noise: 'Más ruido',
-      lines: ['Más candidaturas generan más filtros.', 'Más filtros generan más candidaturas.'],
-      cut: 'Adiós a las candidaturas.',
+      application: 'candidatura',
+      filters: ['filtrar', 'cribar', 'ordenar'],
+      before: 'No creemos que la respuesta sea una candidatura mejor.',
+      statement: 'Creemos que el problema es la candidatura.',
     },
     iceberg: {
       looking: 'Buscando',
       notLooking: 'Sin buscar',
       question: '¿pero se moverían?',
-      tags: ['el trabajo adecuado', 'el equipo adecuado', 'la responsabilidad adecuada', 'la cifra adecuada'],
+      tags: ['el trabajo adecuado', 'más responsabilidad', 'remoto', 'la cifra adecuada', 'el problema adecuado'],
+      statement: 'No buscar ≠ no escuchar.',
     },
     architecture: {
       today: 'Hoy',

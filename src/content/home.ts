@@ -43,6 +43,7 @@ export interface HomeContent {
     looking: string;
     notLooking: string;
     question: string;
+    conditions: string[];
   };
   problem: {
     title: string;
@@ -170,6 +171,7 @@ export interface HomeContent {
     theirs: string;
     yours: string;
     exchange: { ask: string; answer: string }[];
+    signals: string[];
     range: { label: string; value: string; floorLabel: string };
     privateLine: string;
     steps: string[];
@@ -236,6 +238,7 @@ const en: HomeContent = {
     looking: 'Looking',
     notLooking: 'Not looking',
     question: 'but would they move?',
+    conditions: ['right work', 'more ownership', 'remote', 'the right number', 'the right problem'],
   },
   problem: {
     title: 'Looking for a job has become a job.',
@@ -522,6 +525,7 @@ const en: HomeContent = {
       { ask: 'Conditions?', answer: 'Aligned' },
       { ask: 'Salary?', answer: 'Range works' },
     ],
+    signals: ['evidence', 'conditions', 'range'],
     range: { label: 'Range', value: '€110–135K', floorLabel: 'Her floor' },
     privateLine: 'Your range works. The number stays with her.',
     steps: ['Both want to talk', 'Introduction'],
@@ -615,6 +619,7 @@ const es: HomeContent = {
     looking: 'Buscando',
     notLooking: 'Sin buscar',
     question: '¿pero se moverían?',
+    conditions: ['el trabajo adecuado', 'más responsabilidad', 'remoto', 'la cifra adecuada', 'el problema adecuado'],
   },
   problem: {
     title: 'Buscar trabajo se ha convertido en un trabajo.',
@@ -901,6 +906,7 @@ const es: HomeContent = {
       { ask: '¿Condiciones?', answer: 'Encajan' },
       { ask: '¿Salario?', answer: 'El rango encaja' },
     ],
+    signals: ['evidencia', 'condiciones', 'rango'],
     range: { label: 'Rango', value: '110–135.000 €', floorLabel: 'Su suelo' },
     privateLine: 'Vuestro rango encaja. La cifra se queda con ella.',
     steps: ['Los dos quieren hablar', 'Presentación'],

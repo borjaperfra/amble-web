@@ -6,9 +6,8 @@ import Base from '../layouts/Base.astro';
 import Waitlist from './Waitlist.astro';
 import Symbol from './Symbol.astro';
 import SectionIntro from './SectionIntro.astro';
-import InboxFigure from './companies/InboxFigure.astro';
-import FunnelFigure from './companies/FunnelFigure.astro';
-import NegotiationFigure from './companies/NegotiationFigure.astro';
+import DotField from './DotField.astro';
+import AgentLine from './AgentLine.astro';
 import RangeFigure from './companies/RangeFigure.astro';
 import { companies } from '../content/companies';
 import type { Lang } from '../i18n/ui';
@@ -35,7 +34,9 @@ const c = companies[lang];
       </p>
       <div class="form"><Waitlist id="company-hero" audience="company" cta={c.cta} note={c.formPrivacy} /></div>
       <p class="note">{c.formNote}</p>
-      <InboxFigure c={c.inbox} />
+      <div class="inbox-field">
+        <DotField variant="inbox" inboxLabel={`${c.inbox.inbox} · ${c.inbox.applied}`} outsideTags={[c.inbox.tags[2], c.inbox.tags[0], c.inbox.tags[3]]} />
+      </div>
     </section>
 
     <!-- The problem -->
@@ -65,7 +66,14 @@ const c = companies[lang];
           {c.pitch.body.map((p) => <p class="pitch-p" data-reveal>{p}</p>)}
           <p class="pitch-after" data-reveal>{c.pitch.after}</p>
         </div>
-        <FunnelFigure c={c.funnel} />
+        <div class="shift" data-scene aria-label={`${c.funnel.old[0]} → ${c.funnel.next.join(' ')}`}>
+          <p class="q-swap">
+            <span class="q old heading">{c.funnel.old[0]}</span>
+            <span class="q new heading">{c.funnel.next[0]}</span>
+          </p>
+          <p class="q-then">{c.funnel.next[1]}</p>
+          <p class="q-then">{c.funnel.next[2]}</p>
+        </div>
       </div>
 
       <ol class="sequence" role="list" data-scene>
@@ -89,8 +97,10 @@ const c = companies[lang];
 
     <!-- Agent ↔ Rep -->
     <section class="section container nego-section" aria-labelledby="co-nego">
-      <SectionIntro id="co-nego" kicker={c.negotiation.kicker} title={c.negotiation.title} align="center" />
-      <NegotiationFigure c={c.negotiation} />
+      <SectionIntro id="co-nego" kicker={c.negotiation.kicker} title={c.negotiation.title} align="center" level="observation" />
+      <div class="nego-line">
+        <AgentLine left={c.negotiation.agent} right={c.negotiation.rep} signals={c.negotiation.signals} result={c.negotiation.mutual} note={c.negotiation.question} />
+      </div>
     </section>
 
     <!-- The salary rule -->
@@ -151,11 +161,17 @@ const c = companies[lang];
   }
   .title {
     margin-top: var(--space-4);
-    font-size: var(--text-display-xl);
+    font-size: var(--text-thesis);
+  }
+  .inbox-field {
+    width: 100%;
+    max-width: var(--width-wide);
+    margin-top: var(--space-9);
   }
   .hero .lede {
     max-width: 38rem;
     margin-top: var(--space-6);
+    font-size: var(--text-body-lg);
   }
   .hero .lede strong {
     color: var(--color-text);
@@ -192,7 +208,70 @@ const c = companies[lang];
   }
   .p-title,
   .pitch-title {
-    font-size: var(--text-display-lg);
+    font-size: var(--text-chapter);
+  }
+  /* Who applied? → Who should we talk to? Typography, not a diagram. */
+  .shift {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+  .q-swap {
+    display: grid;
+  }
+  .q {
+    grid-area: 1 / 1;
+    font-size: var(--text-observation);
+    transition:
+      opacity 0.7s ease,
+      translate 0.8s var(--ease-standard),
+      text-decoration-color 0.4s ease;
+  }
+  .q.old {
+    color: var(--color-text-faint);
+    text-decoration-line: line-through;
+    text-decoration-thickness: 1.5px;
+    text-decoration-color: var(--color-retracted);
+    opacity: 0;
+  }
+  .q.new {
+    color: var(--color-accent-strong);
+  }
+  .q-then {
+    font-family: var(--font-display);
+    font-size: var(--text-heading-sm);
+    color: var(--color-text-muted);
+    transition: opacity 0.7s ease;
+  }
+  :global(.motion) .shift .q.old {
+    opacity: 1;
+    text-decoration-color: transparent;
+    transition-delay: 0s, 0s, 0.5s;
+  }
+  :global(.motion) .shift.is-playing .q.old {
+    text-decoration-color: var(--color-retracted);
+    opacity: 0;
+    translate: 0 -8px;
+    transition-delay: 1.2s, 1.2s, 0.5s;
+  }
+  :global(.motion) .shift:not(.is-playing) .q.new {
+    opacity: 0;
+    translate: 0 8px;
+  }
+  :global(.motion) .shift .q.new {
+    transition-delay: 1.7s;
+  }
+  :global(.motion) .shift:not(.is-playing) .q-then {
+    opacity: 0;
+  }
+  .shift .q-then:nth-of-type(2) {
+    transition-delay: 2.4s;
+  }
+  .shift .q-then:nth-of-type(3) {
+    transition-delay: 2.9s;
+  }
+  .nego-line {
+    margin-top: var(--space-scene);
   }
   .p-body {
     display: flex;
@@ -282,20 +361,14 @@ const c = companies[lang];
     color: var(--color-text-muted);
   }
   .x {
-    display: grid;
-    place-items: center;
     flex: none;
-    width: 24px;
-    height: 24px;
-    font-size: var(--text-label);
+    font-size: var(--text-body-sm);
     color: var(--color-retracted);
-    background: var(--color-retracted-soft);
-    border-radius: var(--radius-full);
   }
   .seq-closer {
     margin-top: var(--space-7);
     text-align: center;
-    font-size: var(--text-display-lg);
+    font-size: var(--text-observation);
   }
   .seq-closer em {
     color: var(--color-accent-strong);
@@ -323,7 +396,7 @@ const c = companies[lang];
   }
   .s-title {
     margin-top: var(--space-4);
-    font-size: var(--text-display-lg);
+    font-size: var(--text-chapter);
   }
   .s-body {
     margin-top: var(--space-5);
@@ -377,10 +450,9 @@ const c = companies[lang];
     gap: var(--space-3);
   }
   .never-list li {
-    padding: var(--space-4) var(--space-5);
+    padding-block: var(--space-3);
     font-size: var(--text-body-lg);
-    background: var(--color-surface-raised);
-    border-radius: var(--radius-md);
+    border-bottom: var(--border-width) solid var(--color-border);
   }
 
   .finale {
@@ -393,6 +465,6 @@ const c = companies[lang];
   }
   .f-title {
     max-width: 22ch;
-    font-size: var(--text-heading-xl);
+    font-size: var(--text-observation);
   }
 </style>

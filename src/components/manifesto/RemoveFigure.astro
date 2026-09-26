@@ -1,7 +1,7 @@
 ---
-// The close, physically: the old chain from company to person, the
-// application and the screening struck and falling away, and the two ends
-// meeting as intent ↔ evidence ↔ intent.
+// The close, as one line of words on the page: company, job, application,
+// screening, person. The application and the screening are struck and fall
+// away; the ends draw together as intent ↔ evidence ↔ intent.
 import type { ManifestoContent } from '../../content/pages';
 
 interface Props {
@@ -13,24 +13,26 @@ const { c } = Astro.props;
 
 <figure class="remove" data-scene>
   <div class="stage">
-    <ol class="before" role="list">
+    <p class="row before">
       {
         c.before.map((b, i) => (
-          <li class:list={{ struck: c.struck.includes(i) }} style={`--i:${i}`}>
-            <span>{b}</span>
-          </li>
+          <>
+            {i > 0 && <span class:list={['rule', { gone: c.struck.includes(i) || c.struck.includes(i - 1) }]} aria-hidden="true" />}
+            <span class:list={['word', { struck: c.struck.includes(i) }]}>{b}</span>
+          </>
         ))
       }
-    </ol>
-    <ol class="after" role="list">
+    </p>
+    <p class="row after">
       {
         c.after.map((a, i) => (
-          <li class:list={{ middle: i === 1 }} style={`--i:${i}`}>
-            <span>{a}</span>
-          </li>
+          <>
+            {i > 0 && <span class="link" aria-hidden="true">↔</span>}
+            <span class:list={['word', { middle: i === 1 }]}>{a}</span>
+          </>
         ))
       }
-    </ol>
+    </p>
   </div>
   <figcaption>
     <span class="middle-line">{c.middle}</span>
@@ -40,126 +42,136 @@ const { c } = Astro.props;
 
 <style>
   .remove {
-    margin-block: var(--space-7);
-    padding: clamp(var(--space-5), 1rem + 3vw, var(--space-8));
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    padding-block: var(--space-9) var(--space-7);
     text-align: center;
-    background: var(--color-surface-raised);
-    border: var(--border-width) solid var(--color-border-subtle);
-    border-radius: var(--radius-xl);
-    box-shadow: var(--shadow-sheet);
   }
   .stage {
     display: grid;
-    min-height: 360px;
     align-items: center;
+    min-height: 90px;
+    padding-inline: var(--gutter);
   }
-  .before,
-  .after {
+  .row {
     grid-area: 1 / 1;
     display: flex;
-    flex-direction: column;
+    flex-wrap: wrap;
+    justify-content: center;
     align-items: center;
-    gap: var(--space-2);
+    gap: var(--space-3);
   }
-  .before li,
-  .after li {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  .before li + li::before,
-  .after li + li::before {
-    content: '↓';
-    margin-bottom: var(--space-2);
-    color: var(--color-text-faint);
-  }
-  .after li + li::before {
-    content: '↕';
-    color: var(--color-accent);
-  }
-  .before span,
-  .after span {
-    padding: var(--space-2) var(--space-5);
+  .word {
     font-size: var(--text-label);
     font-weight: var(--weight-semibold);
     letter-spacing: var(--tracking-label);
     text-transform: uppercase;
-    border-radius: var(--radius-md);
+    color: var(--color-text);
   }
-  .before span {
-    background: var(--color-surface-sunken);
+  .rule {
+    width: 36px;
+    height: 1px;
+    background: var(--color-text-faint);
   }
-  .after span {
+  .after .word {
     color: var(--color-accent-strong);
-    background: var(--color-accent-wash);
   }
-  .after .middle span {
-    color: var(--color-text-inverse);
-    background: var(--color-accent-strong);
+  .after .word.middle {
+    font-family: var(--font-display);
+    font-size: var(--text-heading-md);
+    font-weight: var(--weight-regular);
+    letter-spacing: 0;
+    text-transform: none;
   }
-
-  /* Choreography: strike, fall away, the chain fades, the new one arrives. */
-  .before {
-    transition: opacity 0.6s ease 2.4s;
+  .link {
+    color: var(--color-accent);
   }
-  .before span {
-    text-decoration-line: line-through;
-    text-decoration-color: transparent;
-    text-decoration-thickness: 2px;
-  }
-  .struck {
-    transition:
-      translate 0.9s cubic-bezier(0.5, 0, 0.75, 0) 1.3s,
-      rotate 0.9s ease 1.3s,
-      opacity 0.9s ease 1.3s;
-  }
-  .struck span {
-    transition: text-decoration-color 0.4s ease 0.6s;
-  }
-  .remove.is-playing .struck span {
-    text-decoration-color: var(--color-retracted);
-  }
-  .remove.is-playing .struck {
-    translate: 40px 60px;
-    rotate: 12deg;
-    opacity: 0;
-  }
-  .remove.is-playing .before {
-    opacity: 0;
-  }
-  .after li {
-    transition:
-      opacity 0.6s ease,
-      translate 0.7s var(--ease-standard);
-    transition-delay: calc(3s + var(--i) * 0.25s);
-  }
-  :global(.motion) .remove:not(.is-playing) .after li {
-    opacity: 0;
-    translate: 0 8px;
-  }
-  /* Without motion, show where it ends. */
-  :global(html:not(.motion)) .before {
-    display: none;
-  }
-
   figcaption {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: var(--space-3);
-    margin-top: var(--space-6);
+    margin-top: var(--space-7);
   }
   .middle-line {
     color: var(--color-text-muted);
   }
   .final {
-    font-size: var(--text-display-lg);
+    font-size: var(--text-thesis);
     color: var(--color-accent-strong);
   }
-  figcaption > * {
-    transition: opacity 0.6s ease 4s;
+
+  /* Resolved by default: the new line only. */
+  .before {
+    display: none;
+  }
+  :global(.motion) .remove .before {
+    display: flex;
+    transition: opacity 0.6s ease 2.3s;
+  }
+  :global(.motion) .remove .word.struck {
+    text-decoration-line: line-through;
+    text-decoration-thickness: 1.5px;
+    text-decoration-color: transparent;
+    transition:
+      text-decoration-color 0.4s ease 0.6s,
+      translate 0.9s cubic-bezier(0.5, 0, 0.75, 0) 1.3s,
+      rotate 0.9s ease 1.3s,
+      opacity 0.9s ease 1.3s;
+  }
+  :global(.motion) .remove .rule.gone {
+    transition: opacity 0.5s ease 1.3s;
+  }
+  :global(.motion) .remove.is-playing .word.struck {
+    text-decoration-color: var(--color-retracted);
+    translate: 0 40px;
+    rotate: 8deg;
+    opacity: 0;
+  }
+  :global(.motion) .remove.is-playing .rule.gone {
+    opacity: 0;
+  }
+  :global(.motion) .remove.is-playing .before {
+    opacity: 0;
+  }
+  :global(.motion) .remove .after > * {
+    transition:
+      opacity 0.7s ease,
+      translate 0.8s var(--ease-standard);
+    transition-delay: 2.9s;
+  }
+  :global(.motion) .remove .after .link {
+    transition-delay: 3.3s;
+  }
+  :global(.motion) .remove:not(.is-playing) .after > * {
+    opacity: 0;
+  }
+  :global(.motion) .remove:not(.is-playing) .after .word:first-child {
+    translate: -24px 0;
+  }
+  :global(.motion) .remove:not(.is-playing) .after .word:last-child {
+    translate: 24px 0;
+  }
+  :global(.motion) .remove figcaption > * {
+    transition: opacity 0.8s ease 3.8s;
   }
   :global(.motion) .remove:not(.is-playing) figcaption > * {
     opacity: 0;
+  }
+  @media (max-width: 640px) {
+    .row {
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+    .rule {
+      width: 1px;
+      height: 16px;
+    }
+    .link {
+      rotate: 90deg;
+    }
+    .stage {
+      min-height: 240px;
+    }
   }
 </style>

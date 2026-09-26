@@ -17,7 +17,7 @@ const { c } = Astro.props;
 
 <section class="night" aria-labelledby="defence-title">
   <div class="container">
-  <SectionIntro id="defence-title" kicker={c.kicker} title={c.title} body={c.line} align="center" />
+  <SectionIntro id="defence-title" kicker={c.kicker} title={c.title} body={c.line} align="center" level="observation" />
 
   <div class="cases" data-scene data-defence>
     {
@@ -89,7 +89,7 @@ const { c } = Astro.props;
     display: grid;
     gap: var(--space-6);
     max-width: var(--width-wide);
-    margin: var(--space-8) auto 0;
+    margin: var(--space-scene) auto 0;
   }
   @media (min-width: 860px) {
     .cases {

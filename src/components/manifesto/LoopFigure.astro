@@ -1,8 +1,8 @@
 ---
-// The broken machine: AI → applications → filters → ATS → screening → more
-// noise, and an arrow looping back to the top. As it plays, applications
-// multiply and filters multiply to meet them, until the loop is cut.
-// Conceptual: no numbers.
+// "More applications. More filters. More noise." — told by the page itself.
+// The screen holds still while you scroll: one application, then more, then
+// filters and screens among them, until the paper is uncomfortable. Then it
+// all clears, and two lines are left. No numbers, no diagram.
 import type { ManifestoContent } from '../../content/pages';
 
 interface Props {
@@ -10,165 +10,161 @@ interface Props {
 }
 
 const { c } = Astro.props;
-const apps = Array.from({ length: 18 }, (_, i) => i);
+
+let seed = 5;
+const rand = () => (seed = (seed * 9301 + 49297) % 233280) / 233280;
+const words: { text: string; x: number; y: number; t: number; kind: 'app' | 'filter'; r: number }[] = [];
+// The first one, alone, near the middle.
+words.push({ text: c.application, x: 46, y: 46, t: 0, kind: 'app', r: 0 });
+for (let i = 1; i < 60; i++) {
+  const filter = i > 22 && i % 3 === 0;
+  words.push({
+    text: filter ? c.filters[i % c.filters.length] : c.application,
+    x: 4 + rand() * 84,
+    y: 8 + rand() * 82,
+    // Slow at first, then faster: density accelerates.
+    t: Math.pow(i / 60, 0.8) * 0.7,
+    kind: filter ? 'filter' : 'app',
+    r: (rand() - 0.5) * 6,
+  });
+}
 ---
 
-<figure class="loop" data-scene>
-  <div class="machine">
-    <p class="node">{c.ai}</p>
-    <p class="arrow" aria-hidden="true">↓</p>
-    <p class="node">{c.applications}</p>
-    <div class="chips" aria-hidden="true">
-      {apps.map((i) => <span class="chip app" style={`--k:${i}`}>{c.application}</span>)}
+<figure class="noise" data-noise>
+  <div class="stick">
+    <div class="field" aria-hidden="true">
+      {
+        words.map((w) => (
+          <span class:list={['w', w.kind]} style={`left:${w.x}%;top:${w.y}%;rotate:${w.r.toFixed(1)}deg`} data-t={w.t.toFixed(3)}>
+            {w.text}
+          </span>
+        ))
+      }
     </div>
-    <p class="arrow" aria-hidden="true">↓</p>
-    <div class="chips filters" aria-hidden="true">
-      {c.filters.map((f, i) => <span class="chip filter" style={`--k:${i}`}>{f}</span>)}
+    <div class="clear">
+      <p class="before">{c.before}</p>
+      <p class="statement display">{c.statement}</p>
     </div>
-    <p class="arrow" aria-hidden="true">↓</p>
-    <p class="node noise">{c.noise}</p>
-
-    <svg class="back" viewBox="0 0 60 100" preserveAspectRatio="none" aria-hidden="true">
-      <path d="M8 96 C 56 96, 56 4, 8 4" pathLength="1" />
-      <path class="head" d="M14 0 L8 4 L14 8" />
-    </svg>
-    <span class="cut" aria-hidden="true"></span>
   </div>
-
-  <figcaption>
-    <p class="lines">
-      <span>{c.lines[0]}</span>
-      <span>{c.lines[1]}</span>
-    </p>
-    <p class="final display">{c.cut}</p>
-  </figcaption>
 </figure>
 
 <style>
-  .loop {
-    margin-block: var(--space-6);
-    padding: clamp(var(--space-5), 1rem + 3vw, var(--space-8));
-    background: var(--color-surface-sunken);
-    border-radius: var(--radius-xl);
-  }
-  .machine {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--space-2);
-    padding-right: 72px;
-  }
-  .node {
-    font-size: var(--text-label);
-    font-weight: var(--weight-semibold);
-    letter-spacing: var(--tracking-label);
-    text-transform: uppercase;
-  }
+  /* Full-bleed and tall: the scroll is what fills the page. */
   .noise {
+    position: relative;
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    height: 260vh;
+  }
+  .stick {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow: hidden;
+  }
+  .field {
+    position: absolute;
+    inset: 64px 4% 0;
+  }
+  @media (max-width: 640px) {
+    /* Room for a word centred at either edge; a third fewer words. */
+    .field {
+      inset: 64px 14% 0;
+    }
+    .w:nth-child(3n) {
+      display: none;
+    }
+  }
+  .w {
+    position: absolute;
+    translate: -50% -50%;
+    font-family: var(--font-mono);
+    font-size: var(--text-mono);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: var(--color-text-muted);
+    opacity: 0;
+    transition: opacity 0.35s ease;
+  }
+  .w.on {
+    opacity: 0.85;
+  }
+  .w.filter {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: var(--text-heading-sm);
+    text-transform: none;
+    letter-spacing: 0;
     color: var(--color-retracted);
   }
-  .arrow {
-    color: var(--color-text-faint);
-  }
-  .chips {
+  .clear {
+    position: absolute;
+    inset: 0;
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
     justify-content: center;
-    gap: 6px;
-    max-width: 34rem;
-  }
-  .chip {
-    padding: 2px var(--space-2);
-    font-family: var(--font-mono);
-    font-size: var(--text-label);
-    border-radius: var(--radius-sm);
-    transition:
-      opacity 0.4s ease,
-      scale 0.4s var(--ease-standard);
-  }
-  .app {
-    color: var(--color-text-muted);
-    background: var(--color-surface-raised);
-    border: var(--border-width) solid var(--color-border);
-    transition-delay: calc(0.2s + var(--k) * 0.12s);
-  }
-  .filter {
-    color: var(--color-text-inverse);
-    background: var(--color-text-faint);
-    transition-delay: calc(0.8s + var(--k) * 0.3s);
-  }
-  :global(.motion) .loop:not(.is-playing) .chip {
-    opacity: 0;
-    scale: 0.8;
-  }
-
-  /* The loop back to the top, and the moss cut through it. */
-  .back {
-    position: absolute;
-    top: 8px;
-    right: 0;
-    bottom: 8px;
-    width: 60px;
-    height: calc(100% - 16px);
-    overflow: visible;
-  }
-  .back path {
-    fill: none;
-    stroke: var(--color-text-faint);
-    stroke-width: 1.5;
-    vector-effect: non-scaling-stroke;
-    stroke-dasharray: 1;
-    stroke-dashoffset: 0;
-    transition: stroke-dashoffset 1.4s var(--ease-standard) 2.4s;
-  }
-  .back .head {
-    stroke-dasharray: none;
-  }
-  :global(.motion) .loop:not(.is-playing) .back path:first-child {
-    stroke-dashoffset: 1;
-  }
-  .cut {
-    position: absolute;
-    right: 8px;
-    top: 50%;
-    width: 64px;
-    height: 3px;
-    background: var(--color-accent);
-    border-radius: 2px;
-    rotate: -30deg;
-    transform-origin: center;
-    transition: scale 0.5s var(--ease-standard) 4.2s;
-  }
-  :global(.motion) .loop:not(.is-playing) .cut {
-    scale: 0 1;
-  }
-
-  figcaption {
-    display: flex;
-    flex-direction: column;
     align-items: center;
-    gap: var(--space-5);
-    margin-top: var(--space-6);
+    gap: var(--space-4);
+    padding: 0 var(--gutter);
     text-align: center;
-  }
-  .lines {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-1);
-    font-family: var(--font-display);
-    font-size: var(--text-heading-sm);
-    color: var(--color-text-muted);
-  }
-  .final {
-    font-size: var(--text-heading-xl);
-    color: var(--color-accent-strong);
-    transition:
-      opacity 0.6s ease 4.6s,
-      translate 0.7s var(--ease-standard) 4.6s;
-  }
-  :global(.motion) .loop:not(.is-playing) .final {
     opacity: 0;
     translate: 0 8px;
+    transition:
+      opacity 0.8s ease,
+      translate 0.8s var(--ease-standard);
+    pointer-events: none;
+  }
+  .before {
+    font-size: var(--text-body-lg);
+    color: var(--color-text-muted);
+  }
+  .statement {
+    max-width: 22ch;
+    font-size: var(--text-chapter);
+    text-wrap: balance;
+  }
+  .noise.is-clear .w {
+    opacity: 0;
+    transition-duration: 0.6s;
+  }
+  .noise.is-clear .clear {
+    opacity: 1;
+    translate: none;
+  }
+
+  /* Without motion: no crowd, just the two lines. */
+  :global(html:not(.motion)) .noise {
+    height: auto;
+    padding-block: var(--space-8);
+  }
+  :global(html:not(.motion)) .stick {
+    position: static;
+    height: auto;
+  }
+  :global(html:not(.motion)) .field {
+    display: none;
+  }
+  :global(html:not(.motion)) .clear {
+    position: static;
+    opacity: 1;
+    translate: none;
   }
 </style>
+
+<script>
+  for (const fig of document.querySelectorAll<HTMLElement>('[data-noise]')) {
+    if (!document.documentElement.classList.contains('motion')) continue;
+    const words = [...fig.querySelectorAll<HTMLElement>('.w')].map((el) => ({ el, t: Number(el.dataset.t) }));
+    const update = () => {
+      const r = fig.getBoundingClientRect();
+      const span = r.height - window.innerHeight;
+      const p = Math.min(1, Math.max(0, -r.top / span));
+      for (const w of words) w.el.classList.toggle('on', p >= w.t + 0.02);
+      fig.classList.toggle('is-clear', p > 0.82);
+    };
+    update();
+    window.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update, { passive: true });
+  }
+</script>

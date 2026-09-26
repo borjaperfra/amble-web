@@ -6,14 +6,15 @@ interface Props {
   body?: string;
   id?: string;
   align?: 'start' | 'center';
+  level?: 'chapter' | 'observation';
 }
 
-const { kicker, title, body, id, align = 'start' } = Astro.props;
+const { kicker, title, body, id, align = 'start', level = 'chapter' } = Astro.props;
 ---
 
 <div class:list={['intro', align]} data-reveal>
   <p class="kicker">{kicker}</p>
-  <h2 class="heading title" id={id}>{title}</h2>
+  <h2 class:list={['heading', 'title', level]} id={id}>{title}</h2>
   {body && <p class="lede">{body}</p>}
 </div>
 
@@ -30,8 +31,11 @@ const { kicker, title, body, id, align = 'start' } = Astro.props;
     margin-inline: auto;
     max-width: 36rem;
   }
-  .title {
-    font-size: var(--text-heading-xl);
+  .title.chapter {
+    font-size: var(--text-chapter);
+  }
+  .title.observation {
+    font-size: var(--text-observation);
   }
   .lede {
     margin-top: var(--space-2);

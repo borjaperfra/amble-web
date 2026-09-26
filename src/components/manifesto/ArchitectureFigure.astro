@@ -1,6 +1,7 @@
 ---
-// Two systems side by side, like a technical plate: today's chain, long and
-// grey, ending in "maybe a conversation"; Amble's, short, in moss.
+// "Give everyone a Rep", as one transformation. A person sends lines out to
+// many small applications; the lines fade; the eye appears beside them, and a
+// single hairline reaches one opportunity far away.
 import Symbol from '../Symbol.astro';
 import type { ManifestoContent } from '../../content/pages';
 
@@ -9,173 +10,218 @@ interface Props {
 }
 
 const { c } = Astro.props;
+
+let seed = 17;
+const rand = () => (seed = (seed * 9301 + 49297) % 233280) / 233280;
+// Two compositions of the same drawing: wide on a desk, tall on a phone.
+const wide = {
+  box: '0 0 1000 300',
+  origin: { x: 140, y: 150 },
+  target: { x: 900, y: 150 },
+  apps: Array.from({ length: 13 }, () => ({ x: 330 + rand() * 520, y: 40 + rand() * 220 })),
+};
+const tall = {
+  box: '0 0 320 440',
+  origin: { x: 160, y: 50 },
+  target: { x: 160, y: 390 },
+  apps: Array.from({ length: 10 }, () => ({ x: 30 + rand() * 260, y: 150 + rand() * 190 })),
+};
+const layouts = [
+  { name: 'wide', ...wide },
+  { name: 'tall', ...tall },
+];
 ---
 
-<figure class="arch" data-scene>
-  <div class="plates">
-    <section class="plate today">
-      <p class="plate-label">{c.today}</p>
-      <ol class="chain" role="list">
-        {
-          c.todaySteps.map((st, i) => (
-            <li style={`--i:${i}`} class:list={{ last: i === c.todaySteps.length - 1 }}>
-              {st}
-            </li>
-          ))
-        }
-      </ol>
-    </section>
-
-    <section class="plate amble">
-      <p class="plate-label">{c.amble}</p>
-      <div class="flow">
-        <span class="step">{c.you}</span>
-        <span class="down" aria-hidden="true">↓</span>
-        <div class="listen">
-          <span class="step rep">
-            <Symbol size={20} />
-            {c.rep}
-          </span>
-          <span class="dots" aria-hidden="true">··· <em>{c.listening}</em> ···</span>
-          <span class="step">{c.opportunity}</span>
-        </div>
-        <span class="down" aria-hidden="true">↓</span>
-        <span class="worth">{c.worth}</span>
-        <span class="down" aria-hidden="true">↓</span>
-        <span class="step final">{c.conversation}</span>
-      </div>
-    </section>
+<figure class="rep" data-scene data-rep>
+  <div class="art">
+    {
+      layouts.map(({ name, box, origin, target, apps }) => {
+        const vertical = name === 'tall';
+        return (
+          <svg class={name} viewBox={box} role="img" aria-label={`${c.caption[0]} ${c.caption[1]}`}>
+            <g class="before">
+              {apps.map((a, i) => <line class="ray" x1={origin.x} y1={origin.y} x2={a.x} y2={a.y} style={`--i:${i}`} />)}
+              {apps.map((a, i) => <rect class="app" x={a.x - 5} y={a.y - 7} width="10" height="14" rx="1" style={`--i:${i}`} />)}
+              <text class="tag" x={vertical ? origin.x + 18 : origin.x - 18} y={vertical ? origin.y + 4 : origin.y - 34}>
+                {c.todaySteps[2].toLowerCase()}
+              </text>
+              {/* On the phone the label turns inward, so it never leaves the page. */}
+              <text
+                class="tag"
+                x={vertical && apps[4].x > origin.x ? apps[4].x - 10 : apps[4].x + 10}
+                y={apps[4].y - 10}
+                text-anchor={vertical && apps[4].x > origin.x ? 'end' : 'start'}
+              >
+                {c.todaySteps[3].toLowerCase()}
+              </text>
+            </g>
+            <g class="after">
+              <line
+                class="reach"
+                x1={vertical ? origin.x : origin.x + 20}
+                y1={vertical ? origin.y + 20 : origin.y}
+                x2={vertical ? target.x : target.x - 12}
+                y2={vertical ? target.y - 12 : target.y}
+                pathLength="1"
+              />
+              <text
+                class="worth"
+                x={vertical ? origin.x + 14 : 520}
+                y={vertical ? (origin.y + target.y) / 2 : origin.y - 16}
+                text-anchor={vertical ? 'start' : 'middle'}
+              >
+                {c.worth}
+              </text>
+              <circle class="opportunity" cx={target.x} cy={target.y} r="7" />
+              <text class="tag strong" x={target.x} y={target.y + 34} text-anchor="middle">{c.opportunity.toLowerCase()}</text>
+            </g>
+            <circle class="you" cx={origin.x} cy={origin.y} r="6" />
+            <text
+              class="tag"
+              x={vertical ? origin.x - 18 : origin.x}
+              y={vertical ? origin.y + 4 : origin.y + 34}
+              text-anchor={vertical ? 'end' : 'middle'}
+            >
+              {c.you.toLowerCase()}
+            </text>
+          </svg>
+        );
+      })
+    }
+    <span class="eye" aria-hidden="true"><Symbol size={30} breathe /></span>
   </div>
   <figcaption>
     <span>{c.caption[0]}</span>
-    <span class="strong">{c.caption[1]}</span>
+    <em>{c.caption[1]}</em>
   </figcaption>
 </figure>
 
 <style>
-  .arch {
-    margin-block: var(--space-6);
+  .rep {
+    margin-block: var(--space-7);
   }
-  .plates {
-    display: grid;
-    gap: var(--space-5);
+  .art {
+    position: relative;
   }
-  @media (min-width: 760px) {
-    .plates {
-      grid-template-columns: 1fr 1fr;
+  svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+  svg.tall {
+    display: none;
+    max-width: 22rem;
+    margin-inline: auto;
+  }
+  @media (max-width: 640px) {
+    svg.wide {
+      display: none;
+    }
+    svg.tall {
+      display: block;
     }
   }
-  .plate {
-    padding: var(--space-6);
-    border-radius: var(--radius-lg);
+  .ray {
+    stroke: var(--color-text-faint);
+    stroke-width: 1;
   }
-  .today {
-    background: var(--color-surface-sunken);
+  .app {
+    fill: none;
+    stroke: var(--color-text-muted);
+    stroke-width: 1;
   }
-  .amble {
-    background: var(--color-surface-raised);
-    border: 1.5px solid var(--color-accent-soft);
-    box-shadow: var(--shadow-sheet);
+  .you {
+    fill: var(--color-text);
   }
-  .plate-label {
-    margin-bottom: var(--space-5);
-    font-size: var(--text-label);
-    font-weight: var(--weight-semibold);
-    letter-spacing: var(--tracking-label);
-    text-transform: uppercase;
-    color: var(--color-text-muted);
+  .tag {
+    font-family: var(--font-ui);
+    font-size: 13px;
+    letter-spacing: 0.02em;
+    fill: var(--color-text-faint);
   }
-  .amble .plate-label {
-    color: var(--color-accent-strong);
+  .tag.strong {
+    fill: var(--color-accent-strong);
   }
-  .chain {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 6px;
-  }
-  .chain li {
-    padding: 3px var(--space-3);
-    font-size: var(--text-body-sm);
-    color: var(--color-text-muted);
-    background: var(--color-surface);
-    border-radius: var(--radius-sm);
-    transition: opacity 0.4s ease;
-    transition-delay: calc(var(--i) * 0.12s);
-  }
-  .chain li + li::before {
-    content: '↓ ';
-    color: var(--color-text-faint);
-  }
-  .chain li.last {
-    font-style: italic;
-  }
-  :global(.motion) .arch:not(.is-playing) .chain li {
-    opacity: 0;
-  }
-  .flow {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 6px;
-  }
-  .step {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-2);
-    padding: 4px var(--space-3);
-    font-size: var(--text-body-sm);
-    font-weight: var(--weight-medium);
-    background: var(--color-accent-wash);
-    border-radius: var(--radius-sm);
-  }
-  .step.final {
-    color: var(--color-text-inverse);
-    background: var(--color-accent-strong);
-  }
-  .listen {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: var(--space-2);
-  }
-  .dots {
-    font-size: var(--text-body-sm);
-    color: var(--color-accent);
-  }
-  .dots em {
-    font-family: var(--font-display);
-    color: var(--color-accent-strong);
-  }
-  .down {
-    padding-left: var(--space-3);
-    color: var(--color-accent);
+  .reach {
+    stroke: var(--color-accent);
+    stroke-width: 1.25;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 0;
   }
   .worth {
-    padding-left: var(--space-3);
     font-family: var(--font-display);
     font-style: italic;
-    color: var(--color-text-muted);
+    font-size: 18px;
+    fill: var(--color-text-muted);
   }
-  .flow > * {
-    transition: opacity 0.5s ease;
+  .opportunity {
+    fill: var(--color-accent);
   }
-  .flow > :nth-child(n) {
-    transition-delay: 1.2s;
+  .eye {
+    position: absolute;
+    left: 14%;
+    top: 26%;
+    translate: -50% -50%;
+    color: var(--color-text);
   }
-  :global(.motion) .arch:not(.is-playing) .flow > * {
-    opacity: 0;
+  @media (max-width: 640px) {
+    /* Beside "you", on the other side from its label. */
+    .eye {
+      left: calc(50% + 44px);
+      top: 11%;
+    }
   }
   figcaption {
     display: flex;
     flex-direction: column;
     gap: var(--space-1);
-    margin-top: var(--space-5);
+    margin-top: var(--space-4);
     font-family: var(--font-display);
     font-size: var(--text-heading-md);
     color: var(--color-text-muted);
   }
-  .strong {
+  figcaption em {
     color: var(--color-accent-strong);
   }
+
+  /* Resolved by default (no motion): the Rep, one line, one opportunity. */
+  .before {
+    opacity: 0;
+  }
+  /* With motion: first the searching, then the change. */
+  :global(.motion) .rep .before {
+    opacity: 1;
+    transition: opacity 0.9s ease;
+  }
+  :global(.motion) .rep.is-b .before {
+    opacity: 0;
+  }
+  :global(.motion) .rep .ray,
+  :global(.motion) .rep .app {
+    transition: opacity 0.4s ease;
+    transition-delay: calc(var(--i) * 70ms);
+  }
+  :global(.motion) .rep:not(.is-playing) :is(.ray, .app) {
+    opacity: 0;
+  }
+  :global(.motion) .rep:not(.is-b) :is(.after, .eye) {
+    opacity: 0;
+  }
+  :global(.motion) .rep:not(.is-b) .reach {
+    stroke-dashoffset: 1;
+  }
+  :global(.motion) .rep .after,
+  :global(.motion) .rep .eye {
+    transition: opacity 0.8s ease 0.3s;
+  }
+  :global(.motion) .rep .reach {
+    transition: stroke-dashoffset 1.4s var(--ease-standard) 0.5s;
+  }
 </style>
+
+<script>
+  for (const fig of document.querySelectorAll<HTMLElement>('[data-rep]')) {
+    fig.addEventListener('scene:play', () => setTimeout(() => fig.classList.add('is-b'), 2400), { once: true });
+  }
+</script>

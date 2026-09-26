@@ -1,7 +1,7 @@
 ---
 // Renders a run of manifesto blocks: paragraphs, beats set large, chapter
 // headings, lists, the Rep's quote, and figures.
-import Iceberg from '../Iceberg.astro';
+import DotField from '../DotField.astro';
 import LoopFigure from './LoopFigure.astro';
 import ArchitectureFigure from './ArchitectureFigure.astro';
 import RemoveFigure from './RemoveFigure.astro';
@@ -23,13 +23,12 @@ const { blocks, figures } = Astro.props;
       if (b.figure === 'architecture') return <ArchitectureFigure c={figures.architecture} />;
       if (b.figure === 'remove') return <RemoveFigure c={figures.remove} />;
       return (
-        <div class="fig-iceberg">
-          <Iceberg
+        <div class="fig-field">
+          <DotField
             size="large"
-            looking={figures.iceberg.looking}
-            notLooking={figures.iceberg.notLooking}
-            question={figures.iceberg.question}
-            tags={figures.iceberg.tags}
+            lookingLabel={figures.iceberg.looking.toLowerCase()}
+            conditions={figures.iceberg.tags}
+            statement={figures.iceberg.statement}
           />
         </div>
       );
@@ -58,19 +57,26 @@ const { blocks, figures } = Astro.props;
 }
 
 <style>
+  /* Text keeps a reading measure; figures take the page's width. */
+  .b-p,
+  .b-beat,
+  .b-chapter,
+  .b-list {
+    max-width: 46rem;
+  }
   .b-p {
     font-size: var(--text-body-lg);
     color: var(--color-text-muted);
     text-wrap: pretty;
   }
   .b-beat {
-    font-size: var(--text-heading-xl);
+    font-size: var(--text-observation);
     text-wrap: balance;
   }
   .b-chapter {
     margin-top: var(--space-9);
     padding-top: var(--space-6);
-    font-size: var(--text-display-lg);
+    font-size: var(--text-chapter);
     border-top: var(--border-width) solid var(--color-border);
     text-wrap: balance;
   }
@@ -99,11 +105,7 @@ const { blocks, figures } = Astro.props;
     border-radius: 20px 20px 20px 6px;
     box-shadow: var(--shadow-sheet);
   }
-  .fig-iceberg {
-    margin-block: var(--space-6);
-    padding: clamp(var(--space-5), 1rem + 3vw, var(--space-8));
-    background: var(--color-surface-raised);
-    border: var(--border-width) solid var(--color-border-subtle);
-    border-radius: var(--radius-xl);
+  .fig-field {
+    margin-block: var(--space-7);
   }
 </style>
