@@ -84,6 +84,8 @@ Needs many reviews first; it will happen, not for launch.
 
 ## Open points
 
+- **Career coach agent (to pick up next):** the site barely mentions it (only "+ career coach" on the roadmap's v0). It needs to be told properly — what it does (strengthen your profile, how to look for work when you want to) — without making the home longer. Options to weigh: fold it into an existing scene (e.g. the "I don't know yet" gap in chapter 1 or the roadmap v0), or give it its own page linked from the roadmap.
+
 - Legal entity for the privacy page (`src/config/legal.ts`): name, tax ID, address.
 - `privacy@amble.fyi` must exist as a real inbox before launch.
 - GitHub sync of your data (section 10) doesn't exist yet: place it in v0 or on the roadmap.
