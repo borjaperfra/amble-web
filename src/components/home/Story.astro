@@ -1,0 +1,602 @@
+---
+// Chapter 1, "It gets to know you": Source → Claim → Evidence → Capability,
+// the product's core idea, told as one pinned scene in four steps.
+//
+//   0  the sources arrive
+//   1  the Rep picks out claims, each still sitting in its source
+//   2  the claims fly out of the documents into the capability they support
+//   3  each capability shows the strength of its evidence, and what's unknown
+//
+// The server renders the final state (claims inside their capabilities), so
+// without JavaScript or with reduced motion the scene reads complete. The
+// script moves each claim back into its source line and plays the steps as the
+// chapter scrolls by. Claims are real elements moved with GSAP Flip: the words
+// you see fly are the same words you read in the CV.
+import EvidenceDots from '../EvidenceDots.astro';
+import type { HomeContent } from '../../content/home';
+
+interface Props {
+  c: HomeContent['story'];
+  strength: HomeContent['strength'];
+  sourceNames: HomeContent['sourceNames'];
+}
+
+const { c, strength, sourceNames } = Astro.props;
+
+const claims = c.sources.flatMap((src) =>
+  src.lines.flatMap((line) => (line.claim ? [{ ...line.claim, text: line.text, source: src.source }] : [])),
+);
+---
+
+<section class="story" data-step="3" data-layout="group" aria-labelledby="story-title">
+  <div class="story-pin">
+    <div class="container story-grid">
+      <div class="captions">
+        <ol class="progress" role="list" aria-hidden="true">
+          {c.steps.map((_, i) => <li data-i={i}>{String(i + 1).padStart(2, '0')}</li>)}
+        </ol>
+        <div class="caption-stack">
+          {
+            c.steps.map((step, i) => (
+              <div class="caption" data-i={i}>
+                <p class="kicker">{step.kicker}</p>
+                {i === 0 ? (
+                  <h2 class="heading caption-title" id="story-title">{step.title}</h2>
+                ) : (
+                  <p class="heading caption-title">{step.title}</p>
+                )}
+                <p class="lede caption-body">{step.body}</p>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+
+      <div class="stage-wrap">
+        <div class="stage">
+          <div class="docs">
+            {
+              c.sources.map((src, d) => (
+                <article class="doc" data-doc={src.id} style={`--d:${d}`}>
+                  <header class="doc-head">
+                    <span class="doc-source">{sourceNames[src.source]}</span>
+                    <span class="doc-title">{src.title}</span>
+                  </header>
+                  <div class="doc-body">
+                    {src.lines.map((line) => (
+                      <p class:list={['doc-line', line.kind]} data-slot={line.claim?.id}>
+                        <span class="line-text">{line.text}</span>
+                      </p>
+                    ))}
+                  </div>
+                </article>
+              ))
+            }
+          </div>
+
+          <div class="caps">
+            {
+              c.caps.map((cap, k) => (
+                <section class="cap" data-cap={cap.id} style={`--k:${k}`}>
+                  <header class="cap-head">
+                    <h3 class="cap-name">{cap.name}</h3>
+                    <p class="cap-meta">
+                      <EvidenceDots strength={cap.strength} label={strength[cap.strength]} />
+                      <span class="cap-count">{cap.count}</span>
+                    </p>
+                  </header>
+                  <ul class="cap-claims" role="list" data-list={cap.id}>
+                    {claims
+                      .filter((cl) => cl.cap === cap.id)
+                      .map((cl) => (
+                        <li class="claim" data-claim={cl.id} data-cap={cl.cap} style={`--ci:${claims.indexOf(cl)}`}>
+                          <span class="claim-text">{cl.text}</span>
+                          <span class="claim-tags">
+                            <span class="source-tag">{sourceNames[cl.source]}</span>
+                            {cl.assisted && <span class="assisted">⚠ {c.assisted}</span>}
+                          </span>
+                        </li>
+                      ))}
+                  </ul>
+                </section>
+              ))
+            }
+            <section class="cap unknown">
+              <p class="unknown-label">{c.unknown.label}</p>
+              <header class="cap-head">
+                <h3 class="cap-name">{c.unknown.name}</h3>
+                <p class="cap-meta">
+                  <EvidenceDots strength={c.unknown.strength} label={strength[c.unknown.strength]} />
+                </p>
+              </header>
+              <p class="unknown-note">{c.unknown.note}</p>
+            </section>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* ---------- Frame ---------- */
+  .story {
+    position: relative;
+  }
+  .story-pin {
+    display: flex;
+    align-items: center;
+    min-height: 100svh;
+    padding-block: var(--space-8);
+  }
+  .story-grid {
+    display: grid;
+    gap: var(--space-7);
+    align-items: center;
+  }
+  @media (min-width: 960px) {
+    .story-grid {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      gap: var(--space-9);
+    }
+  }
+
+  /* ---------- Captions ---------- */
+  .captions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+  .progress {
+    display: flex;
+    gap: var(--space-4);
+    font-family: var(--font-mono);
+    font-size: var(--text-mono);
+    color: var(--color-text-faint);
+  }
+  .progress li {
+    position: relative;
+    padding-top: var(--space-3);
+    transition: color var(--motion-slow) ease;
+  }
+  .progress li::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 1.5px;
+    background: var(--color-border);
+    transform-origin: left;
+    transition: background var(--motion-slow) ease;
+  }
+  .caption-stack {
+    display: grid;
+  }
+  .caption {
+    grid-area: 1 / 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+  .caption-title {
+    font-size: var(--text-heading-xl);
+  }
+  .caption-body {
+    max-width: 28rem;
+  }
+
+  /* Live: one caption at a time, the progress follows the step. */
+  .story.is-live .caption {
+    opacity: 0;
+    transform: translateY(10px);
+    transition:
+      opacity var(--motion-slow) ease,
+      transform var(--motion-arrive) var(--ease-standard);
+    pointer-events: none;
+  }
+  .story.is-live[data-step='-1'] .caption[data-i='0'],
+  .story.is-live[data-step='0'] .caption[data-i='0'],
+  .story.is-live[data-step='1'] .caption[data-i='1'],
+  .story.is-live[data-step='2'] .caption[data-i='2'],
+  .story.is-live[data-step='3'] .caption[data-i='3'] {
+    opacity: 1;
+    transform: none;
+    transition-delay: 120ms;
+    pointer-events: auto;
+  }
+  .story.is-live[data-step='0'] .progress li[data-i='0'],
+  .story.is-live[data-step='1'] .progress li:is([data-i='0'], [data-i='1']),
+  .story.is-live[data-step='2'] .progress li:is([data-i='0'], [data-i='1'], [data-i='2']),
+  .story.is-live[data-step='3'] .progress li {
+    color: var(--color-accent-strong);
+  }
+  .story.is-live[data-step='0'] .progress li[data-i='0']::before,
+  .story.is-live[data-step='1'] .progress li:is([data-i='0'], [data-i='1'])::before,
+  .story.is-live[data-step='2'] .progress li:is([data-i='0'], [data-i='1'], [data-i='2'])::before,
+  .story.is-live[data-step='3'] .progress li::before {
+    background: var(--color-accent);
+  }
+  /* Not live (no JS, reduced motion): every caption, in order. */
+  .story:not(.is-live) .caption-stack {
+    gap: var(--space-6);
+  }
+  .story:not(.is-live) .caption {
+    grid-area: auto;
+  }
+  .story:not(.is-live) .caption:not(:first-child) .caption-title {
+    font-size: var(--text-heading-md);
+  }
+  .story:not(.is-live) .progress {
+    display: none;
+  }
+
+  /* ---------- Stage: a scene that scales like an illustration ---------- */
+  .stage-wrap {
+    width: min(100%, calc(80svh / 0.92));
+    justify-self: center;
+  }
+  .stage {
+    position: relative;
+    container: stage / size;
+    width: 100%;
+    aspect-ratio: 100 / 92;
+    --doc-font: max(11.5px, 1.9cqw);
+    --cap-font: max(16px, 3cqw);
+  }
+
+  /* Documents: position (x, y, w, r) when read; (gx, gy, gr, gs) when piled aside. */
+  .doc {
+    position: absolute;
+    left: calc(var(--x) * 1cqw);
+    top: calc(var(--y) * 1cqw);
+    width: calc(var(--w) * 1cqw);
+    padding: 3.2cqw 3.4cqw;
+    font-size: var(--doc-font);
+    line-height: 1.55;
+    background: var(--color-surface-raised);
+    border: var(--border-width) solid var(--color-border-subtle);
+    border-radius: 1.6cqw;
+    box-shadow: var(--shadow-sheet);
+    transform-origin: top left;
+    transform: rotate(calc(var(--r) * 1deg));
+    transition:
+      transform 1.1s var(--ease-standard),
+      translate var(--motion-arrive) var(--ease-standard),
+      opacity var(--motion-arrive) ease;
+    transition-delay: calc(var(--d) * 90ms);
+  }
+  .doc[data-doc='cv'] { --x: 0; --y: 3; --w: 54; --r: -1.2; --gx: 0; --gy: 1; --gr: -2.5; --gs: 0.46; z-index: 1; }
+  .doc[data-doc='gh'] { --x: 58; --y: 0; --w: 42; --r: 1.4; --gx: 6; --gy: 20; --gr: 3; --gs: 0.5; }
+  .doc[data-doc='web'] { --x: 60; --y: 31; --w: 40; --r: -0.8; --gx: 2; --gy: 31; --gr: -2.2; --gs: 0.5; }
+  .doc[data-doc='li'] { --x: 56; --y: 62; --w: 44; --r: 1; --gx: 7; --gy: 42; --gr: 1.2; --gs: 0.5; }
+
+  .doc-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 2cqw;
+    padding-bottom: 1.6cqw;
+    margin-bottom: 1.6cqw;
+    border-bottom: var(--border-width) solid var(--color-border-subtle);
+  }
+  .doc-source {
+    font-size: 0.78em;
+    font-weight: var(--weight-semibold);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--color-text-faint);
+  }
+  .doc-title {
+    font-family: var(--font-mono);
+    font-size: 0.82em;
+    color: var(--color-text-faint);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .doc-line {
+    position: relative;
+    color: var(--color-text-muted);
+    padding-block: 0.25em;
+  }
+  .doc-line.name {
+    font-family: var(--font-display);
+    font-size: 1.7em;
+    line-height: 1.1;
+    color: var(--color-text);
+  }
+  .doc-line.meta {
+    margin-top: 0.5em;
+    font-size: 0.86em;
+    color: var(--color-text-faint);
+  }
+
+  /* ---------- Claims ---------- */
+  .claim {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4em 0.7em;
+    font-size: var(--doc-font);
+    line-height: 1.45;
+    color: var(--color-text);
+  }
+  .claim-tags {
+    display: inline-flex;
+    gap: 0.4em;
+  }
+  .claim .source-tag {
+    height: auto;
+    padding: 0.1em 0.5em;
+    font-size: 0.8em;
+  }
+  .assisted {
+    font-size: 0.8em;
+    color: var(--color-caution);
+  }
+
+  /* A claim sitting in its source line, laid exactly over the line's text. */
+  .doc-line > .claim {
+    position: absolute;
+    top: 0.25em;
+    left: 0;
+    right: 0;
+    display: block;
+    color: var(--color-text);
+    background-image: linear-gradient(var(--color-accent-soft), var(--color-accent-soft));
+    background-repeat: no-repeat;
+    background-position: 0 88%;
+    background-size: 0% 38%;
+    opacity: 0;
+    transition:
+      opacity var(--motion-slow) ease,
+      background-size 0.9s var(--ease-standard);
+    transition-delay: calc(var(--ci) * 120ms);
+  }
+  .doc-line > .claim .claim-tags {
+    display: none;
+  }
+  .claim-text {
+    box-decoration-break: clone;
+  }
+  .story[data-step='1'] .doc-line > .claim {
+    opacity: 1;
+    background-size: 100% 38%;
+  }
+  /* The line underneath goes quiet once the claim has been picked out. */
+  .story[data-step='1'] .doc-line[data-slot] > .line-text {
+    opacity: 0;
+    transition: opacity var(--motion-slow) ease;
+    transition-delay: calc(var(--ci, 0) * 120ms);
+  }
+
+  /* ---------- Capabilities ---------- */
+  .caps {
+    position: absolute;
+    top: 0;
+    left: 38cqw;
+    width: 62cqw;
+    display: flex;
+    flex-direction: column;
+    gap: 3.6cqw;
+  }
+  .cap-head {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6cqw;
+    margin-bottom: 1.4cqw;
+  }
+  .cap-name {
+    font-family: var(--font-display);
+    font-weight: var(--weight-regular);
+    font-size: var(--cap-font);
+    line-height: 1.15;
+    letter-spacing: var(--tracking-heading);
+  }
+  .cap-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4em 1.2em;
+    font-size: var(--text-body-sm);
+  }
+  .cap-count {
+    font-size: var(--text-body-sm);
+    color: var(--color-text-faint);
+  }
+  .cap-claims {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9cqw;
+    padding-left: 1.6cqw;
+    border-left: 1.5px solid var(--color-accent-soft);
+  }
+  .unknown {
+    padding-top: 2.4cqw;
+    border-top: var(--border-width) dashed var(--color-border);
+  }
+  .unknown-label {
+    margin-bottom: 1cqw;
+    font-size: var(--text-label);
+    font-weight: var(--weight-semibold);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--color-text-faint);
+  }
+  .unknown-note {
+    font-size: var(--doc-font);
+    color: var(--color-text-muted);
+    max-width: 40ch;
+  }
+
+  /* Step choreography (live only; not-live shows the final state). */
+  .story.is-live .doc {
+    opacity: 1;
+  }
+  .story.is-live[data-step='-1'] .doc {
+    opacity: 0;
+    translate: 0 5cqw;
+  }
+  .story.is-live[data-layout='group'] .doc {
+    transform: translate(calc((var(--gx) - var(--x)) * 1cqw), calc((var(--gy) - var(--y)) * 1cqw))
+      rotate(calc(var(--gr) * 1deg)) scale(var(--gs));
+    opacity: 0.55;
+    transition-delay: 0ms;
+  }
+  .story:not(.is-live) .doc {
+    transform: translate(calc((var(--gx) - var(--x)) * 1cqw), calc((var(--gy) - var(--y)) * 1cqw))
+      rotate(calc(var(--gr) * 1deg)) scale(var(--gs));
+    opacity: 0.55;
+  }
+
+  .story.is-live .cap-head,
+  .story.is-live .cap-claims {
+    transition: opacity var(--motion-slow) ease;
+  }
+  .story.is-live[data-layout='read'] .cap-head,
+  .story.is-live[data-layout='read'] .cap-claims {
+    opacity: 0;
+  }
+  .story.is-live[data-layout='group'] .cap-head {
+    opacity: 1;
+    transition-delay: calc(0.5s + var(--k) * 120ms);
+  }
+  .story.is-live .cap-meta,
+  .story.is-live .unknown {
+    transition:
+      opacity var(--motion-slow) ease,
+      translate var(--motion-arrive) var(--ease-standard);
+  }
+  .story.is-live:not([data-step='3']) .cap-meta,
+  .story.is-live:not([data-step='3']) .unknown {
+    opacity: 0;
+    translate: 0 1cqw;
+  }
+  .story.is-live[data-step='3'] .cap-meta {
+    transition-delay: calc(var(--k) * 140ms);
+  }
+  .story.is-live[data-step='3'] .unknown {
+    transition-delay: 520ms;
+  }
+  .story[data-step='3'] .caps .claim {
+    color: var(--color-text-muted);
+    transition: color var(--motion-slow) ease;
+  }
+
+  /* ---------- Narrow stage (phones) ---------- */
+  @media (max-width: 959px) {
+    .story-pin {
+      align-items: flex-start;
+      padding-block: var(--space-6);
+    }
+    .story-grid {
+      gap: var(--space-5);
+    }
+    .caption-title {
+      font-size: var(--text-heading-lg);
+    }
+    .caption-body {
+      font-size: var(--text-body);
+    }
+    .stage-wrap {
+      width: min(100%, calc(62svh / 1.76));
+    }
+    .stage {
+      aspect-ratio: 100 / 176;
+      --doc-font: max(11px, 3.3cqw);
+      --cap-font: max(16px, 5.4cqw);
+    }
+    .doc {
+      padding: 4cqw 4.4cqw;
+      border-radius: 3cqw;
+    }
+    .doc[data-doc='cv'] { --x: 0; --y: 0; --w: 100; --r: -0.6; --gx: 0; --gy: 0; --gr: -2; --gs: 0.27; }
+    .doc[data-doc='gh'] { --x: 0; --y: 81; --w: 76; --r: 1; --gx: 25; --gy: 1; --gr: 2; --gs: 0.3; }
+    .doc[data-doc='web'] { --x: 24; --y: 116; --w: 76; --r: -1; --gx: 49; --gy: 0; --gr: -1.5; --gs: 0.3; }
+    .doc[data-doc='li'] { --x: 4; --y: 144; --w: 76; --r: 0.8; --gx: 73; --gy: 2; --gr: 1.8; --gs: 0.3; }
+    .caps {
+      top: 30cqw;
+      left: 0;
+      width: 100%;
+      gap: 5cqw;
+    }
+    .cap-claims {
+      gap: 1.6cqw;
+      padding-left: 3cqw;
+    }
+    .cap-head {
+      margin-bottom: 2cqw;
+    }
+  }
+</style>
+
+<script>
+  import { gsap, ScrollTrigger, Flip, reducedMotion } from '../../scripts/motion';
+
+  const story = document.querySelector<HTMLElement>('.story');
+
+  if (story && !reducedMotion) {
+    const claims = [...story.querySelectorAll<HTMLElement>('.claim')];
+    const slot = (el: HTMLElement) => story.querySelector<HTMLElement>(`[data-slot="${el.dataset.claim}"]`)!;
+    const list = (el: HTMLElement) => story.querySelector<HTMLElement>(`[data-list="${el.dataset.cap}"]`)!;
+
+    // Start from the beginning: every claim back in its source line.
+    for (const el of claims) {
+      const line = slot(el);
+      line.style.setProperty('--ci', el.style.getPropertyValue('--ci'));
+      line.append(el);
+    }
+    story.classList.add('is-live');
+    story.dataset.layout = 'read';
+    story.dataset.step = '-1';
+
+    let step = -1;
+    let flight: gsap.core.Timeline | undefined;
+
+    const toCapabilities = () => {
+      flight?.progress(1);
+      const state = Flip.getState(claims);
+      story.dataset.layout = 'group';
+      for (const el of claims) list(el).append(el);
+      flight = Flip.from(state, {
+        duration: 1.15,
+        ease: 'power3.inOut',
+        stagger: 0.07,
+        absolute: true,
+        simple: true,
+      });
+    };
+
+    const toSources = () => {
+      flight?.progress(1);
+      story.dataset.layout = 'read';
+      for (const el of claims) slot(el).append(el);
+    };
+
+    const setStep = (next: number) => {
+      if (next === step) return;
+      if (step < 2 && next >= 2) toCapabilities();
+      if (step >= 2 && next < 2) toSources();
+      step = next;
+      story.dataset.step = String(next);
+    };
+
+    // The documents arrive as the chapter comes into view.
+    ScrollTrigger.create({
+      trigger: story,
+      start: 'top 75%',
+      onEnter: () => step < 0 && setStep(0),
+    });
+
+    // Then the scene holds still while the story plays out over the scroll.
+    ScrollTrigger.create({
+      trigger: story,
+      pin: story.querySelector('.story-pin'),
+      start: 'top top',
+      end: '+=320%',
+      onUpdate: (self) => setStep(Math.min(3, Math.floor(self.progress * 4))),
+      onLeaveBack: () => setStep(0),
+    });
+  }
+</script>

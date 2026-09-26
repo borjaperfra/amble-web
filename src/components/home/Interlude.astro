@@ -1,0 +1,86 @@
+---
+// A typographic interlude between chapters: one sentence at poster size that
+// inks itself in, word by word, as you scroll past it.
+interface Props {
+  lines: [string, string];
+  body?: string;
+  id?: string;
+}
+
+const { lines, body, id } = Astro.props;
+const words = (line: string) => line.split(' ');
+---
+
+<section class="interlude" aria-labelledby={id}>
+  <div class="container">
+    <h2 class="display statement" id={id} data-ink>
+      <span class="line">{words(lines[0]).map((w) => <span class="word">{w} </span>)}</span>
+      <span class="line second">{words(lines[1]).map((w) => <span class="word">{w} </span>)}</span>
+    </h2>
+    {body && <p class="lede body" data-reveal>{body}</p>}
+  </div>
+</section>
+
+<style>
+  .interlude {
+    padding-block: var(--space-section);
+    overflow: hidden;
+  }
+  .statement {
+    display: flex;
+    flex-direction: column;
+    font-size: var(--text-poster);
+    line-height: 0.92;
+    letter-spacing: -0.035em;
+  }
+  .second {
+    align-self: flex-end;
+    font-style: italic;
+    color: var(--color-accent-strong);
+    padding-right: 2vw;
+  }
+  .word {
+    display: inline-block;
+    white-space: pre;
+  }
+  .js .word {
+    opacity: var(--ink-min);
+  }
+  .body {
+    max-width: 26rem;
+    margin-top: var(--space-7);
+    margin-left: auto;
+    text-align: right;
+  }
+  @media (max-width: 640px) {
+    .body {
+      text-align: left;
+      margin-left: 0;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .js .word {
+      opacity: 1;
+    }
+  }
+</style>
+
+<script>
+  import { gsap, reducedMotion } from '../../scripts/motion';
+
+  if (!reducedMotion) {
+    for (const statement of document.querySelectorAll<HTMLElement>('[data-ink]')) {
+      gsap.to(statement.querySelectorAll('.word'), {
+        opacity: 1,
+        ease: 'none',
+        stagger: 0.12,
+        scrollTrigger: {
+          trigger: statement,
+          start: 'top 82%',
+          end: 'bottom 45%',
+          scrub: 0.6,
+        },
+      });
+    }
+  }
+</script>

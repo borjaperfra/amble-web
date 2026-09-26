@@ -10,6 +10,15 @@ import type { Lang } from '../i18n/ui';
 export type Source = 'cv' | 'li' | 'gh' | 'web' | 'int';
 export type Strength = 4 | 3 | 2 | 1 | 0;
 
+// One source document in the "It gets to know you" story. Lines with a claim
+// are picked out by the Rep and fly into the capability they support.
+export interface StorySource {
+  id: 'cv' | 'gh' | 'web' | 'li';
+  source: Source;
+  title: string;
+  lines: { text: string; kind?: 'name' | 'meta'; claim?: { id: string; cap: string; assisted?: boolean } }[];
+}
+
 export interface HomeContent {
   hero: {
     tag: string;
@@ -17,14 +26,14 @@ export interface HomeContent {
     subtitle: string;
     building: string;
   };
-  reads: {
-    kicker: string;
-    title: string;
-    body: string;
-    sheetTitle: string;
-    sources: { type: string; name: string }[];
-    discoveries: { label: string; value: string }[];
-    closing: string;
+  story: {
+    interlude: [string, string];
+    interludeBody: string;
+    steps: { kicker: string; title: string; body: string }[];
+    sources: StorySource[];
+    caps: { id: string; name: string; strength: Strength; count: string }[];
+    unknown: { label: string; name: string; strength: Strength; note: string };
+    assisted: string;
   };
   interview: {
     rep: string;
@@ -130,24 +139,88 @@ const en: HomeContent = {
     building:
       'We’re building Amble in the open, with the people who use it. The closed beta is where your feedback shapes what it becomes.',
   },
-  reads: {
-    kicker: 'It gets to know you',
-    title: 'You’re more than a PDF.',
-    body: 'Give your Rep what already exists: your CV, LinkedIn, GitHub, your website. It reads all of it before asking you anything, and builds a profile deeper than any CV.',
-    sheetTitle: 'Getting to know Maya.',
+  story: {
+    interlude: ['You’re more than', 'a PDF.'],
+    interludeBody: 'Your CV says where you’ve been. Your Rep finds out what you’ve done.',
+    steps: [
+      {
+        kicker: '01 · It reads',
+        title: 'It reads before it asks.',
+        body: 'Your CV, LinkedIn, GitHub, your writing. Your Rep starts with what already exists, so it never asks what it could have read.',
+      },
+      {
+        kicker: '02 · Claims',
+        title: 'Every claim keeps its source.',
+        body: 'It picks out what you actually did, and remembers exactly where it read it. What it can’t source, it doesn’t say.',
+      },
+      {
+        kicker: '03 · Evidence',
+        title: 'Evidence, not adjectives.',
+        body: 'Claims that point the same way become evidence. One source is a hint. Three is a pattern.',
+      },
+      {
+        kicker: '04 · Capabilities',
+        title: 'Strength you can check.',
+        body: 'Every capability says how strong its evidence is, and names what your Rep doesn’t know yet.',
+      },
+    ],
     sources: [
-      { type: 'CV', name: 'CV_Maya_Lindqvist_2026.pdf' },
-      { type: 'LinkedIn', name: 'Profile' },
-      { type: 'GitHub', name: 'mlindqvist · 23 repositories' },
-      { type: 'Website', name: 'Personal site · 14 posts' },
+      {
+        id: 'cv',
+        source: 'cv',
+        title: 'CV_Maya_Lindqvist_2026.pdf',
+        lines: [
+          { text: 'Maya Lindqvist', kind: 'name' },
+          { text: 'AI Engineer · Stockholm', kind: 'meta' },
+          { text: 'Lantern Labs · 2024 —', kind: 'meta' },
+          { text: 'Led the evaluation pipeline for support agents.', claim: { id: 'c1', cap: 'eval' } },
+          { text: 'Rebuilt retrieval after it failed an audit.', claim: { id: 'c2', cap: 'retrieval' } },
+          { text: 'Fjord Data · 2020 — 2024', kind: 'meta' },
+          { text: 'Shipped two production search systems.', claim: { id: 'c3', cap: 'retrieval' } },
+          { text: 'Mentored two engineers.' },
+        ],
+      },
+      {
+        id: 'gh',
+        source: 'gh',
+        title: 'mlindqvist',
+        lines: [
+          { text: 'tern · eval harness for LLM agents · ★ 1.2k', claim: { id: 'c4', cap: 'eval', assisted: true } },
+          { text: 'rag-audit · retrieval regression tests', claim: { id: 'c5', cap: 'retrieval' } },
+          { text: 'dotfiles' },
+        ],
+      },
+      {
+        id: 'web',
+        source: 'web',
+        title: 'Writing',
+        lines: [
+          { text: 'Your eval set is lying to you', claim: { id: 'c6', cap: 'eval' } },
+          { text: 'Graders are models too', claim: { id: 'c7', cap: 'writing' } },
+        ],
+      },
+      {
+        id: 'li',
+        source: 'li',
+        title: 'Profile',
+        lines: [
+          { text: 'Talk · Measuring agents, PyData Berlin 2025', claim: { id: 'c8', cap: 'writing' } },
+          { text: '412 connections' },
+        ],
+      },
     ],
-    discoveries: [
-      { value: '3', label: 'roles' },
-      { value: '9', label: 'projects' },
-      { value: '31', label: 'pieces of evidence' },
-      { value: '7', label: 'capabilities' },
+    caps: [
+      { id: 'eval', name: 'LLM evaluation', strength: 4, count: '3 pieces of evidence' },
+      { id: 'retrieval', name: 'Retrieval systems', strength: 3, count: '3 pieces of evidence' },
+      { id: 'writing', name: 'Technical writing', strength: 3, count: '2 pieces of evidence' },
     ],
-    closing: 'I’ve got the basics. There are a few things I’d rather ask you myself.',
+    unknown: {
+      label: 'I don’t know yet',
+      name: 'Leading a team',
+      strength: 1,
+      note: 'You’ve mentored two engineers. That’s not the same as leading a team, and I can’t tell yet.',
+    },
+    assisted: 'co-produced',
   },
   interview: {
     rep: 'Your Rep',
@@ -333,24 +406,88 @@ const es: HomeContent = {
     building:
       'Estamos construyendo Amble en abierto, con quienes lo usan. La beta cerrada es donde tu feedback decide en qué se convierte.',
   },
-  reads: {
-    kicker: 'Te conoce',
-    title: 'Eres más que un PDF.',
-    body: 'Dale a tu Rep lo que ya existe: tu CV, LinkedIn, GitHub, tu web. Lo lee todo antes de preguntarte nada y construye un perfil más profundo que cualquier CV.',
-    sheetTitle: 'Conociendo a Marta.',
+  story: {
+    interlude: ['Eres más que', 'un PDF.'],
+    interludeBody: 'Tu CV dice dónde has estado. Tu Rep averigua qué has hecho.',
+    steps: [
+      {
+        kicker: '01 · Lee',
+        title: 'Lee antes de preguntar.',
+        body: 'Tu CV, LinkedIn, GitHub, lo que escribes. Tu Rep empieza por lo que ya existe, para no preguntarte nunca lo que podía haber leído.',
+      },
+      {
+        kicker: '02 · Afirmaciones',
+        title: 'Cada afirmación guarda su fuente.',
+        body: 'Separa lo que de verdad hiciste y recuerda exactamente dónde lo leyó. Lo que no puede respaldar, no lo dice.',
+      },
+      {
+        kicker: '03 · Evidencia',
+        title: 'Evidencia, no adjetivos.',
+        body: 'Las afirmaciones que apuntan al mismo sitio se convierten en evidencia. Una fuente es un indicio. Tres, un patrón.',
+      },
+      {
+        kicker: '04 · Capacidades',
+        title: 'Una fuerza que puedes comprobar.',
+        body: 'Cada capacidad dice cuánta evidencia tiene, y nombra lo que tu Rep todavía no sabe.',
+      },
+    ],
     sources: [
-      { type: 'CV', name: 'CV_Marta_Quiroga_2026.pdf' },
-      { type: 'LinkedIn', name: 'Perfil' },
-      { type: 'GitHub', name: 'mquiroga · 19 repositorios' },
-      { type: 'Web', name: 'Web personal · 11 artículos' },
+      {
+        id: 'cv',
+        source: 'cv',
+        title: 'CV_Marta_Quiroga_2026.pdf',
+        lines: [
+          { text: 'Marta Quiroga', kind: 'name' },
+          { text: 'Ingeniera de IA · Valencia', kind: 'meta' },
+          { text: 'Farolillo Labs · 2024 —', kind: 'meta' },
+          { text: 'Lideró el pipeline de evaluación de los agentes de soporte.', claim: { id: 'c1', cap: 'eval' } },
+          { text: 'Rehízo la recuperación tras suspender una auditoría.', claim: { id: 'c2', cap: 'retrieval' } },
+          { text: 'Tramontana Data · 2020 — 2024', kind: 'meta' },
+          { text: 'Puso en producción dos buscadores.', claim: { id: 'c3', cap: 'retrieval' } },
+          { text: 'Mentora de dos ingenieros.' },
+        ],
+      },
+      {
+        id: 'gh',
+        source: 'gh',
+        title: 'mquiroga',
+        lines: [
+          { text: 'sonda · banco de evaluación para agentes · ★ 1,2k', claim: { id: 'c4', cap: 'eval', assisted: true } },
+          { text: 'rag-audit · tests de regresión de recuperación', claim: { id: 'c5', cap: 'retrieval' } },
+          { text: 'dotfiles' },
+        ],
+      },
+      {
+        id: 'web',
+        source: 'web',
+        title: 'Artículos',
+        lines: [
+          { text: 'Tu set de evaluación te está mintiendo', claim: { id: 'c6', cap: 'eval' } },
+          { text: 'Los evaluadores también son modelos', claim: { id: 'c7', cap: 'writing' } },
+        ],
+      },
+      {
+        id: 'li',
+        source: 'li',
+        title: 'Perfil',
+        lines: [
+          { text: 'Charla · Medir agentes, PyData Madrid 2025', claim: { id: 'c8', cap: 'writing' } },
+          { text: '412 contactos' },
+        ],
+      },
     ],
-    discoveries: [
-      { value: '3', label: 'puestos' },
-      { value: '8', label: 'proyectos' },
-      { value: '27', label: 'evidencias' },
-      { value: '7', label: 'capacidades' },
+    caps: [
+      { id: 'eval', name: 'Evaluación de LLMs', strength: 4, count: '3 evidencias' },
+      { id: 'retrieval', name: 'Sistemas de recuperación', strength: 3, count: '3 evidencias' },
+      { id: 'writing', name: 'Escritura técnica', strength: 3, count: '2 evidencias' },
     ],
-    closing: 'Ya tengo lo básico. Hay un par de cosas que prefiero preguntarte yo.',
+    unknown: {
+      label: 'Aún no lo sé',
+      name: 'Liderar un equipo',
+      strength: 1,
+      note: 'Has sido mentora de dos ingenieros. No es lo mismo que liderar un equipo, y todavía no puedo saberlo.',
+    },
+    assisted: 'co-producido',
   },
   interview: {
     rep: 'Tu Rep',

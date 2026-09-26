@@ -13,6 +13,11 @@ html {
   scroll-padding-top: var(--space-7);
 }
 
+/* Lenis drives the scroll on the home; native smoothing would fight it. */
+html.lenis {
+  scroll-behavior: auto;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;

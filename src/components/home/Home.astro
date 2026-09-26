@@ -1,7 +1,8 @@
 ---
 import Base from '../../layouts/Base.astro';
 import Hero from './Hero.astro';
-import Reads from './Reads.astro';
+import Interlude from './Interlude.astro';
+import Story from './Story.astro';
 import Interview from './Interview.astro';
 import Defence from './Defence.astro';
 import MapSection from './MapSection.astro';
@@ -21,7 +22,8 @@ const c = home[lang];
 <Base joinHref="#join">
   <main>
     <Hero c={c.hero} />
-    <Reads c={c.reads} />
+    <Interlude lines={c.story.interlude} body={c.story.interludeBody} id="interlude-pdf" />
+    <Story c={c.story} strength={c.strength} sourceNames={c.sourceNames} />
     <Interview c={c.interview} />
     <Defence c={c.defence} />
     <MapSection c={c.map} strength={c.strength} sourceNames={c.sourceNames} />
@@ -33,3 +35,8 @@ const c = home[lang];
     <Finale c={c.finale} />
   </main>
 </Base>
+
+<script>
+  import { startSmoothScroll } from '../../scripts/motion';
+  startSmoothScroll();
+</script>
