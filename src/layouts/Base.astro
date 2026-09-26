@@ -1,0 +1,35 @@
+---
+import { Font } from 'astro:assets';
+import { getRelativeLocaleUrl } from 'astro:i18n';
+import { useTranslations, type Lang } from '../i18n/ui';
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+  // Path without locale prefix, used for hreflang alternates (e.g. '' or 'manifesto').
+  path?: string;
+}
+
+const lang = (Astro.currentLocale ?? 'en') as Lang;
+const t = useTranslations(lang);
+const { title = t('meta.title'), description = t('meta.description'), path = '' } = Astro.props;
+---
+
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="/favicon.ico" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="alternate" hreflang="en" href={new URL(getRelativeLocaleUrl('en', path), Astro.site)} />
+    <link rel="alternate" hreflang="es" href={new URL(getRelativeLocaleUrl('es', path), Astro.site)} />
+    <Font cssVariable="--font-inter" preload />
+    <Font cssVariable="--font-newsreader" preload />
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

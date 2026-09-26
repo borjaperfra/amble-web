@@ -15,4 +15,9 @@ See [`BRIEF.md`](./BRIEF.md) for the summary that matters to the website.
 
 ## Status
 
-Planning. No stack chosen yet.
+Scaffolded: Astro 7, EN + ES. See [`PLAN.md`](./PLAN.md).
+
+```bash
+npm install
+npm run dev
+```
