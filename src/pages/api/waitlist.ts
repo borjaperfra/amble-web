@@ -6,6 +6,7 @@ import { parseEmail } from '../../lib/email-rules';
 import { join, releaseCooldown } from '../../lib/waitlist';
 import { sendConfirmation } from '../../lib/email';
 import { allow } from '../../lib/rate-limit';
+import { bump } from '../../lib/counts';
 
 export const prerender = false;
 
@@ -81,6 +82,7 @@ export const POST: APIRoute = async ({ request, clientAddress, redirect }) => {
       await releaseCooldown(result.id);
       return reply('error', 502);
     }
+    await bump('join', lang).catch(() => {});
     return reply('ok', 200);
   } catch (err) {
     console.error('[waitlist] join failed', err instanceof Error ? err.message : err);

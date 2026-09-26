@@ -15,8 +15,9 @@ interface Props {
 const { c, sourceNames } = Astro.props;
 ---
 
-<section class="section container" aria-labelledby="interview-title">
-  <SectionIntro id="interview-title" kicker={c.kicker} title={c.title} align="center" />
+<section class="band" aria-labelledby="interview-title">
+  <div class="container">
+  <div class="head"><SectionIntro id="interview-title" kicker={c.kicker} title={c.title} /></div>
 
   <div class="scene" data-scene data-threads>
     <ul class="clues" role="list">
@@ -53,9 +54,29 @@ const { c, sourceNames } = Astro.props;
       </button>
     </figure>
   </div>
+  </div>
 </section>
 
 <style>
+  /* Left-aligned heads share the scene's axis. */
+  .head {
+    max-width: var(--width-wide);
+    margin-inline: auto;
+  }
+  /* A sunken band, title to the left: a change of pace after the poster. */
+  .band {
+    padding-block: var(--space-section);
+    background: var(--color-surface-sunken);
+  }
+  .band :global(.intro) {
+    max-width: 34rem;
+  }
+  .band .clue {
+    background: var(--color-surface-raised);
+  }
+  .knot {
+    stroke: var(--color-surface-sunken) !important;
+  }
   .scene {
     position: relative;
     display: grid;

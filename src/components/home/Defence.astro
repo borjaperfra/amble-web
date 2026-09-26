@@ -15,7 +15,8 @@ interface Props {
 const { c } = Astro.props;
 ---
 
-<section class="section container" aria-labelledby="defence-title">
+<section class="night" aria-labelledby="defence-title">
+  <div class="container">
   <SectionIntro id="defence-title" kicker={c.kicker} title={c.title} body={c.line} align="center" />
 
   <div class="cases" data-scene data-defence>
@@ -59,9 +60,30 @@ const { c } = Astro.props;
       ))
     }
   </div>
+  </div>
 </section>
 
 <style>
+  /* Night: the one dark section, where the code lives. */
+  .night {
+    padding-block: var(--space-section);
+    background: var(--color-code-bg);
+    color: var(--color-text-inverse);
+  }
+  .night :global(.intro .kicker) {
+    color: var(--color-code-faint);
+  }
+  .night :global(.intro .lede) {
+    color: var(--color-code-text);
+  }
+  .night .case {
+    color: var(--color-text);
+    border-color: transparent;
+    box-shadow: 0 24px 60px rgb(0 0 0 / 0.35);
+  }
+  .night .code {
+    background: #34342d;
+  }
   .cases {
     display: grid;
     gap: var(--space-6);
@@ -245,6 +267,9 @@ const { c } = Astro.props;
   /* Retracted: the code stays legible, the decision in it is struck through. */
   .retracted .code {
     background: var(--color-code-bg-dim);
+  }
+  .night .retracted .code {
+    background: #43433b;
   }
   .retracted .code-line.key {
     text-decoration: line-through;

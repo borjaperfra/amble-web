@@ -14,3 +14,14 @@ create table if not exists waitlist (
 );
 
 create index if not exists waitlist_token_hash_idx on waitlist (token_hash);
+
+-- Anonymous, aggregated counts: no cookies, no identifiers, no IPs. One row per
+-- day, event and stage; the beacon only ever increments a number.
+create table if not exists site_counts (
+  day    date not null,
+  event  text not null check (event in ('view', 'stage', 'join')),
+  stage  text not null default '',
+  locale text not null check (locale in ('en', 'es')),
+  n      integer not null default 0,
+  primary key (day, event, stage, locale)
+);

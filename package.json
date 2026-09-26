@@ -13,7 +13,8 @@
     "start": "node scripts/migrate.mjs && node server.mjs",
     "db:migrate": "node --env-file=.env scripts/migrate.mjs",
     "og": "node scripts/og.mts",
-    "test": "vitest run"
+    "test": "vitest run",
+    "stats": "node --env-file=.env scripts/stats.mjs"
   },
   "dependencies": {
     "@astrojs/mdx": "^8.0.2",

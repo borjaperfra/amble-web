@@ -25,6 +25,8 @@ Without `RESEND_API_KEY`, confirmation links are printed to the server log inste
 
 Other scripts:
 
+- `npm run stats` prints the last 14 days of anonymous counts (views, how far people scroll, sign-ups).
+- `npm test` runs the unit tests.
 - `npm run og` regenerates the social cards (`public/og-*.png`) and `public/favicon-closed.svg`.
 - `node design/blink-frames.mts` renders the eye's blink, frame by frame, to `design/blink-frames.html`.
 

@@ -107,6 +107,27 @@ const canonical = new URL(getRelativeLocaleUrl(lang, path), Astro.site);
         { rootMargin: '-30% 0px -30% 0px' },
       );
       document.querySelectorAll('[data-scene]').forEach((el) => scenes.observe(el));
+
+      // Anonymous counts: a view, and how far down the story people get. No
+      // cookies, no identifiers; skipped entirely under Do Not Track or GPC.
+      const nav = navigator as Navigator & { globalPrivacyControl?: boolean };
+      if (!nav.globalPrivacyControl && nav.doNotTrack !== '1' && 'sendBeacon' in navigator) {
+        const lang = document.documentElement.lang === 'es' ? 'es' : 'en';
+        const ping = (msg: string) => navigator.sendBeacon('/api/beacon', msg);
+        ping(`view:${lang}`);
+        const reached = new IntersectionObserver(
+          (entries) => {
+            for (const e of entries) {
+              if (!e.isIntersecting) continue;
+              const el = e.target as HTMLElement;
+              ping(`stage:${lang}:${el.dataset.stage ?? el.dataset.count}`);
+              reached.unobserve(el);
+            }
+          },
+          { rootMargin: '-40% 0px -40% 0px' },
+        );
+        document.querySelectorAll('[data-stage], [data-count]').forEach((el) => reached.observe(el));
+      }
     </script>
   </body>
 </html>

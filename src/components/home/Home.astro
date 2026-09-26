@@ -46,9 +46,9 @@ const c = home[lang];
       <Agents c={c.agents} />
     </div>
     <Roadmap c={c.roadmap} />
-    <Yours c={c.yours} career={c.career} data={c.data} />
-    <YourTurn c={c.yourTurn} />
-    <Finale c={c.finale} />
+    <div data-count="yours"><Yours c={c.yours} career={c.career} data={c.data} /></div>
+    <div data-count="turn"><YourTurn c={c.yourTurn} /></div>
+    <div data-count="finale"><Finale c={c.finale} /></div>
   </main>
 </Base>
 

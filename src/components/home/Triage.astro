@@ -15,7 +15,7 @@ const { c } = Astro.props;
 ---
 
 <section class="section container" aria-labelledby="triage-title">
-  <SectionIntro id="triage-title" kicker={c.kicker} title={c.title} body={c.line} align="center" />
+  <div class="head"><SectionIntro id="triage-title" kicker={c.kicker} title={c.title} body={c.line} /></div>
 
   <div class="scene" data-scene data-triage>
     <ol class="deck" role="list">
@@ -61,6 +61,11 @@ const { c } = Astro.props;
 </section>
 
 <style>
+  /* Left-aligned heads share the scene's axis. */
+  .head {
+    max-width: var(--width-wide);
+    margin-inline: auto;
+  }
   .scene {
     display: grid;
     gap: var(--space-8);
