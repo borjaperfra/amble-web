@@ -41,6 +41,22 @@ export interface HomeContent {
     // Shown with step 02, so the highlight reads as "this, read here".
     legend: { claim: string; source: string };
   };
+  yourTurn: {
+    kicker: string;
+    title: string;
+    line: string;
+    label: string;
+    placeholder: string;
+    cta: string;
+    reading: string;
+    errors: { invalid: string; notFound: string; limit: string; network: string; empty: string };
+    labels: { read: string; repos: string; languages: string; since: string; claims: string; ask: string };
+    // {placeholders} are filled in the browser with facts from GitHub.
+    claims: { maintains: string; writes: string; uses: string; active: string; about: string };
+    questions: string[];
+    join: string;
+    again: string;
+  };
   interview: {
     kicker: string;
     title: string;
@@ -205,6 +221,44 @@ const en: HomeContent = {
     },
     assisted: 'co-produced',
     legend: { claim: 'a claim', source: 'where it was read' },
+  },
+  yourTurn: {
+    kicker: 'Your turn',
+    title: 'What would your Rep read about you?',
+    line: 'Type your GitHub username. Your browser asks GitHub directly; nothing reaches us.',
+    label: 'GitHub username',
+    placeholder: 'your-username',
+    cta: 'Read my GitHub',
+    reading: 'Reading your GitHub…',
+    errors: {
+      invalid: 'That isn’t a GitHub username.',
+      notFound: 'I couldn’t find that profile on GitHub.',
+      limit: 'GitHub asked me to slow down. Try again in a few minutes.',
+      network: 'I couldn’t reach GitHub. Nothing has been lost.',
+      empty: 'That profile has no public repositories yet. I’d start with your CV.',
+    },
+    labels: {
+      read: 'What I read',
+      repos: 'public repositories',
+      languages: 'Languages',
+      since: 'On GitHub since',
+      claims: 'What I can already say, with its source',
+      ask: 'What I’d still ask you',
+    },
+    claims: {
+      maintains: 'Maintains {repo}, {stars} ★',
+      writes: 'Writes mostly {lang}: {n} of {total} repositories',
+      uses: 'Has code in {langs}',
+      active: 'Last pushed code {when}',
+      about: 'Describes themselves as “{bio}”',
+    },
+    questions: [
+      'Which of these did you design, and which did an agent write?',
+      'What have you shipped that isn’t public?',
+      'What would make a new job worth your attention?',
+    ],
+    join: 'Want your Rep to read the rest? Join the beta',
+    again: 'Try another',
   },
   interview: {
     kicker: 'The interview',
@@ -434,6 +488,44 @@ const es: HomeContent = {
     },
     assisted: 'co-producido',
     legend: { claim: 'una afirmación', source: 'dónde se leyó' },
+  },
+  yourTurn: {
+    kicker: 'Tu turno',
+    title: '¿Qué leería tu Rep de ti?',
+    line: 'Escribe tu usuario de GitHub. Tu navegador se lo pide a GitHub directamente; a nosotros no nos llega nada.',
+    label: 'Usuario de GitHub',
+    placeholder: 'tu-usuario',
+    cta: 'Leer mi GitHub',
+    reading: 'Leyendo tu GitHub…',
+    errors: {
+      invalid: 'Eso no es un usuario de GitHub.',
+      notFound: 'No encuentro ese perfil en GitHub.',
+      limit: 'GitHub me pide que vaya más despacio. Prueba en unos minutos.',
+      network: 'No he podido llegar a GitHub. No se ha perdido nada.',
+      empty: 'Ese perfil aún no tiene repositorios públicos. Yo empezaría por tu CV.',
+    },
+    labels: {
+      read: 'Lo que he leído',
+      repos: 'repositorios públicos',
+      languages: 'Lenguajes',
+      since: 'En GitHub desde',
+      claims: 'Lo que ya puedo decir, con su fuente',
+      ask: 'Lo que aún te preguntaría',
+    },
+    claims: {
+      maintains: 'Mantiene {repo}, {stars} ★',
+      writes: 'Escribe sobre todo en {lang}: {n} de {total} repositorios',
+      uses: 'Tiene código en {langs}',
+      active: 'Último push {when}',
+      about: 'Se describe como «{bio}»',
+    },
+    questions: [
+      '¿Qué de esto diseñaste tú y qué escribió un agente?',
+      '¿Qué has puesto en producción que no sea público?',
+      '¿Qué haría que un trabajo nuevo mereciera tu atención?',
+    ],
+    join: '¿Quieres que tu Rep lea el resto? Entra en la beta',
+    again: 'Probar otro',
   },
   interview: {
     kicker: 'La entrevista',

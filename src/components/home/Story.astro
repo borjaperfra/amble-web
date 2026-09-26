@@ -104,11 +104,11 @@ const claims = c.sources.flatMap((src) =>
                       <span class="cap-count">{cap.count}</span>
                     </p>
                   </header>
-                  <ul class="cap-claims" role="list" data-list={cap.id}>
+                  <div class="cap-claims" data-list={cap.id}>
                     {claims
                       .filter((cl) => cl.cap === cap.id)
                       .map((cl) => (
-                        <li class="claim" data-claim={cl.id} data-cap={cl.cap} style={`--ci:${claims.indexOf(cl)}`}>
+                        <div class="claim" data-claim={cl.id} data-cap={cl.cap} style={`--ci:${claims.indexOf(cl)}`}>
                           <span class="claim-badge" title={sourceNames[cl.source]}>
                             <SourceIcon source={cl.source} size={12} />
                           </span>
@@ -119,9 +119,9 @@ const claims = c.sources.flatMap((src) =>
                               {cl.assisted && <span class="assisted">⚠ {c.assisted}</span>}
                             </span>
                           </span>
-                        </li>
+                        </div>
                       ))}
-                  </ul>
+                  </div>
                 </section>
               ))
             }
@@ -286,8 +286,8 @@ const claims = c.sources.flatMap((src) =>
     container: stage / size;
     width: 100%;
     aspect-ratio: 100 / 92;
-    --doc-font: max(12px, 2.05cqw);
-    --cap-font: max(18px, 3.5cqw);
+    --doc-font: max(13.5px, 2.1cqw);
+    --cap-font: max(20px, 3.5cqw);
   }
 
   /* Documents: position (x, y, w, r) when read; (gx, gy, gr, gs) when piled aside. */
@@ -331,7 +331,7 @@ const claims = c.sources.flatMap((src) =>
     display: inline-flex;
     align-items: center;
     gap: 0.5em;
-    font-size: 0.82em;
+    font-size: 0.9em;
     font-weight: var(--weight-semibold);
     letter-spacing: 0.04em;
     color: var(--color-text);
@@ -342,7 +342,7 @@ const claims = c.sources.flatMap((src) =>
   }
   .doc-title {
     font-family: var(--font-mono);
-    font-size: 0.78em;
+    font-size: 0.86em;
     color: var(--color-text-faint);
     overflow: hidden;
     text-overflow: ellipsis;
@@ -361,7 +361,7 @@ const claims = c.sources.flatMap((src) =>
   }
   .doc-line.meta {
     margin-top: 0.45em;
-    font-size: 0.84em;
+    font-size: 0.9em;
     color: var(--color-text-faint);
   }
   .line-text {
@@ -430,12 +430,12 @@ const claims = c.sources.flatMap((src) =>
     gap: 0.6em;
   }
   .claim-source {
-    font-size: 0.78em;
+    font-size: 0.86em;
     font-weight: var(--weight-medium);
     color: var(--color-accent-strong);
   }
   .assisted {
-    font-size: 0.78em;
+    font-size: 0.86em;
     color: var(--color-caution);
   }
 
@@ -621,8 +621,8 @@ const claims = c.sources.flatMap((src) =>
     }
     .stage {
       aspect-ratio: 100 / 176;
-      --doc-font: max(11.5px, 3.4cqw);
-      --cap-font: max(16px, 5.2cqw);
+      --doc-font: max(13px, 3.5cqw);
+      --cap-font: max(18px, 5.4cqw);
     }
     .doc {
       padding: 4cqw 4cqw 4cqw 7cqw;

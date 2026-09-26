@@ -44,7 +44,8 @@ const { c, sourceNames } = Astro.props;
       <p class="gap">{c.gap}</p>
       <p class="rep"><Symbol size={22} /> {c.rep}</p>
       <p class="heading question">{c.question}</p>
-      <button class="talk" type="button" aria-label={c.talk}>
+      <!-- A toy: it shows what talking to your Rep feels like, and does nothing else. -->
+      <button class="talk" type="button" aria-hidden="true" tabindex="-1">
         <span class="mic" aria-hidden="true">
           {Array.from({ length: 5 }, (_, i) => <span class="bar" style={`--b:${i}`} />)}
         </span>

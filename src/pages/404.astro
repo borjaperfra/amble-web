@@ -1,0 +1,52 @@
+---
+// One 404 for both languages: the eye, and a line in each.
+import Base from '../layouts/Base.astro';
+import Symbol from '../components/Symbol.astro';
+import { ui } from '../i18n/ui';
+---
+
+<Base title="404 — Amble" description={ui.en['notfound.title']}>
+  <main class="lost container">
+    <Symbol size={120} watch breathe />
+    <div class="lines">
+      <p lang="en"><span class="heading">{ui.en['notfound.title']}</span> {ui.en['notfound.body']}</p>
+      <p lang="es"><span class="heading">{ui.es['notfound.title']}</span> {ui.es['notfound.body']}</p>
+    </div>
+    <p class="back">
+      <a class="text-link" href="/" lang="en">{ui.en['notfound.back']} →</a>
+      <a class="text-link" href="/es/" lang="es">{ui.es['notfound.back']} →</a>
+    </p>
+  </main>
+</Base>
+
+<style>
+  .lost {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-7);
+    padding-block: var(--space-10);
+    text-align: center;
+  }
+  .lines {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+  .lines p {
+    font-size: var(--text-body-lg);
+    color: var(--color-text-muted);
+  }
+  .lines p:first-child .heading {
+    display: block;
+    font-size: var(--text-display-lg);
+    color: var(--color-text);
+  }
+  .lines p:last-child .heading {
+    color: var(--color-text);
+  }
+  .back {
+    display: flex;
+    gap: var(--space-6);
+  }
+</style>

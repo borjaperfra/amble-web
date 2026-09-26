@@ -10,7 +10,7 @@ This project is deliberately separate from the product repo (`../amble`). Nothin
 
 ## Stack
 
-Astro 7 with `@astrojs/node` (standalone). Pages are prerendered, EN at `/`, ES at `/es/`. The waitlist is the only server code: Postgres + Resend.
+Astro 7 with `@astrojs/node` in middleware mode, served by `server.mjs` (Express + compression). Pages are prerendered, EN at `/`, ES at `/es/`. The waitlist is the only server code: Postgres + Resend. The home's motion uses GSAP (ScrollTrigger, Flip) and Lenis.
 
 ## Local
 
@@ -23,9 +23,15 @@ npm run dev
 
 Without `RESEND_API_KEY`, confirmation links are printed to the server log instead of emailed.
 
+Other scripts:
+
+- `npm run og` regenerates the social cards (`public/og-*.png`) and `public/favicon-closed.svg`.
+- `node design/blink-frames.mts` renders the eye's blink, frame by frame, to `design/blink-frames.html`.
+
 ## Railway
 
 - One service from this repo plus a Postgres plugin.
-- Build: `npm run build`. Start: `npm start` (applies `db/schema.sql`, then runs `dist/server/entry.mjs`).
+- Build: `npm run build`. Start: `npm start` (applies `db/schema.sql`, then runs `server.mjs`).
 - Variables: `DATABASE_URL` (from the Postgres plugin), `RESEND_API_KEY`, `WAITLIST_FROM`, `SITE_URL=https://amble.fyi`, `HOST=0.0.0.0`. Railway sets `PORT`.
+- `server.mjs` compresses responses, caches hashed assets for a year and revalidates HTML. The waitlist's rate limit reads the client IP from the last `X-Forwarded-For` hop, which Railway's proxy sets.
 - Astro rejects cross-site form posts by checking `Origin` against the request host; the custom domain must reach the service with its own `Host` header.

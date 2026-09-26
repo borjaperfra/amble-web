@@ -65,10 +65,16 @@ Needs many reviews first; it will happen, not for launch.
 - `/privacy` in both languages. No cookies, no analytics, no third-party requests.
 - Form hardening: urlencoded only, ≤1 KB, exactly `email`/`locale`/`website`, strict ASCII email rule shared by browser and server, spaces stripped as typed, same answer for known and unknown addresses. Unconfirmed signups deleted after 30 days.
 
+## Done (later on 2026-09-26)
+
+- Home rebuilt as scenes; chapter 1 pinned story; "Your turn" live GitHub read (browser → GitHub, facts only, nothing stored).
+- Joining is a moment (the eye blinks, a calm line). The eye blinks for real, on click and on its own.
+- `/manifesto` and `/how-its-built` in both languages; native view transitions between pages.
+- Social cards, background-tab title and closed-eye favicon, bilingual 404.
+- Legibility: nothing under 13px, body 17px, all text colours AA. Lighthouse: home 97/100/100/100, manifesto 100 across.
+
 ## Open points
 
 - Legal entity for the privacy page (`src/config/legal.ts`): name, tax ID, address.
 - `privacy@amble.fyi` must exist as a real inbox before launch.
 - GitHub sync of your data (section 10) doesn't exist yet: place it in v0 or on the roadmap.
-- Social card (og:image) with the symbol.
-- `/manifesto` and `/how-its-built`.

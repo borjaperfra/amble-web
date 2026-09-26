@@ -18,6 +18,8 @@ const other: Lang = lang === 'en' ? 'es' : 'en';
 <header class="header container">
   <Logo />
   <nav class="nav" aria-label={t('nav.label')}>
+    <a class="page text-link" href={getRelativeLocaleUrl(lang, 'manifesto')}>{t('nav.manifesto')}</a>
+    <a class="page text-link" href={getRelativeLocaleUrl(lang, 'how-its-built')}>{t('nav.howBuilt')}</a>
     <a class="lang text-link" href={getRelativeLocaleUrl(other, path)} hreflang={other} lang={other}>
       {t('nav.otherLang')}
     </a>
@@ -76,7 +78,16 @@ const other: Lang = lang === 'en' ? 'es' : 'en';
     font-size: var(--text-body-sm);
   }
 
-  /* On phones the language switch lives in the footer. */
+  /* The page's own logo travels between pages (view transitions). */
+  .header :global(.logo) {
+    view-transition-name: logo;
+  }
+  /* On small screens the other pages and the language switch live in the footer. */
+  @media (max-width: 860px) {
+    .page {
+      display: none;
+    }
+  }
   @media (max-width: 480px) {
     .lang {
       display: none;

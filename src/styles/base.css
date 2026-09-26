@@ -13,6 +13,24 @@ html {
   scroll-padding-top: var(--space-7);
 }
 
+/* Page to page: a native cross-document view transition. Calm crossfade; the
+   header logo keeps its place. No JavaScript router, so page scripts behave. */
+@view-transition {
+  navigation: auto;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 420ms;
+  animation-timing-function: var(--ease-standard);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @view-transition {
+    navigation: none;
+  }
+}
+
 /* Lenis drives the scroll on the home; native smoothing would fight it. */
 html.lenis {
   scroll-behavior: auto;
@@ -36,6 +54,8 @@ body {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  font-kerning: normal;
+  font-feature-settings: 'kern', 'liga', 'calt';
   overflow-x: hidden;
 }
 
@@ -98,6 +118,11 @@ input {
 }
 
 /* ---------- Type primitives ---------- */
+
+.display,
+.heading {
+  hanging-punctuation: first last;
+}
 
 .display {
   font-family: var(--font-display);

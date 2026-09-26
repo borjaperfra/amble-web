@@ -1,0 +1,58 @@
+---
+// A pipeline drawn as steps and arrows, for the long-form pages. The last
+// `emphasis` steps are shown in moss: where the idea lands.
+interface Props {
+  steps: string[];
+  emphasis?: number;
+  label?: string;
+}
+
+const { steps, emphasis = 1, label } = Astro.props;
+---
+
+<figure class="flow" aria-label={label ?? steps.join(' → ')}>
+  <ol role="list">
+    {
+      steps.map((step, i) => (
+        <li class:list={{ strong: i >= steps.length - emphasis }}>
+          <span>{step}</span>
+        </li>
+      ))
+    }
+  </ol>
+</figure>
+
+<style>
+  .flow {
+    margin: var(--space-6) 0;
+  }
+  ol {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2) 0;
+  }
+  li {
+    display: flex;
+    align-items: center;
+  }
+  li span {
+    padding: var(--space-2) var(--space-4);
+    font-size: var(--text-body-sm);
+    font-weight: var(--weight-medium);
+    color: var(--color-text);
+    background: var(--color-surface-raised);
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--radius-full);
+  }
+  li.strong span {
+    color: var(--color-text-inverse);
+    background: var(--color-accent);
+    border-color: var(--color-accent);
+  }
+  li + li::before {
+    content: '→';
+    padding: 0 var(--space-2);
+    color: var(--color-accent);
+  }
+</style>

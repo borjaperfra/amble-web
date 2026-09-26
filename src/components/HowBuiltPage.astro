@@ -1,0 +1,130 @@
+---
+import Base from '../layouts/Base.astro';
+import Flow from './Flow.astro';
+import { howBuilt } from '../content/pages';
+import type { Lang } from '../i18n/ui';
+
+const lang = (Astro.currentLocale ?? 'en') as Lang;
+const c = howBuilt[lang];
+---
+
+<Base title={c.meta.title} description={c.meta.description} path="how-its-built">
+  <main class="how container">
+    <header class="head">
+      <p class="kicker">{c.kicker}</p>
+      <h1 class="display title">{c.title}</h1>
+      <p class="lede">{c.lede}</p>
+    </header>
+
+    <div class="sections">
+      {
+        c.sections.map((s, i) => (
+          <section class="part" data-reveal>
+            <p class="num">{String(i + 1).padStart(2, '0')}</p>
+            <div class="part-body">
+              <h2 class="heading part-title">{s.title}</h2>
+              {s.body.map((p) => (
+                <p class="text">{p}</p>
+              ))}
+              {s.flow && <Flow steps={s.flow} emphasis={s.emphasis ?? 1} />}
+              {s.states && (
+                <dl class="states">
+                  {s.states.map((st) => (
+                    <div class="state">
+                      <dt>{st.name}</dt>
+                      <dd>{st.body}</dd>
+                    </div>
+                  ))}
+                </dl>
+              )}
+            </div>
+          </section>
+        ))
+      }
+    </div>
+  </main>
+</Base>
+
+<style>
+  .how {
+    max-width: calc(var(--width-wide) + var(--gutter) * 2);
+    padding-block: var(--space-9) var(--space-section);
+  }
+  .head {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+    max-width: 52rem;
+  }
+  .title {
+    font-size: var(--text-display-xl);
+  }
+  .lede {
+    max-width: 38rem;
+  }
+  .sections {
+    margin-top: var(--space-10);
+    border-top: var(--border-width) solid var(--color-border);
+  }
+  .part {
+    display: grid;
+    gap: var(--space-3) var(--space-7);
+    padding-block: var(--space-8);
+    border-bottom: var(--border-width) solid var(--color-border-subtle);
+  }
+  @media (min-width: 860px) {
+    .part {
+      grid-template-columns: 5rem minmax(0, 1fr);
+    }
+  }
+  .num {
+    font-family: var(--font-mono);
+    font-size: var(--text-mono);
+    color: var(--color-accent-strong);
+    padding-top: 0.5em;
+  }
+  .part-body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    max-width: 46rem;
+  }
+  .part-title {
+    font-size: var(--text-heading-xl);
+  }
+  .text {
+    font-size: var(--text-body-lg);
+    color: var(--color-text-muted);
+    text-wrap: pretty;
+  }
+  .states {
+    display: grid;
+    gap: var(--space-3);
+    margin-top: var(--space-3);
+  }
+  @media (min-width: 640px) {
+    .states {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  .state {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    padding: var(--space-4) var(--space-5);
+    background: var(--color-surface-raised);
+    border: var(--border-width) solid var(--color-border-subtle);
+    border-radius: var(--radius-md);
+  }
+  .state dt {
+    font-family: var(--font-display);
+    font-size: var(--text-heading-sm);
+  }
+  .state dd {
+    margin: 0;
+    color: var(--color-text-muted);
+  }
+  .state:nth-child(3) dt {
+    color: var(--color-caution);
+  }
+</style>

@@ -1,0 +1,482 @@
+---
+// "Your turn": the visitor types a GitHub username and sees what their Rep
+// would read — real public facts, each with its source, and the questions the
+// Rep would still have to ask. Nothing is inferred and nothing reaches our
+// server: the browser talks to GitHub's public API directly.
+//
+// Everything that comes back from GitHub is untrusted text. It is only ever
+// written with textContent, never as HTML.
+import SectionIntro from '../SectionIntro.astro';
+import SourceIcon from '../SourceIcon.astro';
+import Symbol from '../Symbol.astro';
+import { getRelativeLocaleUrl } from 'astro:i18n';
+import type { HomeContent } from '../../content/home';
+import type { Lang } from '../../i18n/ui';
+
+interface Props {
+  c: HomeContent['yourTurn'];
+}
+
+const { c } = Astro.props;
+const lang = (Astro.currentLocale ?? 'en') as Lang;
+---
+
+<section class="section container" id="your-turn" aria-labelledby="your-turn-title">
+  <SectionIntro id="your-turn-title" kicker={c.kicker} title={c.title} body={c.line} align="center" />
+
+  <div class="turn" data-your-turn data-lang={lang} data-copy={JSON.stringify(c)}>
+    <form class="ask" novalidate>
+      <label class="visually-hidden" for="gh-user">{c.label}</label>
+      <span class="prefix" aria-hidden="true">
+        <SourceIcon source="gh" size={20} />
+        github.com/
+      </span>
+      <input
+        id="gh-user"
+        class="field"
+        name="user"
+        type="text"
+        required
+        maxlength="39"
+        autocomplete="off"
+        autocapitalize="off"
+        autocorrect="off"
+        spellcheck="false"
+        placeholder={c.placeholder}
+        aria-describedby="gh-status"
+      />
+      <button class="btn" type="submit">{c.cta}</button>
+    </form>
+    <p class="status" id="gh-status" role="status" aria-live="polite"></p>
+
+    <article class="result" hidden>
+      <header class="who">
+        <img class="avatar" alt="" width="56" height="56" />
+        <div>
+          <p class="name heading"></p>
+          <p class="handle"></p>
+        </div>
+      </header>
+
+      <div class="cols">
+        <section class="read">
+          <p class="kicker">{c.labels.read}</p>
+          <p class="big"><span class="repo-count heading"></span> <span>{c.labels.repos}</span></p>
+          <p class="since"></p>
+          <p class="kicker lang-label">{c.labels.languages}</p>
+          <ul class="langs" role="list"></ul>
+        </section>
+
+        <section class="says">
+          <p class="kicker">{c.labels.claims}</p>
+          <ul class="claims" role="list"></ul>
+          <p class="kicker ask-label">{c.labels.ask}</p>
+          <ul class="questions" role="list">
+            {
+              c.questions.map((q) => (
+                <li>
+                  <Symbol size={20} />
+                  <span>{q}</span>
+                </li>
+              ))
+            }
+          </ul>
+        </section>
+      </div>
+
+      <footer class="result-foot">
+        <a class="btn" href={`${getRelativeLocaleUrl(lang)}#join`}>{c.join} →</a>
+        <button class="text-link again" type="button">{c.again}</button>
+      </footer>
+    </article>
+  </div>
+</section>
+
+<style>
+  .turn {
+    max-width: var(--width-wide);
+    margin: var(--space-7) auto 0;
+  }
+  .ask {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    max-width: 640px;
+    margin: 0 auto;
+    padding: var(--space-2);
+    background: var(--color-surface-raised);
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sheet);
+    transition: border-color var(--motion-fast) ease;
+  }
+  .ask:focus-within {
+    border-color: var(--color-focus);
+  }
+  .prefix {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding-left: var(--space-3);
+    font-family: var(--font-mono);
+    font-size: var(--text-body);
+    color: var(--color-text-muted);
+    white-space: nowrap;
+  }
+  .field {
+    flex: 1;
+    min-width: 0;
+    height: var(--control-height);
+    padding: 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-body);
+    color: var(--color-text);
+    background: transparent;
+    border: 0;
+    outline: none;
+  }
+  .status {
+    min-height: 1.6em;
+    margin-top: var(--space-3);
+    text-align: center;
+    font-size: var(--text-body-sm);
+    color: var(--color-text-muted);
+  }
+  .turn[data-state='error'] .status {
+    color: var(--color-retracted);
+  }
+  @media (max-width: 560px) {
+    .ask {
+      flex-wrap: wrap;
+    }
+    .ask .btn {
+      width: 100%;
+    }
+  }
+
+  /* ---------- Result ---------- */
+  .result {
+    margin-top: var(--space-6);
+    padding: clamp(var(--space-5), 1rem + 2.5vw, var(--space-8));
+    background: var(--color-surface-raised);
+    border: var(--border-width) solid var(--color-border-subtle);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-sheet);
+  }
+  .who {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding-bottom: var(--space-5);
+    border-bottom: var(--border-width) solid var(--color-border-subtle);
+  }
+  .avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: var(--radius-full);
+    background: var(--color-surface-sunken);
+  }
+  .name {
+    font-size: var(--text-heading-md);
+  }
+  .handle {
+    font-family: var(--font-mono);
+    font-size: var(--text-body-sm);
+    color: var(--color-text-muted);
+  }
+  .cols {
+    display: grid;
+    gap: var(--space-7);
+    padding-top: var(--space-6);
+  }
+  @media (min-width: 860px) {
+    .cols {
+      grid-template-columns: minmax(0, 4fr) minmax(0, 7fr);
+      gap: var(--space-8);
+    }
+  }
+  .read,
+  .says {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+  .big {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-2);
+    color: var(--color-text-muted);
+  }
+  .repo-count {
+    font-size: var(--text-display-lg);
+    line-height: 1;
+    color: var(--color-text);
+  }
+  .since {
+    color: var(--color-text-muted);
+  }
+  .lang-label,
+  .ask-label {
+    margin-top: var(--space-5);
+  }
+  .langs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+  .langs :global(li) {
+    padding: var(--space-1) var(--space-3);
+    font-size: var(--text-body-sm);
+    background: var(--color-surface);
+    border: var(--border-width) solid var(--color-border-subtle);
+    border-radius: var(--radius-full);
+  }
+  .langs :global(li b) {
+    font-weight: var(--weight-medium);
+    color: var(--color-accent-strong);
+  }
+  .claims,
+  .questions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+  .claims :global(li) {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: var(--space-3);
+    align-items: start;
+    font-size: var(--text-body-lg);
+  }
+  .claims :global(.badge) {
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    margin-top: 0.05em;
+    color: var(--color-text-inverse);
+    background: var(--color-accent);
+    border-radius: var(--radius-full);
+  }
+  .claims :global(.src) {
+    display: block;
+    font-size: var(--text-body-sm);
+    color: var(--color-accent-strong);
+  }
+  .questions li {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    font-family: var(--font-display);
+    font-size: var(--text-heading-sm);
+    line-height: var(--leading-tight);
+  }
+  .questions :global(.symbol) {
+    margin-top: 0.15em;
+    color: var(--color-text);
+  }
+  .result-foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-5);
+    margin-top: var(--space-7);
+    padding-top: var(--space-5);
+    border-top: var(--border-width) solid var(--color-border-subtle);
+  }
+  .again {
+    background: none;
+    border: 0;
+    cursor: pointer;
+  }
+
+  /* Things arrive one by one, the way the Rep would find them. */
+  .result :global(.arrive) {
+    animation: arrive var(--motion-arrive) var(--ease-standard) both;
+    animation-delay: calc(var(--n, 0) * 140ms);
+  }
+  @keyframes arrive {
+    from {
+      opacity: 0;
+      translate: 0 8px;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .result :global(.arrive) {
+      animation: none;
+    }
+  }
+</style>
+
+<script>
+  const USER_RE = /^[A-Za-z0-9](?:[A-Za-z0-9]|-(?=[A-Za-z0-9])){0,38}$/;
+  const GH = 'https://api.github.com';
+
+  interface Repo {
+    name: string;
+    fork: boolean;
+    archived: boolean;
+    stargazers_count: number;
+    language: string | null;
+    pushed_at: string;
+    html_url: string;
+  }
+
+  for (const root of document.querySelectorAll<HTMLElement>('[data-your-turn]')) {
+    const c = JSON.parse(root.dataset.copy ?? '{}');
+    const lang = root.dataset.lang ?? 'en';
+    const form = root.querySelector<HTMLFormElement>('form')!;
+    const input = root.querySelector<HTMLInputElement>('input')!;
+    const button = form.querySelector<HTMLButtonElement>('button')!;
+    const status = root.querySelector<HTMLElement>('.status')!;
+    const result = root.querySelector<HTMLElement>('.result')!;
+    const $ = <T extends Element>(sel: string) => result.querySelector<T>(sel)!;
+
+    const say = (text: string, state = '') => {
+      status.textContent = text;
+      root.dataset.state = state;
+    };
+    const fill = (template: string, values: Record<string, string>) =>
+      template.replace(/\{(\w+)\}/g, (_, k) => values[k] ?? '');
+    const el = (tag: string, text?: string, cls?: string) => {
+      const node = document.createElement(tag);
+      if (text) node.textContent = text;
+      if (cls) node.className = cls;
+      return node;
+    };
+    const ago = (iso: string) => {
+      const days = Math.round((Date.parse(iso) - Date.now()) / 86_400_000);
+      const rtf = new Intl.RelativeTimeFormat(lang, { numeric: 'auto' });
+      if (Math.abs(days) < 30) return rtf.format(days, 'day');
+      if (Math.abs(days) < 365) return rtf.format(Math.round(days / 30), 'month');
+      return rtf.format(Math.round(days / 365), 'year');
+    };
+    const ghIcon = root.querySelector('.prefix svg')!.cloneNode(true) as SVGElement;
+
+    input.addEventListener('input', () => {
+      const clean = input.value.replace(/\s+/g, '').replace(/^@/, '');
+      if (clean !== input.value) input.value = clean;
+    });
+
+    root.querySelector('.again')!.addEventListener('click', () => {
+      result.hidden = true;
+      input.value = '';
+      say('');
+      input.focus();
+    });
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const user = input.value.trim().replace(/^@/, '');
+      if (!USER_RE.test(user)) return say(c.errors.invalid, 'error');
+
+      button.disabled = true;
+      say(c.reading);
+      try {
+        const opts = { headers: { accept: 'application/vnd.github+json' } };
+        const [profileRes, reposRes] = await Promise.all([
+          fetch(`${GH}/users/${encodeURIComponent(user)}`, opts),
+          fetch(`${GH}/users/${encodeURIComponent(user)}/repos?per_page=100&sort=pushed&type=owner`, opts),
+        ]);
+        if (profileRes.status === 404) return say(c.errors.notFound, 'error');
+        if (profileRes.status === 403 || profileRes.status === 429) return say(c.errors.limit, 'error');
+        if (!profileRes.ok || !reposRes.ok) return say(c.errors.network, 'error');
+
+        const profile = await profileRes.json();
+        const repos = ((await reposRes.json()) as Repo[]).filter((r) => !r.fork);
+        if (!repos.length) return say(c.errors.empty, 'error');
+        render(profile, repos);
+        say('');
+      } catch {
+        say(c.errors.network, 'error');
+      } finally {
+        button.disabled = false;
+      }
+    });
+
+    function render(profile: Record<string, unknown>, repos: Repo[]) {
+      const login = String(profile.login ?? '');
+      const avatar = String(profile.avatar_url ?? '');
+      const img = $<HTMLImageElement>('.avatar');
+      if (/^https:\/\/avatars\.githubusercontent\.com\//.test(avatar)) img.src = `${avatar}&s=112`;
+      $('.name').textContent = String(profile.name || login);
+      $('.handle').textContent = `@${login}`;
+
+      $('.repo-count').textContent = String(repos.length);
+      const created = String(profile.created_at ?? '');
+      $('.since').textContent = created ? `${c.labels.since} ${new Date(created).getFullYear()}` : '';
+
+      // Languages, by how many of their own repositories use each.
+      const counts = new Map<string, number>();
+      for (const r of repos) if (r.language) counts.set(r.language, (counts.get(r.language) ?? 0) + 1);
+      const ranked = [...counts.entries()].sort((a, b) => b[1] - a[1]);
+      const langs = $('.langs');
+      langs.replaceChildren(
+        ...ranked.slice(0, 6).map(([name, n], i) => {
+          const li = el('li', undefined, 'arrive');
+          li.style.setProperty('--n', String(i));
+          li.append(el('b', name), document.createTextNode(` · ${n}`));
+          return li;
+        }),
+      );
+
+      // Claims: only what the data shows, each with where it was read.
+      const claims: { text: string; src: string }[] = [];
+      const top = [...repos].sort((a, b) => b.stargazers_count - a.stargazers_count)[0];
+      if (top && top.stargazers_count > 0) {
+        claims.push({
+          text: fill(c.claims.maintains, { repo: top.name, stars: top.stargazers_count.toLocaleString(lang) }),
+          src: `github.com/${login}/${top.name}`,
+        });
+      }
+      // "Mostly" only when the data says so: at least two repositories, and
+      // at least 40% of those with a language. Otherwise, just name them.
+      const withLanguage = repos.filter((r) => r.language).length;
+      if (ranked.length && ranked[0][1] >= 2 && ranked[0][1] / withLanguage >= 0.4) {
+        claims.push({
+          text: fill(c.claims.writes, { lang: ranked[0][0], n: String(ranked[0][1]), total: String(repos.length) }),
+          src: `github.com/${login}?tab=repositories`,
+        });
+      } else if (ranked.length) {
+        const names = ranked.slice(0, 3).map(([name]) => name);
+        claims.push({
+          text: fill(c.claims.uses, { langs: new Intl.ListFormat(lang, { type: 'conjunction' }).format(names) }),
+          src: `github.com/${login}?tab=repositories`,
+        });
+      }
+      const latest = repos[0];
+      if (latest?.pushed_at) {
+        claims.push({ text: fill(c.claims.active, { when: ago(latest.pushed_at) }), src: `github.com/${login}/${latest.name}` });
+      }
+      const bio = typeof profile.bio === 'string' ? profile.bio.trim().slice(0, 160) : '';
+      if (bio) claims.push({ text: fill(c.claims.about, { bio }), src: `github.com/${login}` });
+
+      const list = $('.claims');
+      list.replaceChildren(
+        ...claims.map((claim, i) => {
+          const li = el('li', undefined, 'arrive');
+          li.style.setProperty('--n', String(i + 2));
+          const badge = el('span', undefined, 'badge');
+          const icon = ghIcon.cloneNode(true) as SVGElement;
+          icon.setAttribute('width', '14');
+          icon.setAttribute('height', '14');
+          badge.append(icon);
+          const body = el('span');
+          body.append(el('span', claim.text), el('span', claim.src, 'src'));
+          li.append(badge, body);
+          return li;
+        }),
+      );
+
+      result.querySelectorAll<HTMLElement>('.questions li').forEach((li, i) => {
+        li.classList.remove('arrive');
+        void li.offsetWidth;
+        li.classList.add('arrive');
+        li.style.setProperty('--n', String(i + 2 + claims.length));
+      });
+
+      result.hidden = false;
+      result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }
+</script>

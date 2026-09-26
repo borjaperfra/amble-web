@@ -3,6 +3,7 @@ import Base from '../../layouts/Base.astro';
 import Hero from './Hero.astro';
 import Interlude from './Interlude.astro';
 import Story from './Story.astro';
+import YourTurn from './YourTurn.astro';
 import Interview from './Interview.astro';
 import Defence from './Defence.astro';
 import Distinctive from './Distinctive.astro';
@@ -24,6 +25,7 @@ const c = home[lang];
     <Hero c={c.hero} />
     <Interlude lines={c.story.interlude} body={c.story.interludeBody} id="interlude-pdf" />
     <Story c={c.story} strength={c.strength} sourceNames={c.sourceNames} />
+    <YourTurn c={c.yourTurn} />
     <Interview c={c.interview} sourceNames={c.sourceNames} />
     <Defence c={c.defence} />
     <Distinctive c={c.distinctive} />

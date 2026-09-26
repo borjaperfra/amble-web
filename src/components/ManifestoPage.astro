@@ -1,0 +1,99 @@
+---
+import Base from '../layouts/Base.astro';
+import Symbol from './Symbol.astro';
+import { manifesto } from '../content/pages';
+import type { Lang } from '../i18n/ui';
+
+const lang = (Astro.currentLocale ?? 'en') as Lang;
+const c = manifesto[lang];
+---
+
+<Base title={c.meta.title} description={c.meta.description} path="manifesto">
+  <main class="manifesto container">
+    <header class="head">
+      <p class="kicker">{c.kicker}</p>
+      <h1 class="display title">{c.title}</h1>
+      <p class="lede">{c.lede}</p>
+    </header>
+
+    <ol class="principles" role="list">
+      {
+        c.principles.map((p, i) => (
+          <li class="principle" data-reveal>
+            <span class="num">{String(i + 1).padStart(2, '0')}</span>
+            <h2 class="heading p-title">{p.title}</h2>
+            <p class="p-body">{p.body}</p>
+          </li>
+        ))
+      }
+    </ol>
+
+    <footer class="closing" data-reveal>
+      <Symbol size={64} watch breathe />
+      <p class="display closing-text">
+        {c.closing[0]}
+        <br />
+        <em>{c.closing[1]}</em>
+      </p>
+    </footer>
+  </main>
+</Base>
+
+<style>
+  .manifesto {
+    max-width: calc(var(--width-wide) + var(--gutter) * 2);
+    padding-block: var(--space-9) var(--space-section);
+  }
+  .head {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+    max-width: 52rem;
+  }
+  .title {
+    font-size: var(--text-display-xl);
+  }
+  .lede {
+    max-width: 38rem;
+  }
+  .principles {
+    margin-top: var(--space-10);
+    border-top: var(--border-width) solid var(--color-border);
+  }
+  .principle {
+    display: grid;
+    gap: var(--space-2) var(--space-7);
+    padding-block: var(--space-7);
+    border-bottom: var(--border-width) solid var(--color-border-subtle);
+  }
+  @media (min-width: 860px) {
+    .principle {
+      grid-template-columns: 5rem minmax(0, 5fr) minmax(0, 6fr);
+      align-items: baseline;
+    }
+  }
+  .num {
+    font-family: var(--font-mono);
+    font-size: var(--text-mono);
+    color: var(--color-accent-strong);
+  }
+  .p-title {
+    font-size: var(--text-heading-lg);
+  }
+  .p-body {
+    font-size: var(--text-body-lg);
+    color: var(--color-text-muted);
+    text-wrap: pretty;
+  }
+  .closing {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-6);
+    margin-top: var(--space-section);
+    text-align: center;
+  }
+  .closing-text {
+    font-size: var(--text-display-lg);
+  }
+</style>

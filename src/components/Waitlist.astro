@@ -2,6 +2,7 @@
 import { getRelativeLocaleUrl } from 'astro:i18n';
 import { useTranslations, type Lang } from '../i18n/ui';
 import { EMAIL_MAX, EMAIL_PATTERN } from '../lib/email-rules';
+import Symbol from './Symbol.astro';
 
 interface Props {
   id?: string;
@@ -53,6 +54,11 @@ const statusId = `${id}-status`;
       aria-describedby={statusId}
     />
     <button class="btn" type="submit">{t('waitlist.cta')}</button>
+  </div>
+  <div class="done" role="status" aria-live="polite">
+    <Symbol size={48} breathe />
+    <p class="done-title">{t('waitlist.doneTitle')}</p>
+    <p class="done-body">{t('waitlist.doneBody')}</p>
   </div>
   <p class="status-line">
     <span class="status" id={statusId} role="status" aria-live="polite">{t('waitlist.note')}</span>
@@ -118,11 +124,52 @@ const statusId = `${id}-status`;
   .waitlist[data-state='ok'] .status {
     color: var(--color-accent-strong);
   }
-  .waitlist[data-state='ok'] .row {
+  /* Joined: the form clears and the eye settles in its place. */
+  .done {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+    text-align: center;
+    color: var(--color-text);
+  }
+  .done-title {
+    margin-top: var(--space-3);
+    font-family: var(--font-display);
+    font-size: var(--text-heading-lg);
+    line-height: 1.1;
+  }
+  .done-body {
+    max-width: 30ch;
+    color: var(--color-text-muted);
+    text-wrap: balance;
+  }
+  .waitlist[data-state='ok'] .row,
+  .waitlist[data-state='ok'] .status-line {
     display: none;
   }
-  .waitlist[data-state='ok'] .status-line {
-    justify-content: center;
+  .waitlist[data-state='ok'] .done {
+    display: flex;
+  }
+  .waitlist[data-state='ok'] .done > * {
+    animation: settle var(--motion-arrive) var(--ease-standard) both;
+  }
+  .waitlist[data-state='ok'] .done > :nth-child(2) {
+    animation-delay: 0.5s;
+  }
+  .waitlist[data-state='ok'] .done > :nth-child(3) {
+    animation-delay: 0.7s;
+  }
+  @keyframes settle {
+    from {
+      opacity: 0;
+      translate: 0 8px;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .waitlist[data-state='ok'] .done > * {
+      animation: none;
+    }
   }
   .waitlist[data-state='invalid'] .status,
   .waitlist[data-state='empty'] .status,
@@ -199,6 +246,14 @@ const statusId = `${id}-status`;
       }
       show(outcome);
       button.disabled = false;
+      if (outcome === 'ok') {
+        const done = form.querySelector<HTMLElement>('.done')!;
+        // Re-set the text so screen readers announce the live region.
+        for (const p of done.querySelectorAll('p')) p.textContent = p.textContent;
+        // The eye closes once, slowly, and opens: noted.
+        const eye = done.querySelector('svg.symbol');
+        setTimeout(() => eye?.dispatchEvent(new MouseEvent('click', { bubbles: true })), 650);
+      }
     });
   }
 </script>

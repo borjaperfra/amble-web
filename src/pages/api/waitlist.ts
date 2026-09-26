@@ -54,7 +54,10 @@ export const POST: APIRoute = async ({ request, clientAddress, redirect }) => {
   // Honeypot: bots fill every field. Pretend it worked.
   if (form.get('website')) return reply('ok', 200);
 
-  if (!allow(clientAddress)) return reply('slow-down', 429);
+  // Behind Railway's proxy the socket address is the proxy's. The last entry of
+  // X-Forwarded-For is the one the proxy appended, so it can't be forged.
+  const forwarded = request.headers.get('x-forwarded-for')?.split(',').pop()?.trim();
+  if (!allow(forwarded || clientAddress)) return reply('slow-down', 429);
 
   const parsed = parseEmail(form.get('email'));
   if (!parsed) return reply('invalid', 400);

@@ -6,8 +6,10 @@ import mdx from '@astrojs/mdx';
 // Pages are prerendered; only the waitlist endpoint runs on the server (Railway).
 export default defineConfig({
   site: 'https://amble.fyi',
-  adapter: node({ mode: 'standalone' }),
+  adapter: node({ mode: 'middleware' }),
   integrations: [mdx()],
+  // Small site, one stylesheet per page: inline it and skip the render-blocking request.
+  build: { inlineStylesheets: 'always' },
   env: {
     schema: {
       DATABASE_URL: envField.string({ context: 'server', access: 'secret' }),
@@ -29,6 +31,7 @@ export default defineConfig({
       provider: fontProviders.google(),
       weights: [400, 500, 600],
       styles: ['normal'],
+      subsets: ['latin'],
     },
     {
       name: 'Newsreader',
@@ -36,6 +39,7 @@ export default defineConfig({
       provider: fontProviders.google(),
       weights: [400, 500],
       styles: ['normal', 'italic'],
+      subsets: ['latin'],
     },
   ],
 });
