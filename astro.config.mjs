@@ -1,5 +1,5 @@
 // @ts-check
-import { defineConfig, fontProviders } from 'astro/config';
+import { defineConfig, envField, fontProviders } from 'astro/config';
 import node from '@astrojs/node';
 import mdx from '@astrojs/mdx';
 
@@ -8,6 +8,15 @@ export default defineConfig({
   site: 'https://amble.fyi',
   adapter: node({ mode: 'standalone' }),
   integrations: [mdx()],
+  env: {
+    schema: {
+      DATABASE_URL: envField.string({ context: 'server', access: 'secret' }),
+      // Without it, confirmation links are logged instead of emailed (local dev).
+      RESEND_API_KEY: envField.string({ context: 'server', access: 'secret', optional: true }),
+      WAITLIST_FROM: envField.string({ context: 'server', access: 'secret', default: 'Amble <rep@amble.fyi>' }),
+      SITE_URL: envField.string({ context: 'server', access: 'secret', default: 'https://amble.fyi' }),
+    },
+  },
   i18n: {
     locales: ['en', 'es'],
     defaultLocale: 'en',

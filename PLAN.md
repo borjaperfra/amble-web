@@ -20,19 +20,26 @@ Later, the site grows into: social login → create a profile → start your age
 - Email only. Double opt-in (GDPR). Store email, locale, consent timestamp, confirmation timestamp.
 - No queue position, no referrals (no artificial scarcity — PRODUCT_SPEC §2).
 - Success copy is understated: "Got it. Check your inbox."
+- Built: `POST /api/waitlist` (JSON for fetch, 303 redirect without JS), `GET /api/waitlist/confirm`, `/joined` and `/confirmed` in both languages. Honeypot, per-IP rate limit, 2-minute resend cooldown, same answer whether or not the email is already on the list, hashed tokens that expire in 7 days.
+
+## Roadmap (told on the site, openly)
+
+- **v0 — closed beta (now).** The Rep reads your sources, interviews you, builds your Map, learns from your choices (triage), knows what to listen for, writes your career.md. The beta is there to collect feedback: what breaks, what to improve. Added during v0: **your career coach** — how to improve your profile, how to look for work.
+- **v1 — it reads the offers.** The Rep reads offers published on the internet and brings you only the ones that fit.
+- **v2 — agent to agent.** Companies arrive with their own agents. Your Rep talks to theirs and negotiates for you. The definitive version.
 
 ## Home — sections
 
-Shown working, Rosario-style, on a demo profile: **Marta Quiroga** in ES, an English-named equivalent in EN. No "fictional profile" label.
+Shown working, Rosario-style, on a demo profile: **Marta Quiroga** (ES) and **Maya Lindqvist** (EN), both AI Engineers, at invented companies. No "fictional profile" label.
 
-1. **Hero** — *I'm not looking. Amble is.* + an h2 that explains: meet your Rep, it listens for job offers and negotiates them for you. Email field.
+1. **Hero** — a **beta** tag. *I'm not looking. Amble is.* + an h2 that explains: meet your Rep, it listens for job offers and negotiates them for you. One line saying we're building it in the open, with a closed beta that collects users' feedback. Email field.
 2. **You're more than a PDF.** Amble builds a deep profile from your docs and a few questions. Sources arriving, discoveries settling one by one.
 3. **It asks what your CV can't tell.** One interview question with "Why this question?".
 4. **It checks its own understanding.** A defence question on co-produced code, then a visible retraction.
 5. **A map, not a score.** Map excerpt with ●●●○ evidence and "Things I don't know yet".
 6. **Teach Amble with your choices.** A yes or a no is data. One triage offer crossing two axes → the revealed preference.
 7. **Then it listens.** Breathing moss dot. "Nothing worth bothering you with."
-8. **Your agent talks to theirs.** It reads offers and brings you only what fits; it talks to the company's agent for you. (Wording pending — see open points.)
+8. **Where it's going.** The roadmap above: v0 today (+ career coach), v1 reads offers and filters them, v2 your agent talks to the company's agent.
 9. **career.md.** Portable, provenance in every line, open format.
 10. **Your data is yours.** Inspect, correct, dispute. Take your data with you, delete your whole profile, or keep it synced in your GitHub.
 11. **Remove applications.** Email again.
@@ -46,8 +53,13 @@ Shown working, Rosario-style, on a demo profile: **Marta Quiroga** in ES, an Eng
 
 The plan is to open `amble` and the `career.md` format. Before making `amble` public, audit its git history for personal data (fixture profiles, `.env*`, `.amble-data/`).
 
+Needs many reviews first; it will happen, not for launch.
+
+## Domain
+
+`amble.fyi` (free as of 2026-09-26, not bought yet). Resend needs it verified before real emails go out.
+
 ## Open points
 
-- Domain: confirm the spelling (`amble.fyi` vs `ample.fyi`).
-- Sections 1, 8, 10 describe things the product doesn't do yet (negotiating, agent-to-agent, reading offers, GitHub sync). Decide how to mark what's in the beta vs. what's coming.
-- English name for the demo profile.
+- GitHub sync of your data (section 10) doesn't exist yet: place it in v0 or on the roadmap.
+- A privacy page: the waitlist collects emails, so it needs one before launch (GDPR).

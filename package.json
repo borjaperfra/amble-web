@@ -10,14 +10,22 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "start": "node ./dist/server/entry.mjs"
+    "start": "node scripts/migrate.mjs && node ./dist/server/entry.mjs",
+    "db:migrate": "node --env-file=.env scripts/migrate.mjs"
   },
   "dependencies": {
     "@astrojs/mdx": "^8.0.2",
     "@astrojs/node": "^11.1.6",
-    "astro": "^7.3.5"
+    "astro": "^7.3.5",
+    "postgres": "^3.4.9",
+    "resend": "^6.30.0"
   },
   "allowScripts": {
     "esbuild": true
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "@types/node": "^24.19.0",
+    "typescript": "^6.0.3"
   }
 }

@@ -1,0 +1,110 @@
+---
+import { getRelativeLocaleUrl } from 'astro:i18n';
+import Base from '../layouts/Base.astro';
+import Waitlist from './Waitlist.astro';
+import { useTranslations, type Lang } from '../i18n/ui';
+
+// The quiet pages after the waitlist form: "joined" and "confirmed". They are
+// static, so the error variants are picked from the query string on the client.
+interface Props {
+  kind: 'joined' | 'confirmed';
+}
+
+const { kind } = Astro.props;
+const lang = (Astro.currentLocale ?? 'en') as Lang;
+const t = useTranslations(lang);
+const errors = {
+  invalid: t('waitlist.invalid'),
+  'slow-down': t('waitlist.slow-down'),
+  error: t('waitlist.error'),
+};
+---
+
+<Base path={kind}>
+  <main class="notice">
+    <p class="wordmark"><a href={getRelativeLocaleUrl(lang)}>amble</a></p>
+
+    <section data-variant="default">
+      <h1 class="serif">{t(`${kind}.title`)}</h1>
+      <p>{t(`${kind}.body`)}</p>
+    </section>
+
+    {
+      kind === 'confirmed' && (
+        <section data-variant="invalid" hidden>
+          <h1 class="serif">{t('confirmed.invalidTitle')}</h1>
+          <p>{t('confirmed.invalidBody')}</p>
+          <Waitlist id="retry" />
+        </section>
+      )
+    }
+
+    {
+      kind === 'joined' && (
+        <section data-variant="error" hidden>
+          <h1 class="serif" data-error-text data-errors={JSON.stringify(errors)} />
+          <Waitlist id="retry" />
+        </section>
+      )
+    }
+
+    <a class="text-btn" href={getRelativeLocaleUrl(lang)}>← {t('back')}</a>
+  </main>
+</Base>
+
+<style>
+  .notice {
+    min-height: 100svh;
+    max-width: var(--reading-max);
+    margin: 0 auto;
+    padding: 48px var(--page-pad);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 48px;
+  }
+  .wordmark a {
+    font-family: var(--font-display);
+    font-size: 22px;
+    text-decoration: none;
+  }
+  section {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  section[hidden] {
+    display: none;
+  }
+  h1 {
+    font-size: var(--heading-xl);
+    font-weight: 400;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+  }
+  section p {
+    font-size: var(--text-body-lg);
+    color: var(--ink-secondary);
+  }
+  .text-btn {
+    align-self: flex-start;
+    text-decoration: none;
+  }
+</style>
+
+<script>
+  const params = new URLSearchParams(location.search);
+  const show = (variant: string) => {
+    for (const s of document.querySelectorAll<HTMLElement>('[data-variant]')) {
+      s.hidden = s.dataset.variant !== variant;
+    }
+  };
+  if (params.has('invalid')) show('invalid');
+  const error = params.get('error');
+  const target = document.querySelector<HTMLElement>('[data-error-text]');
+  if (error && target) {
+    const errors = JSON.parse(target.dataset.errors ?? '{}');
+    target.textContent = errors[error] ?? errors.error;
+    show('error');
+  }
+</script>
