@@ -63,6 +63,7 @@ const lang = (Astro.currentLocale ?? 'en') as Lang;
         <section class="read">
           <p class="kicker">{c.labels.read}</p>
           <p class="big"><span class="repo-count heading"></span> <span>{c.labels.repos}</span></p>
+          <p class="forks"></p>
           <p class="since"></p>
           <p class="kicker lang-label">{c.labels.languages}</p>
           <ul class="langs" role="list"></ul>
@@ -85,6 +86,7 @@ const lang = (Astro.currentLocale ?? 'en') as Lang;
         </section>
       </div>
 
+      <p class="public-only">{c.labels.publicOnly}</p>
       <footer class="result-foot">
         <a class="btn" href={`${getRelativeLocaleUrl(lang)}#join`}>{c.join} →</a>
         <button class="text-link again" type="button">{c.again}</button>
@@ -221,8 +223,17 @@ const lang = (Astro.currentLocale ?? 'en') as Lang;
     line-height: 1;
     color: var(--color-text);
   }
-  .since {
+  .since,
+  .forks {
     color: var(--color-text-muted);
+  }
+  .public-only {
+    margin-top: var(--space-6);
+    padding: var(--space-3) var(--space-4);
+    font-size: var(--text-body-sm);
+    color: var(--color-text-muted);
+    background: var(--color-surface);
+    border-radius: var(--radius-md);
   }
   .lang-label,
   .ask-label {
@@ -331,6 +342,15 @@ const lang = (Astro.currentLocale ?? 'en') as Lang;
     html_url: string;
   }
 
+  interface GhEvent {
+    type: string;
+    created_at: string;
+    repo: { name: string };
+  }
+
+  // Events that mean work, not stars or follows.
+  const WORK = new Set(['PushEvent', 'PullRequestEvent', 'PullRequestReviewEvent', 'IssuesEvent', 'IssueCommentEvent', 'CreateEvent', 'ReleaseEvent']);
+
   for (const root of document.querySelectorAll<HTMLElement>('[data-your-turn]')) {
     const c = JSON.parse(root.dataset.copy ?? '{}');
     const lang = root.dataset.lang ?? 'en';
@@ -383,18 +403,21 @@ const lang = (Astro.currentLocale ?? 'en') as Lang;
       say(c.reading);
       try {
         const opts = { headers: { accept: 'application/vnd.github+json' } };
-        const [profileRes, reposRes] = await Promise.all([
+        const [profileRes, reposRes, eventsRes] = await Promise.all([
           fetch(`${GH}/users/${encodeURIComponent(user)}`, opts),
           fetch(`${GH}/users/${encodeURIComponent(user)}/repos?per_page=100&sort=pushed&type=owner`, opts),
+          fetch(`${GH}/users/${encodeURIComponent(user)}/events/public?per_page=100`, opts),
         ]);
         if (profileRes.status === 404) return say(c.errors.notFound, 'error');
         if (profileRes.status === 403 || profileRes.status === 429) return say(c.errors.limit, 'error');
         if (!profileRes.ok || !reposRes.ok) return say(c.errors.network, 'error');
 
         const profile = await profileRes.json();
-        const repos = ((await reposRes.json()) as Repo[]).filter((r) => !r.fork);
-        if (!repos.length) return say(c.errors.empty, 'error');
-        render(profile, repos);
+        const all = (await reposRes.json()) as Repo[];
+        const repos = all.filter((r) => !r.fork);
+        const events: GhEvent[] = eventsRes.ok ? await eventsRes.json() : [];
+        if (!repos.length && !events.length) return say(c.errors.empty, 'error');
+        render(profile, repos, all.length - repos.length, events);
         say('');
       } catch {
         say(c.errors.network, 'error');
@@ -403,7 +426,7 @@ const lang = (Astro.currentLocale ?? 'en') as Lang;
       }
     });
 
-    function render(profile: Record<string, unknown>, repos: Repo[]) {
+    function render(profile: Record<string, unknown>, repos: Repo[], forks: number, events: GhEvent[]) {
       const login = String(profile.login ?? '');
       const avatar = String(profile.avatar_url ?? '');
       const img = $<HTMLImageElement>('.avatar');
@@ -412,6 +435,7 @@ const lang = (Astro.currentLocale ?? 'en') as Lang;
       $('.handle').textContent = `@${login}`;
 
       $('.repo-count').textContent = String(repos.length);
+      $('.forks').textContent = forks ? fill(c.labels.forks, { n: String(forks) }) : '';
       const created = String(profile.created_at ?? '');
       $('.since').textContent = created ? `${c.labels.since} ${new Date(created).getFullYear()}` : '';
 
@@ -453,9 +477,28 @@ const lang = (Astro.currentLocale ?? 'en') as Lang;
           src: `github.com/${login}?tab=repositories`,
         });
       }
+      // Latest public work anywhere (their repos or others'), from the events feed;
+      // falls back to the last push to their own repositories.
+      const work = events.filter((e) => WORK.has(e.type));
+      const lastWork = work[0];
       const latest = repos[0];
-      if (latest?.pushed_at) {
-        claims.push({ text: fill(c.claims.active, { when: ago(latest.pushed_at) }), src: `github.com/${login}/${latest.name}` });
+      if (lastWork) {
+        claims.push({
+          text: fill(c.claims.active, { when: ago(lastWork.created_at), repo: lastWork.repo.name }),
+          src: `github.com/${lastWork.repo.name}`,
+        });
+      } else if (latest?.pushed_at) {
+        claims.push({
+          text: fill(c.claims.active, { when: ago(latest.pushed_at), repo: `${login}/${latest.name}` }),
+          src: `github.com/${login}/${latest.name}`,
+        });
+      }
+      const others = [...new Set(work.map((e) => e.repo.name).filter((n) => !n.toLowerCase().startsWith(`${login.toLowerCase()}/`)))];
+      if (others.length) {
+        claims.push({
+          text: fill(c.claims.contributes, { n: String(others.length), repo: others[0] }),
+          src: `github.com/${others[0]}`,
+        });
       }
       const bio = typeof profile.bio === 'string' ? profile.bio.trim().slice(0, 160) : '';
       if (bio) claims.push({ text: fill(c.claims.about, { bio }), src: `github.com/${login}` });

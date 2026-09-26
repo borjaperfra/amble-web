@@ -23,6 +23,7 @@ const { c } = Astro.props;
         <li class:list={['stop', { current: i === 0 }]} style={`--i:${i}`}>
           <div class="art" aria-hidden="true">
             {i === 0 && <span class="here">{c.now}</span>}
+            {step.soon && <span class:list={['here', 'soon']}>{step.soon}</span>}
             {i === 0 && <span class="halo" />}
             {i === 0 && (
               <div class="disc v0">
@@ -139,6 +140,15 @@ const { c } = Astro.props;
     background: var(--color-accent);
     border-radius: var(--radius-full);
     z-index: 2;
+  }
+  /* Future stops: an outlined tag, so "Now" stays the only solid one. */
+  .here.soon {
+    color: var(--color-accent-strong);
+    background: var(--color-surface-raised);
+    border: 1.5px dashed var(--color-accent);
+  }
+  .here.soon::after {
+    display: none;
   }
   .here::after {
     content: '';

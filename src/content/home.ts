@@ -53,9 +53,9 @@ export interface HomeContent {
     cta: string;
     reading: string;
     errors: { invalid: string; notFound: string; limit: string; network: string; empty: string };
-    labels: { read: string; repos: string; languages: string; since: string; claims: string; ask: string };
+    labels: { read: string; repos: string; forks: string; languages: string; since: string; claims: string; ask: string; publicOnly: string };
     // {placeholders} are filled in the browser with facts from GitHub.
-    claims: { maintains: string; writes: string; uses: string; active: string; about: string };
+    claims: { maintains: string; writes: string; uses: string; active: string; about: string; contributes: string };
     questions: string[];
     join: string;
     again: string;
@@ -148,7 +148,7 @@ export interface HomeContent {
     kicker: string;
     title: string;
     now: string;
-    steps: { version: string; title: string; line: string; extra?: string }[];
+    steps: { version: string; title: string; line: string; extra?: string; soon?: string }[];
   };
   career: {
     kicker: string;
@@ -284,17 +284,20 @@ const en: HomeContent = {
     },
     labels: {
       read: 'What I read',
-      repos: 'public repositories',
+      repos: 'public repositories of your own',
+      forks: '+ {n} forks',
       languages: 'Languages',
       since: 'On GitHub since',
       claims: 'What I can already say, with its source',
       ask: 'What I’d still ask you',
+      publicOnly: 'Only public data. Private repositories and private contributions stay invisible here; in the beta, your Rep reads them only if you let it.',
     },
     claims: {
       maintains: 'Maintains {repo}, {stars} ★',
       writes: 'Writes mostly {lang}: {n} of {total} repositories',
       uses: 'Has code in {langs}',
-      active: 'Last pushed code {when}',
+      active: 'Last public activity {when}, in {repo}',
+      contributes: 'Also works in {n} repositories that aren’t theirs, like {repo}',
       about: 'Describes themselves as “{bio}”',
     },
     questions: [
@@ -456,8 +459,8 @@ const en: HomeContent = {
     now: 'Now',
     steps: [
       { version: 'v0', title: 'Your Rep', line: 'Closed beta. We fix what breaks, with you.', extra: '+ career coach' },
-      { version: 'v1', title: 'It reads the offers', line: 'Brings you only the ones that fit.' },
-      { version: 'v2', title: 'Agent to agent', line: 'Yours talks to theirs. No applications.' },
+      { version: 'v1', title: 'It reads the offers', line: 'Brings you only the ones that fit.', soon: 'Next' },
+      { version: 'v2', title: 'Agent to agent', line: 'Yours talks to theirs. No applications.', soon: 'Coming soon' },
     ],
   },
   career: {
@@ -619,17 +622,20 @@ const es: HomeContent = {
     },
     labels: {
       read: 'Lo que he leído',
-      repos: 'repositorios públicos',
+      repos: 'repositorios públicos propios',
+      forks: '+ {n} forks',
       languages: 'Lenguajes',
       since: 'En GitHub desde',
       claims: 'Lo que ya puedo decir, con su fuente',
       ask: 'Lo que aún te preguntaría',
+      publicOnly: 'Solo datos públicos. Los repositorios y las contribuciones privadas no se ven aquí; en la beta, tu Rep solo los lee si le das permiso.',
     },
     claims: {
       maintains: 'Mantiene {repo}, {stars} ★',
       writes: 'Escribe sobre todo en {lang}: {n} de {total} repositorios',
       uses: 'Tiene código en {langs}',
-      active: 'Último push {when}',
+      active: 'Última actividad pública {when}, en {repo}',
+      contributes: 'También trabaja en {n} repositorios que no son suyos, como {repo}',
       about: 'Se describe como «{bio}»',
     },
     questions: [
@@ -791,8 +797,8 @@ const es: HomeContent = {
     now: 'Ahora',
     steps: [
       { version: 'v0', title: 'Tu Rep', line: 'Beta cerrada. Arreglamos lo que falla, contigo.', extra: '+ coach de carrera' },
-      { version: 'v1', title: 'Lee las ofertas', line: 'Te trae solo las que encajan.' },
-      { version: 'v2', title: 'De agente a agente', line: 'El tuyo habla con el suyo. Sin candidaturas.' },
+      { version: 'v1', title: 'Lee las ofertas', line: 'Te trae solo las que encajan.', soon: 'Siguiente' },
+      { version: 'v2', title: 'De agente a agente', line: 'El tuyo habla con el suyo. Sin candidaturas.', soon: 'Próximamente' },
     ],
   },
   career: {

@@ -46,8 +46,9 @@ const { c } = Astro.props;
               <Symbol size={18} />
               <span>{k.ask}</span>
             </p>
-            <p class="bubble person" data-type={k.answer}>
-              {k.answer}
+            <p class="bubble person">
+              <span class="ghost" aria-hidden="true">{k.answer}</span>
+              <span class="typed">{k.answer}</span>
             </p>
           </div>
 
@@ -207,7 +208,17 @@ const { c } = Astro.props;
     background: var(--color-action);
     border-bottom-right-radius: var(--radius-sm);
   }
-  .bubble.person.is-typing::after {
+  .bubble.person {
+    position: relative;
+  }
+  .ghost {
+    visibility: hidden;
+  }
+  .typed {
+    position: absolute;
+    inset: var(--space-3) var(--space-4);
+  }
+  .bubble.person.is-typing .typed::after {
     content: '▍';
     margin-left: 1px;
     opacity: 0.6;
@@ -340,19 +351,21 @@ const { c } = Astro.props;
       cases.forEach((k) => k.classList.add('is-read', 'is-asked', 'is-answering', 'is-judged'));
       continue;
     }
-    const answers = cases.map((k) => k.querySelector<HTMLElement>('.bubble.person')!);
-    const texts = answers.map((a) => a.dataset.type ?? a.textContent ?? '');
-    answers.forEach((a) => (a.textContent = ' '));
+    // The bubble keeps the size of the full answer (the ghost) from the start;
+    // only the visible text is typed, so nothing around it grows.
+    const answers = cases.map((k) => k.querySelector<HTMLElement>('.bubble.person .typed')!);
+    const texts = answers.map((a) => a.textContent ?? '');
+    answers.forEach((a) => (a.textContent = ''));
 
     // The answer arrives word by word, at the pace of someone thinking it through.
     const type = async (el: HTMLElement, text: string) => {
-      el.classList.add('is-typing');
+      el.parentElement!.classList.add('is-typing');
       const words = text.split(' ');
       for (let n = 1; n <= words.length; n++) {
         el.textContent = words.slice(0, n).join(' ');
         await wait(/[.?]$/.test(words[n - 1]) ? 380 : 90);
       }
-      el.classList.remove('is-typing');
+      el.parentElement!.classList.remove('is-typing');
     };
 
     scene.addEventListener(

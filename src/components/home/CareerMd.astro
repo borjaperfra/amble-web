@@ -12,7 +12,7 @@ const { c } = Astro.props;
 ---
 
 <section class="section container" aria-labelledby="career-title">
-  <div class="split">
+  <div class="split career">
     <SectionIntro id="career-title" kicker={c.kicker} title={c.title} body={c.line} />
 <figure class="file" data-scene>
   <figcaption class="file-bar">
@@ -39,6 +39,11 @@ const { c } = Astro.props;
 </section>
 
 <style>
+  /* Same axis as the sections around it. */
+  .career {
+    max-width: var(--width-wide);
+    margin-inline: auto;
+  }
   .file {
     overflow: hidden;
     background: var(--color-surface-raised);
