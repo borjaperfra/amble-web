@@ -3,21 +3,32 @@
 // inks itself in, word by word, as you scroll past it.
 interface Props {
   lines: [string, string];
-  body?: string;
+  body?: string[];
+  // A short line above the statement, linking it to what came before.
+  bridge?: string;
   id?: string;
 }
 
-const { lines, body, id } = Astro.props;
+const { lines, body, bridge, id } = Astro.props;
 const words = (line: string) => line.split(' ');
 ---
 
 <section class="interlude" id={id} aria-labelledby={id && `${id}-title`}>
   <div class="container">
+    {bridge && <p class="bridge" data-reveal>{bridge}</p>}
     <h2 class="display statement" id={id && `${id}-title`} data-ink>
       <span class="line">{words(lines[0]).map((w) => <span class="word">{w} </span>)}</span>
       <span class="line second">{words(lines[1]).map((w) => <span class="word">{w} </span>)}</span>
     </h2>
-    {body && <p class="lede body" data-reveal>{body}</p>}
+    {
+      body && (
+        <div class="body" data-reveal>
+          {body.map((p) => (
+            <p class="lede">{p}</p>
+          ))}
+        </div>
+      )
+    }
   </div>
 </section>
 
@@ -39,11 +50,21 @@ const words = (line: string) => line.split(' ');
     color: var(--color-accent-strong);
     padding-right: 2vw;
   }
+  .bridge {
+    margin-bottom: var(--space-6);
+    font-family: var(--font-display);
+    font-size: var(--text-heading-md);
+    font-style: italic;
+    color: var(--color-text-muted);
+  }
   .body {
-    max-width: 26rem;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    max-width: 30rem;
     margin-top: var(--space-7);
     margin-left: auto;
-    text-align: right;
+    text-align: left;
   }
   @media (max-width: 640px) {
     .body {

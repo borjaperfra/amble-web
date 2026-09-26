@@ -84,6 +84,9 @@ const readThisWeek = 37;
       </div>
       <figcaption class="channel">{c.notify.channel}</figcaption>
     </figure>
+    <p class="explain">
+      {c.explain.map((e) => <span>{e}</span>)}
+    </p>
   </div>
 </section>
 
@@ -254,12 +257,13 @@ const readThisWeek = 37;
     flex-direction: column;
     justify-content: flex-end;
     gap: var(--space-3);
-    height: 560px;
-    overflow: hidden;
     padding: var(--space-5) var(--space-4);
     background: var(--color-bg);
     border-radius: 0 0 30px 30px;
-    mask-image: linear-gradient(to bottom, transparent 0, #000 36px);
+  }
+  /* The facts are already in the filter list; the card keeps what's new. */
+  .card .card-facts {
+    display: none;
   }
   /* On phones the card is trimmed to what matters, and the screen fits it. */
   @media (max-width: 600px) {
@@ -380,6 +384,23 @@ const readThisWeek = 37;
     text-align: center;
     font-size: var(--text-body-sm);
     color: var(--color-code-text);
+  }
+
+  .explain {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-2) var(--space-5);
+    font-family: var(--font-display);
+    font-size: var(--text-heading-md);
+  }
+  .explain span:last-child {
+    color: var(--color-accent-strong);
+  }
+  @media (min-width: 960px) {
+    .explain {
+      grid-column: 1 / -1;
+    }
   }
 
   /* ---------- Choreography ---------- */

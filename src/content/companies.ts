@@ -9,8 +9,10 @@ export interface CompaniesContent {
   kicker: string;
   title: [string, string];
   lede: string;
+  pitch: { title: string; body: string[] };
   cta: string;
   formNote: string;
+  formPrivacy: string;
   how: { kicker: string; title: string; steps: { n: string; title: string; body: string }[] };
   salary: {
     kicker: string;
@@ -36,6 +38,7 @@ export interface CompaniesContent {
   finale: { title: string; body: string };
 }
 
+
 const en: CompaniesContent = {
   meta: {
     title: 'For companies — Amble',
@@ -43,9 +46,18 @@ const en: CompaniesContent = {
   },
   badge: 'Early access · company side in v2',
   kicker: 'For companies',
-  title: ['Hire from evidence,', 'not applications.'],
-  lede: 'Your agent talks to candidates’ Reps. It asks what you need to know, gets answers with sources, and only brings you people who want the role as much as you want them.',
+  title: ['The person you want', 'probably isn’t applying.'],
+  lede: 'Your inbox shows you who applied. It doesn’t show you who would move.',
+  pitch: {
+    title: 'Stop screening applications. Start finding mutual intent.',
+    body: [
+      'Tell Amble who you actually need: the work, the evidence, the constraints and the range.',
+      'Company agents talk to Reps privately.',
+      'You don’t get 400 applicants. You get people who can demonstrate the work, and already know enough to want the conversation.',
+    ],
+  },
   cta: 'Request early access',
+  formPrivacy: 'Only about early access. Nothing else.',
   formNote: 'We’re building the company side now. We’ll write when there’s a place for you.',
   how: {
     kicker: 'How it works',
@@ -59,7 +71,7 @@ const en: CompaniesContent = {
   },
   salary: {
     kicker: 'The salary rule',
-    title: 'Every role has a range. Only the agents know it.',
+    title: 'Every role has a range. Only the agents need to know it.',
     body: 'No range, no role. Your range is never published and never leaves your agent, except to tell a candidate’s Rep that it fits. A candidate hears about it only when it matches what they’d accept.',
     rules: [
       'Every role carries a range, or it isn’t listed.',
@@ -98,7 +110,7 @@ const en: CompaniesContent = {
     ],
   },
   finale: {
-    title: 'Fewer interviews. Better ones.',
+    title: 'The goal isn’t more candidates. It’s fewer conversations that should never have happened.',
     body: 'Join the early-access list for companies.',
   },
 };
@@ -110,9 +122,18 @@ const es: CompaniesContent = {
   },
   badge: 'Acceso anticipado · lado de empresa en la v2',
   kicker: 'Para empresas',
-  title: ['Contrata por evidencia,', 'no por candidaturas.'],
-  lede: 'Tu agente habla con los Reps de los candidatos. Pregunta lo que necesitas saber, recibe respuestas con su fuente y solo te trae a personas que quieren el puesto tanto como tú a ellas.',
+  title: ['La persona que buscas', 'probablemente no está aplicando.'],
+  lede: 'Tu bandeja te enseña quién ha aplicado. No te enseña quién se movería.',
+  pitch: {
+    title: 'Deja de cribar candidaturas. Empieza a encontrar intención mutua.',
+    body: [
+      'Cuéntale a Amble a quién necesitas de verdad: el trabajo, la evidencia, las condiciones y el rango.',
+      'Los agentes de empresa hablan con los Reps en privado.',
+      'No recibes 400 candidatos. Recibes personas que pueden demostrar el trabajo y que ya saben lo suficiente como para querer la conversación.',
+    ],
+  },
   cta: 'Pedir acceso anticipado',
+  formPrivacy: 'Solo sobre el acceso anticipado. Nada más.',
   formNote: 'Estamos construyendo el lado de empresa. Te escribiremos cuando haya sitio para ti.',
   how: {
     kicker: 'Cómo funciona',
@@ -126,7 +147,7 @@ const es: CompaniesContent = {
   },
   salary: {
     kicker: 'La regla del salario',
-    title: 'Cada puesto tiene un rango. Solo lo saben los agentes.',
+    title: 'Cada puesto tiene un rango. Solo los agentes necesitan saberlo.',
     body: 'Sin rango, no hay puesto. Tu rango nunca se publica ni sale de tu agente, salvo para decirle al Rep de un candidato que encaja. El candidato solo lo conoce cuando coincide con lo que aceptaría.',
     rules: [
       'Cada puesto lleva un rango, o no se publica.',
@@ -165,7 +186,7 @@ const es: CompaniesContent = {
     ],
   },
   finale: {
-    title: 'Menos entrevistas. Mejores.',
+    title: 'El objetivo no es tener más candidatos. Es tener menos conversaciones que nunca debieron ocurrir.',
     body: 'Apúntate a la lista de acceso anticipado para empresas.',
   },
 };

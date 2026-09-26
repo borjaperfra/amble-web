@@ -13,8 +13,27 @@ const c = manifesto[lang];
     <header class="head">
       <p class="kicker">{c.kicker}</p>
       <h1 class="display title">{c.title}</h1>
-      <p class="lede">{c.lede}</p>
     </header>
+
+    <div class="essay">
+      {
+        c.essay.map((b) =>
+          b.kind === 'list' ? (
+            <ul class="e-list" role="list">
+              {(b.text as string[]).map((line, i) => (
+                <li data-reveal style={`--i:${i}`}>{line}</li>
+              ))}
+            </ul>
+          ) : b.kind === 'beat' ? (
+            <p class="display e-beat" data-reveal>{b.text}</p>
+          ) : (
+            <p class="e-p" data-reveal>{b.text}</p>
+          ),
+        )
+      }
+    </div>
+
+    <p class="kicker principles-label">{c.principlesLabel}</p>
 
     <ol class="principles" role="list">
       {
@@ -30,11 +49,13 @@ const c = manifesto[lang];
 
     <footer class="closing" data-reveal>
       <Symbol size={64} watch breathe />
-      <p class="display closing-text">
-        {c.closing[0]}
-        <br />
-        <em>{c.closing[1]}</em>
-      </p>
+      <div class="closing-text">
+        {
+          c.closing.map((line, i) => (
+            <p class:list={['c-line', { last: i === c.closing.length - 1, formula: line.includes('↔') }]}>{line}</p>
+          ))
+        }
+      </div>
     </footer>
   </main>
 </Base>
@@ -53,11 +74,39 @@ const c = manifesto[lang];
   .title {
     font-size: var(--text-display-xl);
   }
-  .lede {
-    max-width: 38rem;
+  .essay {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-7);
+    max-width: 44rem;
+    margin-top: var(--space-9);
+  }
+  .e-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    font-family: var(--font-display);
+    font-size: var(--text-heading-lg);
+    line-height: var(--leading-heading);
+  }
+  .e-list li:last-child {
+    color: var(--color-accent-strong);
+    font-style: italic;
+  }
+  .e-p {
+    font-size: var(--text-body-lg);
+    color: var(--color-text-muted);
+    text-wrap: pretty;
+  }
+  .e-beat {
+    font-size: var(--text-display-lg);
+    text-wrap: balance;
+  }
+  .principles-label {
+    margin-top: var(--space-10);
   }
   .principles {
-    margin-top: var(--space-10);
+    margin-top: var(--space-5);
     border-top: var(--border-width) solid var(--color-border);
   }
   .principle {
@@ -94,6 +143,26 @@ const c = manifesto[lang];
     text-align: center;
   }
   .closing-text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    max-width: 44rem;
+  }
+  .c-line {
+    font-size: var(--text-body-lg);
+    color: var(--color-text-muted);
+  }
+  .c-line.formula {
+    margin-block: var(--space-4);
+    font-family: var(--font-mono);
+    font-size: var(--text-heading-md);
+    color: var(--color-accent-strong);
+  }
+  .c-line.last {
+    margin-top: var(--space-4);
+    font-family: var(--font-display);
     font-size: var(--text-display-lg);
+    line-height: var(--leading-display);
+    color: var(--color-text);
   }
 </style>

@@ -15,6 +15,7 @@ const { c } = Astro.props;
   <div class="container inner">
     <p class="kicker" data-reveal>{c.kicker}</p>
     <h2 class="display title" id="listening-title" data-reveal>{c.title}</h2>
+    <p class="line" data-reveal>{c.line}</p>
 
     <div class="eye" data-reveal>
       <Symbol size={148} breathe watch />
@@ -36,6 +37,16 @@ const { c } = Astro.props;
       }
     </ul>
     <p class="learned-note" data-reveal><span class="mark" aria-hidden="true"></span>{c.learnedNote}</p>
+
+    <div class="filter" data-scene>
+      <p class="filter-body">{c.filter.body}</p>
+      <p class="wrongs">
+        {c.filter.wrongs.map((w, i) => <span class="wrong" style={`--w:${i}`}>{w}</span>)}
+      </p>
+      <p class="gone">{c.filter.gone}</p>
+    </div>
+
+    <p class="point heading" data-reveal>{c.point}</p>
 
     <p class="empty" data-reveal>
       <span class="heading">{c.empty[0]}</span>
@@ -143,11 +154,61 @@ const { c } = Astro.props;
     color: var(--color-accent-soft);
     text-wrap: balance;
   }
+  .line {
+    margin-top: var(--space-4);
+    font-size: var(--text-body-lg);
+    color: var(--color-accent-soft);
+  }
+  /* The filter: four ways an offer is wrong, each struck through, then gone. */
+  .filter {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-4);
+    max-width: 40rem;
+    margin-top: var(--space-9);
+  }
+  .filter-body {
+    font-size: var(--text-body-lg);
+  }
+  .wrongs {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-2) var(--space-5);
+    font-family: var(--font-display);
+    font-size: var(--text-heading-md);
+  }
+  .wrong {
+    text-decoration: line-through;
+    text-decoration-color: var(--color-accent-soft);
+    text-decoration-thickness: 2px;
+    opacity: 0.55;
+    transition:
+      opacity 0.6s ease,
+      text-decoration-color 0.6s ease;
+    transition-delay: calc(0.3s + var(--w) * 0.45s);
+  }
+  :global(.motion) .filter:not(.is-playing) .wrong {
+    opacity: 1;
+    text-decoration-color: transparent;
+  }
+  .gone {
+    color: var(--color-accent-soft);
+    transition: opacity 0.6s ease 2.2s;
+  }
+  :global(.motion) .filter:not(.is-playing) .gone {
+    opacity: 0;
+  }
+  .point {
+    margin-top: var(--space-8);
+    font-size: var(--text-heading-lg);
+  }
   .empty {
     display: flex;
     flex-direction: column;
     gap: var(--space-1);
-    margin-top: var(--space-9);
+    margin-top: var(--space-5);
     color: var(--color-accent-soft);
   }
   .empty .heading {

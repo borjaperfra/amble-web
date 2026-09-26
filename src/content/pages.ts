@@ -7,9 +7,11 @@ export interface ManifestoContent {
   meta: { title: string; description: string };
   kicker: string;
   title: string;
-  lede: string;
+  // The argument, in blocks: plain paragraphs, and short "beat" lines set large.
+  essay: { kind: 'p' | 'beat' | 'list'; text: string | string[] }[];
+  principlesLabel: string;
   principles: { title: string; body: string }[];
-  closing: [string, string];
+  closing: string[];
 }
 
 export interface HowBuiltContent {
@@ -32,8 +34,29 @@ const manifestoEn: ManifestoContent = {
     description: 'Amble represents people. It doesn’t rank them. Nine principles behind your professional Rep.',
   },
   kicker: 'Manifesto',
-  title: 'Amble represents people. It doesn’t rank them.',
-  lede: 'Looking for work is a job nobody should have. We’re building the representative everyone deserves: one that knows your work, says only what it can show, and stays quiet until something is worth your time.',
+  title: 'Recruiting is broken. AI finished the job.',
+  essay: [
+    {
+      kind: 'list',
+      text: [
+        'LinkedIn turned professional identity into a profile.',
+        'Job boards turned finding work into search.',
+        'ATSs turned people into keywords.',
+        'Then AI made applying essentially free.',
+      ],
+    },
+    {
+      kind: 'p',
+      text: 'Now one person can apply to hundreds of jobs. Companies answer with more filters, more automation and more screening. So we get more applications, more noise, and less information about whether two sides should actually talk.',
+    },
+    { kind: 'beat', text: 'We don’t need a better application. We need to remove the application.' },
+    {
+      kind: 'p',
+      text: 'The best person for a role may never apply. They’re working. They’re not checking job boards. They’re not updating LinkedIn. They’re not “open to work.” That doesn’t mean there’s nothing they’d move for.',
+    },
+    { kind: 'beat', text: 'That’s what a Rep is for.' },
+  ],
+  principlesLabel: 'What we build by',
   principles: [
     {
       title: 'Represent, don’t rank.',
@@ -72,7 +95,13 @@ const manifestoEn: ManifestoContent = {
       body: 'With the people who use it, and in public where we can. The format your profile is written in will be open for anyone to read and use.',
     },
   ],
-  closing: ['You shouldn’t have to look.', 'Your Rep is listening.'],
+  closing: [
+    'The old system starts with a job and waits for applications.',
+    'We think the next one starts with two sides knowing what they want.',
+    'Intent ↔ evidence ↔ intent.',
+    'No applications.',
+    'Remove applications.',
+  ],
 };
 
 const manifestoEs: ManifestoContent = {
@@ -81,8 +110,29 @@ const manifestoEs: ManifestoContent = {
     description: 'Amble representa a personas. No las clasifica. Nueve principios detrás de tu Rep profesional.',
   },
   kicker: 'Manifiesto',
-  title: 'Amble representa a personas. No las clasifica.',
-  lede: 'Buscar trabajo es un trabajo que nadie debería tener. Estamos construyendo el representante que todo el mundo merece: uno que conoce tu trabajo, solo dice lo que puede demostrar y guarda silencio hasta que algo merece tu tiempo.',
+  title: 'El reclutamiento estaba roto. La IA lo ha rematado.',
+  essay: [
+    {
+      kind: 'list',
+      text: [
+        'LinkedIn convirtió la identidad profesional en un perfil.',
+        'Los portales de empleo convirtieron encontrar trabajo en buscar.',
+        'Los ATS convirtieron a las personas en palabras clave.',
+        'Después, la IA hizo que aplicar fuera prácticamente gratis.',
+      ],
+    },
+    {
+      kind: 'p',
+      text: 'Ahora una persona puede aplicar a cientos de ofertas. Las empresas responden con más filtros, más automatización y más cribado. Así que tenemos más candidaturas, más ruido y menos información sobre si dos partes deberían hablar de verdad.',
+    },
+    { kind: 'beat', text: 'No necesitamos una candidatura mejor. Necesitamos eliminar la candidatura.' },
+    {
+      kind: 'p',
+      text: 'La mejor persona para un puesto puede que nunca aplique. Está trabajando. No mira portales de empleo. No actualiza LinkedIn. No está «open to work». Eso no significa que no haya nada por lo que se movería.',
+    },
+    { kind: 'beat', text: 'Para eso existe un Rep.' },
+  ],
+  principlesLabel: 'Con lo que construimos',
   principles: [
     {
       title: 'Representar, no clasificar.',
@@ -121,7 +171,13 @@ const manifestoEs: ManifestoContent = {
       body: 'Con quienes lo usan, y en público donde podamos. El formato en el que se escribe tu perfil será abierto para que cualquiera lo lea y lo use.',
     },
   ],
-  closing: ['No deberías tener que buscar.', 'Tu Rep está escuchando.'],
+  closing: [
+    'El sistema antiguo empieza con una oferta y espera candidaturas.',
+    'Creemos que el siguiente empieza con dos partes que saben lo que quieren.',
+    'Intención ↔ evidencia ↔ intención.',
+    'Sin candidaturas.',
+    'Adiós a las candidaturas.',
+  ],
 };
 
 const howEn: HowBuiltContent = {

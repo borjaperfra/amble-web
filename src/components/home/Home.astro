@@ -6,7 +6,8 @@ import Story from './Story.astro';
 import YourTurn from './YourTurn.astro';
 import Interview from './Interview.astro';
 import Defence from './Defence.astro';
-import Distinctive from './Distinctive.astro';
+import MapSection from './MapSection.astro';
+import Problem from './Problem.astro';
 import Triage from './Triage.astro';
 import Listening from './Listening.astro';
 import Opportunity from './Opportunity.astro';
@@ -25,10 +26,11 @@ const c = home[lang];
 <Base joinHref="#join" stages={c.stages}>
   <main>
     <Hero c={c.hero} />
+    <Problem c={c.problem} />
     <div data-stage="reads" id="stage-reads">
-      <Interlude lines={c.story.interlude} body={c.story.interludeBody} id="interlude-pdf" />
+      <Interlude lines={c.story.interlude} body={c.story.interludeBody} bridge={c.problem.bridge} id="interlude-pdf" />
       <Story c={c.story} strength={c.strength} sourceNames={c.sourceNames} />
-      <Distinctive c={c.distinctive} />
+      <MapSection c={c.map} strength={c.strength} />
     </div>
     <div data-stage="asks" id="stage-asks">
       <Interview c={c.interview} sourceNames={c.sourceNames} />

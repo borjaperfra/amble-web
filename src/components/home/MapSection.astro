@@ -1,0 +1,119 @@
+---
+// The professional map, told honestly in three columns: what the Rep can stand
+// behind, what it's less sure about, and what it still doesn't know.
+// No score, no ranking.
+import EvidenceDots from '../EvidenceDots.astro';
+import type { HomeContent } from '../../content/home';
+
+interface Props {
+  c: HomeContent['map'];
+  strength: HomeContent['strength'];
+}
+
+const { c, strength } = Astro.props;
+---
+
+<section class="map container" aria-labelledby="map-title">
+  <p class="kicker" data-reveal>{c.kicker}</p>
+  <h2 class="display title" id="map-title" data-reveal>{c.title}</h2>
+
+  <div class="cols" data-scene>
+    {
+      c.cols.map((col, i) => (
+        <section class:list={['col', { unknown: col.strength === 0 }]} style={`--i:${i}`}>
+          <p class="col-label">{col.label}</p>
+          <ul class="col-items" role="list">
+            {col.items.map((item) => (
+              <li>
+                <span class="item-name heading">{item}</span>
+                <EvidenceDots strength={col.strength} label={strength[col.strength]} />
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))
+    }
+  </div>
+
+  <p class="closer heading" data-reveal>{c.closer}</p>
+</section>
+
+<style>
+  .map {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding-block: var(--space-section);
+  }
+  .title {
+    max-width: 18ch;
+    margin-top: var(--space-4);
+    font-size: var(--text-display-lg);
+  }
+  .cols {
+    display: grid;
+    gap: var(--space-5);
+    width: 100%;
+    max-width: var(--width-wide);
+    margin-top: var(--space-8);
+    text-align: left;
+  }
+  @media (min-width: 860px) {
+    .cols {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  .col {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+    padding: var(--space-6);
+    background: var(--color-surface-raised);
+    border: var(--border-width) solid var(--color-border-subtle);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sheet);
+    transition:
+      opacity var(--motion-slow) ease,
+      translate var(--motion-arrive) var(--ease-standard);
+    transition-delay: calc(var(--i) * 0.18s);
+  }
+  .col.unknown {
+    background: transparent;
+    border-style: dashed;
+    border-color: var(--color-border);
+    box-shadow: none;
+  }
+  :global(.motion) .cols:not(.is-playing) .col {
+    opacity: 0;
+    translate: 0 10px;
+  }
+  .col-label {
+    font-size: var(--text-label);
+    font-weight: var(--weight-semibold);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--color-accent-strong);
+  }
+  .unknown .col-label {
+    color: var(--color-caution);
+  }
+  .col-items {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+  .col-items li {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+  .item-name {
+    font-size: var(--text-heading-sm);
+  }
+  .closer {
+    margin-top: var(--space-8);
+    font-size: var(--text-heading-lg);
+    color: var(--color-accent-strong);
+  }
+</style>

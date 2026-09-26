@@ -29,13 +29,23 @@ export interface HomeContent {
   hero: {
     tag: string;
     title: [string, string]; // second line gets the italic "Amble"
+    lead: string; // "Meet your professional Rep."
     subtitle: string;
+    punch: string; // "You don't search. Your Rep does."
     more: string;
     status: { prefix: string; words: string[] };
+    beta: { title: string; body: string; closer: string };
+  };
+  problem: {
+    title: string;
+    verbs: string[];
+    pains: string[];
+    answer: string;
+    bridge: string;
   };
   story: {
     interlude: [string, string];
-    interludeBody: string;
+    interludeBody: string[];
     steps: { kicker: string; title: string; body: string }[];
     sources: StorySource[];
     caps: { id: string; name: string; strength: Strength; count: string }[];
@@ -64,6 +74,7 @@ export interface HomeContent {
   interview: {
     kicker: string;
     title: string;
+    line: string;
     rep: string;
     // What the Rep read, and what it concluded it couldn't tell.
     clues: { source: Source; text: string; reads: string }[];
@@ -87,15 +98,20 @@ export interface HomeContent {
       outcome: string;
     }[];
   };
-  distinctive: {
+  // The professional map, told as three honest columns.
+  map: {
     kicker: string;
-    words: string[];
-    line: string;
+    title: string;
+    cols: { label: string; strength: Strength; items: string[] }[];
+    closer: string;
   };
   triage: {
     kicker: string;
     title: string;
     line: string;
+    questions: string[];
+    teach: string;
+    closer: string;
     who: string;
     verdicts: string[];
     offers: {
@@ -112,6 +128,9 @@ export interface HomeContent {
   listening: {
     kicker: string;
     title: string;
+    line: string;
+    filter: { body: string; wrongs: string[]; gone: string };
+    point: string;
     status: string;
     // learned: revealed by the triage, not declared. Shown as such.
     items: { text: string; learned?: boolean }[];
@@ -128,6 +147,7 @@ export interface HomeContent {
     stream: { role: string; company: string; reason: string }[];
     match: { role: string; company: string; facts: string[] };
     notify: { from: string; text: string; time: string; channel: string };
+    explain: string[];
     whyLabel: string;
     why: { text: string; src: string }[];
     considerLabel: string;
@@ -194,14 +214,36 @@ const en: HomeContent = {
   hero: {
     tag: 'Closed beta',
     title: ['I’m not looking.', 'is.'],
+    lead: 'Meet your professional Rep.',
     subtitle:
-      'Meet your Rep: a professional agent that knows your work, listens for the offers worth your time, and negotiates them for you.',
+      'An AI agent that gets to know your work, learns what would make you move, and finds the opportunities worth your time.',
+    punch: 'You don’t search. Your Rep does.',
     more: 'See how it works',
     status: { prefix: 'Your Rep is', words: ['reading your work.', 'asking what it couldn’t read.', 'listening.'] },
+    beta: {
+      title: 'Join the closed beta',
+      body: 'We’re starting with people in tech. Your Rep learns what matters to you. Next, it starts bringing the right opportunities to your phone.',
+      closer: 'No searching. No job alerts. No applications.',
+    },
+  },
+  problem: {
+    title: 'Looking for a job has become a job.',
+    verbs: ['Search.', 'Filter.', 'Apply.', 'Repeat.'],
+    pains: [
+      'Hundreds of roles you don’t want.',
+      'Applications nobody reads.',
+      'Recruiters asking for things already on your CV.',
+      'And most never answer you.',
+    ],
+    answer: 'Amble does the looking instead.',
+    bridge: 'But first, your Rep needs to know you.',
   },
   story: {
     interlude: ['You’re more than', 'a PDF.'],
-    interludeBody: 'Your CV says where you’ve been. Your Rep finds out what you’ve done.',
+    interludeBody: [
+      'A CV tells your Rep where you’ve worked. Your work shows what you’ve actually done.',
+      'Amble reads your CV, GitHub, LinkedIn and the work you choose to share. Then it asks about what it couldn’t find.',
+    ],
     steps: [
       { kicker: '01 · Reads', title: 'It reads before it asks.', body: 'CV, LinkedIn, GitHub, your writing.' },
       { kicker: '02 · Claims', title: 'Every claim keeps its source.', body: 'What it can’t source, it doesn’t say.' },
@@ -311,7 +353,8 @@ const en: HomeContent = {
   },
   interview: {
     kicker: 'The interview',
-    title: 'Then it asks what it couldn’t read.',
+    title: 'It doesn’t ask what it can already read.',
+    line: 'Your Rep asks about the things that actually matter: what you owned, what you decided, and what the work alone can’t prove.',
     rep: 'Your Rep',
     clues: [
       { source: 'cv', text: 'Led the evaluation pipeline', reads: 'she led it' },
@@ -324,7 +367,7 @@ const en: HomeContent = {
   defence: {
     kicker: 'It checks itself',
     title: 'Code shows what shipped. Not who decided.',
-    line: 'Defend it, and it stays. If you can’t, your Rep stops claiming it.',
+    line: 'AI made producing work easier. It also made proving who did what harder. Your Rep doesn’t assume. When ownership matters, it asks.',
     cases: [
       {
         file: 'tern/export.py',
@@ -356,15 +399,27 @@ const en: HomeContent = {
       },
     ],
   },
-  distinctive: {
-    kicker: 'What makes Maya, Maya',
-    words: ['LLM evaluation', 'Developer tools', 'Clear writing'],
-    line: 'Not a score. A combination.',
+  map: {
+    kicker: 'Your professional map',
+    title: 'No score. No ranking. Just what your Rep can stand behind.',
+    cols: [
+      { label: 'What you’ve demonstrated', strength: 4, items: ['LLM evaluation', 'Retrieval systems'] },
+      { label: 'What it’s less sure about', strength: 2, items: ['Production scale', 'Technical writing'] },
+      { label: 'What it still doesn’t know', strength: 0, items: ['Leading a team'] },
+    ],
+    closer: 'Amble represents people. It doesn’t rank them.',
   },
   triage: {
     kicker: 'It learns what matters',
-    title: 'Teach it with your choices.',
-    line: 'A yes is data. A no is better data.',
+    title: 'You probably don’t know exactly what would make you move.',
+    line: 'Neither does your Rep. Yet.',
+    questions: [
+      'A higher salary, but five days in the office?',
+      'More equity, but solo on-call?',
+      'A smaller company, with much more ownership?',
+    ],
+    teach: 'Your choices teach your Rep what actually matters.',
+    closer: 'A yes is data. A no is better data.',
     who: 'Maya',
     verdicts: ['Yes', 'Yes, if…', 'Depends', 'No'],
     offers: [
@@ -379,7 +434,7 @@ const en: HomeContent = {
       {
         role: 'Staff AI Engineer',
         company: 'Series C · 400 people',
-        facts: ['€150K', 'Berlin office', '3 days a week'],
+        facts: ['€150K', 'Berlin office', '5 days a week'],
         verdict: 'Yes, if…',
         reason: '“…I can stay in Stockholm.”',
         learned: { type: 'Weighs most', text: 'Staying remote' },
@@ -399,6 +454,13 @@ const en: HomeContent = {
   listening: {
     kicker: 'Then it listens',
     title: 'Silence is a feature.',
+    line: 'Your Rep does the job hunting. You get your time back.',
+    filter: {
+      body: 'It reads the opportunities out there against what you’ve done and what you actually want.',
+      wrongs: ['Wrong salary.', 'Wrong location.', 'Wrong work.', 'Wrong trade-off.'],
+      gone: 'Gone before it reaches you.',
+    },
+    point: 'Most weeks, nothing. That’s the point.',
     status: 'Listening',
     items: [
       { text: 'AI evaluation' },
@@ -412,9 +474,9 @@ const en: HomeContent = {
   },
   opportunity: {
     kicker: 'Then it tells you',
-    title: 'Most weeks, nothing. Then this.',
-    line: 'Your Rep reads the offers so you don’t, and only interrupts you for one that fits.',
-    badge: 'Coming in v1',
+    title: 'Then your phone buzzes.',
+    line: 'No feed to check. No saved searches. No inbox full of job alerts. When something makes it through your Rep, it comes to you.',
+    badge: 'Next, during the beta',
     counter: 'read this week · 1 worth your time',
     salary: 'Whenever an offer states a salary, you see it, and your Rep uses it. No “competitive”.',
     stream: [
@@ -425,7 +487,8 @@ const en: HomeContent = {
       { role: 'Staff AI Engineer', company: 'Series C · Berlin', reason: 'Relocation required' },
     ],
     match: { role: 'Evaluation Lead', company: 'Kestrel · Series A · 40 people', facts: ['Remote, Europe', '€125K + 0.4%', 'Owns evals end to end'] },
-    notify: { from: 'Amble', text: 'I found something worth hearing.', time: '09:41', channel: 'On WhatsApp or Telegram' },
+    notify: { from: 'Amble', text: 'I found something worth your attention.', time: '09:41', channel: 'On WhatsApp or Telegram' },
+    explain: ['WhatsApp or Telegram.', 'One opportunity.', 'And why it made the cut.'],
     whyLabel: 'Why I’m showing you this',
     why: [
       { text: 'They need someone to own LLM evaluation. It’s your strongest evidence.', src: 'Your map · ●●●●' },
@@ -532,14 +595,36 @@ const es: HomeContent = {
   hero: {
     tag: 'Beta cerrada',
     title: ['Yo no busco.', 'sí.'],
+    lead: 'Conoce a tu Rep profesional.',
     subtitle:
-      'Conoce a tu Rep: un agente profesional que conoce tu trabajo, escucha las ofertas que merecen tu tiempo y las negocia por ti.',
+      'Un agente de IA que conoce tu trabajo, aprende qué te haría cambiar y encuentra las oportunidades que merecen tu tiempo.',
+    punch: 'Tú no buscas. Tu Rep sí.',
     more: 'Mira cómo funciona',
     status: { prefix: 'Tu Rep está', words: ['leyendo tu trabajo.', 'preguntando lo que no pudo leer.', 'escuchando.'] },
+    beta: {
+      title: 'Entra en la beta cerrada',
+      body: 'Empezamos con gente de tecnología. Tu Rep aprende lo que te importa. Después, empieza a traerte las oportunidades adecuadas al móvil.',
+      closer: 'Sin buscar. Sin alertas de empleo. Sin candidaturas.',
+    },
+  },
+  problem: {
+    title: 'Buscar trabajo se ha convertido en un trabajo.',
+    verbs: ['Buscar.', 'Filtrar.', 'Aplicar.', 'Repetir.'],
+    pains: [
+      'Cientos de puestos que no quieres.',
+      'Candidaturas que nadie lee.',
+      'Recruiters que te piden lo que ya está en tu CV.',
+      'Y la mayoría ni te contesta.',
+    ],
+    answer: 'Amble busca por ti.',
+    bridge: 'Pero antes, tu Rep necesita conocerte.',
   },
   story: {
     interlude: ['Eres más que', 'un PDF.'],
-    interludeBody: 'Tu CV dice dónde has estado. Tu Rep averigua qué has hecho.',
+    interludeBody: [
+      'Un CV le dice a tu Rep dónde has trabajado. Tu trabajo enseña lo que de verdad has hecho.',
+      'Amble lee tu CV, GitHub, LinkedIn y el trabajo que decidas compartir. Después pregunta por lo que no pudo encontrar.',
+    ],
     steps: [
       { kicker: '01 · Lee', title: 'Lee antes de preguntar.', body: 'CV, LinkedIn, GitHub, lo que escribes.' },
       { kicker: '02 · Afirmaciones', title: 'Cada afirmación guarda su fuente.', body: 'Lo que no puede respaldar, no lo dice.' },
@@ -649,7 +734,8 @@ const es: HomeContent = {
   },
   interview: {
     kicker: 'La entrevista',
-    title: 'Luego pregunta lo que no pudo leer.',
+    title: 'No pregunta lo que ya puede leer.',
+    line: 'Tu Rep pregunta por lo que de verdad importa: de qué fuiste responsable, qué decidiste y lo que el trabajo por sí solo no puede demostrar.',
     rep: 'Tu Rep',
     clues: [
       { source: 'cv', text: 'Lideró el pipeline de evaluación', reads: 'lo lideró' },
@@ -662,7 +748,7 @@ const es: HomeContent = {
   defence: {
     kicker: 'Se comprueba a sí mismo',
     title: 'El código dice qué se envió. No quién lo decidió.',
-    line: 'Si lo defiendes, se queda. Si no puedes, tu Rep deja de afirmarlo.',
+    line: 'La IA ha hecho más fácil producir trabajo. Y más difícil demostrar quién hizo qué. Tu Rep no da nada por hecho. Cuando importa de quién es algo, pregunta.',
     cases: [
       {
         file: 'sonda/export.py',
@@ -694,15 +780,27 @@ const es: HomeContent = {
       },
     ],
   },
-  distinctive: {
-    kicker: 'Lo que hace a Marta, Marta',
-    words: ['Evaluación de LLMs', 'Herramientas para devs', 'Escritura clara'],
-    line: 'No una nota. Una combinación.',
+  map: {
+    kicker: 'Tu mapa profesional',
+    title: 'Sin nota. Sin ranking. Solo lo que tu Rep puede respaldar.',
+    cols: [
+      { label: 'Lo que has demostrado', strength: 4, items: ['Evaluación de LLMs', 'Sistemas de recuperación'] },
+      { label: 'De lo que está menos seguro', strength: 2, items: ['Escala en producción', 'Escritura técnica'] },
+      { label: 'Lo que aún no sabe', strength: 0, items: ['Liderar un equipo'] },
+    ],
+    closer: 'Amble representa a personas. No las clasifica.',
   },
   triage: {
     kicker: 'Aprende lo que te importa',
-    title: 'Enséñale con tus decisiones.',
-    line: 'Un sí es un dato. Un no, un dato mejor.',
+    title: 'Probablemente no sabes exactamente qué te haría cambiar.',
+    line: 'Tu Rep tampoco. Todavía.',
+    questions: [
+      '¿Más sueldo, pero cinco días en la oficina?',
+      '¿Más equity, pero guardias en solitario?',
+      '¿Una empresa más pequeña, con mucha más responsabilidad?',
+    ],
+    teach: 'Tus decisiones le enseñan a tu Rep lo que de verdad importa.',
+    closer: 'Un sí es un dato. Un no, un dato mejor.',
     who: 'Marta',
     verdicts: ['Sí', 'Sí, si…', 'Depende', 'No'],
     offers: [
@@ -717,7 +815,7 @@ const es: HomeContent = {
       {
         role: 'Staff AI Engineer',
         company: 'Serie C · 400 personas',
-        facts: ['150.000 €', 'Oficina en Berlín', '3 días por semana'],
+        facts: ['150.000 €', 'Oficina en Berlín', '5 días por semana'],
         verdict: 'Sí, si…',
         reason: '«…puedo quedarme en Valencia.»',
         learned: { type: 'Pesa más', text: 'Seguir en remoto' },
@@ -737,6 +835,13 @@ const es: HomeContent = {
   listening: {
     kicker: 'Y escucha',
     title: 'El silencio es una función.',
+    line: 'Tu Rep hace la búsqueda por ti. Tú recuperas tu tiempo.',
+    filter: {
+      body: 'Lee las oportunidades que hay ahí fuera frente a lo que has hecho y lo que de verdad quieres.',
+      wrongs: ['Salario equivocado.', 'Ubicación equivocada.', 'Trabajo equivocado.', 'Intercambio equivocado.'],
+      gone: 'Fuera antes de llegarte.',
+    },
+    point: 'Casi todas las semanas, nada. De eso se trata.',
     status: 'Escuchando',
     items: [
       { text: 'Evaluación de IA' },
@@ -750,9 +855,9 @@ const es: HomeContent = {
   },
   opportunity: {
     kicker: 'Y te avisa',
-    title: 'Casi todas las semanas, nada. Hasta que llega esto.',
-    line: 'Tu Rep lee las ofertas por ti y solo te interrumpe por una que encaja.',
-    badge: 'Llega en la v1',
+    title: 'Hasta que te vibra el móvil.',
+    line: 'Sin feed que revisar. Sin búsquedas guardadas. Sin una bandeja llena de alertas. Cuando algo pasa el filtro de tu Rep, te llega.',
+    badge: 'Lo siguiente, durante la beta',
     counter: 'leídas esta semana · 1 merece tu tiempo',
     salary: 'Siempre que una oferta publique el salario, lo verás y tu Rep lo usará. Nada de «competitivo».',
     stream: [
@@ -763,7 +868,8 @@ const es: HomeContent = {
       { role: 'Staff AI Engineer', company: 'Serie C · Berlín', reason: 'Exige mudarse' },
     ],
     match: { role: 'Evaluation Lead', company: 'Kestrel · Serie A · 40 personas', facts: ['Remoto, Europa', '125.000 € + 0,4 %', 'Evaluación de principio a fin'] },
-    notify: { from: 'Amble', text: 'He encontrado algo que merece la pena.', time: '09:41', channel: 'Por WhatsApp o Telegram' },
+    notify: { from: 'Amble', text: 'He encontrado algo que merece tu atención.', time: '09:41', channel: 'Por WhatsApp o Telegram' },
+    explain: ['WhatsApp o Telegram.', 'Una oportunidad.', 'Y por qué ha pasado el corte.'],
     whyLabel: 'Por qué te lo enseño',
     why: [
       { text: 'Necesitan a alguien que lleve la evaluación de LLMs. Es tu evidencia más sólida.', src: 'Tu mapa · ●●●●' },

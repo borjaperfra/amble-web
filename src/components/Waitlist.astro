@@ -8,11 +8,13 @@ interface Props {
   id?: string;
   audience?: 'candidate' | 'company';
   cta?: string;
+  note?: string;
 }
 
 const lang = (Astro.currentLocale ?? 'en') as Lang;
 const t = useTranslations(lang);
-const { id = 'waitlist', audience = 'candidate', cta } = Astro.props;
+const { id = 'waitlist', audience = 'candidate', cta, note } = Astro.props;
+const noteText = note ?? t('waitlist.note');
 const messages = {
   ok: t('waitlist.ok'),
   invalid: t('waitlist.invalid'),
@@ -20,7 +22,7 @@ const messages = {
   'slow-down': t('waitlist.slow-down'),
   error: t('waitlist.error'),
   sending: t('waitlist.sending'),
-  note: t('waitlist.note'),
+  note: noteText,
 };
 const statusId = `${id}-status`;
 ---
@@ -64,7 +66,7 @@ const statusId = `${id}-status`;
     <p class="done-body">{t('waitlist.doneBody')}</p>
   </div>
   <p class="status-line">
-    <span class="status" id={statusId} role="status" aria-live="polite">{t('waitlist.note')}</span>
+    <span class="status" id={statusId} role="status" aria-live="polite">{noteText}</span>
     <a class="privacy" href={getRelativeLocaleUrl(lang, 'privacy')}>{t('footer.privacy')}</a>
   </p>
 </form>

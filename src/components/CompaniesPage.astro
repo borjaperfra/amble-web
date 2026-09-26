@@ -24,8 +24,18 @@ const c = companies[lang];
         <em>{c.title[1]}</em>
       </h1>
       <p class="lede">{c.lede}</p>
-      <div class="form"><Waitlist id="company-hero" audience="company" cta={c.cta} /></div>
+      <div class="form"><Waitlist id="company-hero" audience="company" cta={c.cta} note={c.formPrivacy} /></div>
       <p class="note">{c.formNote}</p>
+    </section>
+
+    <!-- The pitch -->
+    <section class="pitch" aria-labelledby="co-pitch">
+      <div class="container pitch-inner">
+        <h2 class="display pitch-title" id="co-pitch" data-reveal>{c.pitch.title}</h2>
+        <div class="pitch-body">
+          {c.pitch.body.map((p, i) => <p data-reveal style={`--i:${i}`}>{p}</p>)}
+        </div>
+      </div>
     </section>
 
     <!-- How it works -->
@@ -108,7 +118,7 @@ const c = companies[lang];
       <Symbol size={40} breathe />
       <h2 class="display f-title" id="co-finale">{c.finale.title}</h2>
       <p class="lede">{c.finale.body}</p>
-      <div class="form"><Waitlist id="company-finale" audience="company" cta={c.cta} /></div>
+      <div class="form"><Waitlist id="company-finale" audience="company" cta={c.cta} note={c.formPrivacy} /></div>
     </section>
   </main>
 </Base>
@@ -476,7 +486,38 @@ const c = companies[lang];
     padding-block: var(--space-section) var(--space-8);
   }
   .f-title {
+    max-width: 22ch;
+    font-size: var(--text-heading-xl);
+  }
+  .pitch {
+    padding-block: var(--space-section);
+    background: var(--color-surface-sunken);
+  }
+  .pitch-inner {
+    display: grid;
+    gap: var(--space-6);
+    max-width: calc(var(--width-wide) + var(--gutter) * 2);
+  }
+  @media (min-width: 900px) {
+    .pitch-inner {
+      grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+      align-items: end;
+      gap: var(--space-9);
+    }
+  }
+  .pitch-title {
     font-size: var(--text-display-lg);
+  }
+  .pitch-body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    font-size: var(--text-body-lg);
+    color: var(--color-text-muted);
+  }
+  .pitch-body p:last-child {
+    color: var(--color-text);
+    font-weight: var(--weight-medium);
   }
   @media (prefers-reduced-motion: reduce) {
     .pulse {

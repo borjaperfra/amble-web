@@ -18,20 +18,23 @@ const { c } = Astro.props;
       {c.status.words.map((w, i) => <span class:list={['live-word', { 'is-on': i === 0 }]}>{w}</span>)}
     </span>
   </p>
-  <p class="tag rise">
-    <span class="tag-dot" aria-hidden="true"></span>
-    {c.tag}
-  </p>
   <h1 id="hero-title" class="display title rise d1">
     {c.title[0]}
     <br />
     <em>Amble</em>{' '}{c.title[1]}
   </h1>
+  <p class="lead rise d2">{c.lead}</p>
   <p class="subtitle rise d2">{c.subtitle}</p>
-  <div class="form rise d3">
-    <Waitlist id="hero" />
+  <p class="punch rise d2">{c.punch}</p>
+  <div class="beta rise d3">
+    <p class="beta-title">{c.beta.title}</p>
+    <p class="beta-body">{c.beta.body}</p>
+    <div class="form">
+      <Waitlist id="hero" />
+    </div>
+    <p class="closer">{c.beta.closer}</p>
   </div>
-  <a class="more text-link rise d4" href="#interlude-pdf">
+  <a class="more text-link rise d4" href="#problem">
     {c.more}
     <span class="arrow" aria-hidden="true">↓</span>
   </a>
@@ -109,11 +112,49 @@ const { c } = Astro.props;
     background: var(--color-accent);
   }
   .title {
-    margin-top: var(--space-6);
+    margin-top: var(--space-2);
     font-size: var(--text-display-xl);
   }
-  .subtitle {
+  .lead {
     margin-top: var(--space-6);
+    font-family: var(--font-display);
+    font-size: var(--text-heading-md);
+  }
+  .punch {
+    margin-top: var(--space-4);
+    font-weight: var(--weight-medium);
+    color: var(--color-accent-strong);
+  }
+  /* The beta block: what you're joining, right by the form. */
+  .beta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 34rem;
+    margin-top: var(--space-7);
+    padding-top: var(--space-6);
+    border-top: var(--border-width) solid var(--color-border-subtle);
+  }
+  .beta-title {
+    font-size: var(--text-label);
+    font-weight: var(--weight-semibold);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--color-accent-strong);
+  }
+  .beta-body {
+    margin-top: var(--space-2);
+    color: var(--color-text-muted);
+    text-wrap: balance;
+  }
+  .closer {
+    margin-top: var(--space-5);
+    font-family: var(--font-display);
+    font-size: var(--text-heading-sm);
+  }
+  .subtitle {
+    margin-top: var(--space-3);
     max-width: 34rem;
     font-size: var(--text-body-lg);
     color: var(--color-text-muted);
@@ -123,7 +164,7 @@ const { c } = Astro.props;
     display: flex;
     justify-content: center;
     width: 100%;
-    margin-top: var(--space-7);
+    margin-top: var(--space-5);
   }
 
   .more {

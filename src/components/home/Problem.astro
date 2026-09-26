@@ -1,0 +1,105 @@
+---
+// The problem, before anything else: the loop everyone knows, what it costs,
+// and the one line that answers it. Then the bridge into the demo.
+import type { HomeContent } from '../../content/home';
+
+interface Props {
+  c: HomeContent['problem'];
+}
+
+const { c } = Astro.props;
+---
+
+<section class="problem" id="problem" aria-labelledby="problem-title">
+  <div class="container inner">
+    <h2 class="display title" id="problem-title" data-reveal>{c.title}</h2>
+
+    <p class="verbs" data-scene aria-label={c.verbs.join(' ')}>
+      {c.verbs.map((v, i) => <span class="verb" style={`--v:${i}`} aria-hidden="true">{v}</span>)}
+      <span class="loop" aria-hidden="true">↻</span>
+    </p>
+
+    <ul class="pains" role="list">
+      {c.pains.map((p, i) => <li data-reveal style={`--i:${i}`}>{p}</li>)}
+    </ul>
+
+    <p class="answer heading" data-reveal>{c.answer}</p>
+  </div>
+</section>
+
+<style>
+  .problem {
+    padding-block: var(--space-section);
+    background: var(--color-surface-sunken);
+  }
+  .inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .title {
+    max-width: 16ch;
+    font-size: var(--text-display-lg);
+  }
+
+  /* The loop: four verbs taking turns, forever. */
+  .verbs {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: baseline;
+    gap: var(--space-2) var(--space-5);
+    margin-top: var(--space-7);
+    font-family: var(--font-display);
+    font-size: var(--text-heading-lg);
+  }
+  .verb {
+    color: var(--color-text);
+  }
+  .loop {
+    color: var(--color-text-muted);
+  }
+  :global(.motion) .verbs.is-playing .verb {
+    animation: turn 4s ease-in-out infinite;
+    animation-delay: calc(var(--v) * 1s);
+    color: var(--color-text-muted);
+  }
+  :global(.motion) .verbs.is-playing .loop {
+    animation: spin 4s linear infinite;
+    display: inline-block;
+  }
+  @keyframes turn {
+    0%,
+    25% {
+      color: var(--color-accent-strong);
+    }
+    30%,
+    100% {
+      color: var(--color-text-muted);
+    }
+  }
+  @keyframes spin {
+    to {
+      rotate: 360deg;
+    }
+  }
+
+  .pains {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    margin-top: var(--space-7);
+    font-size: var(--text-body-lg);
+    color: var(--color-text-muted);
+  }
+  .pains li:last-child {
+    color: var(--color-text);
+    font-weight: var(--weight-medium);
+  }
+  .answer {
+    margin-top: var(--space-8);
+    font-size: var(--text-heading-xl);
+    color: var(--color-accent-strong);
+  }
+</style>
