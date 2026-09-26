@@ -1,0 +1,107 @@
+---
+import Symbol from '../Symbol.astro';
+import type { HomeContent } from '../../content/home';
+
+interface Props {
+  c: HomeContent['listening'];
+}
+
+const { c } = Astro.props;
+---
+
+<section class="listening" aria-labelledby="listening-title">
+  <div class="container inner">
+    <p class="kicker">{c.kicker}</p>
+    <h2 class="heading title" id="listening-title">{c.title}</h2>
+    <p class="lede body">{c.body}</p>
+
+    <div class="screen" data-reveal>
+      <p class="status">
+        <Symbol size={22} breathe />
+        <span>{c.status}</span>
+      </p>
+      <p class="heading quiet">{c.quiet}</p>
+
+      <p class="kicker for">{c.forLabel}</p>
+      <ul class="items" role="list">
+        {c.items.map((item) => <li>{item}</li>)}
+      </ul>
+
+      <hr class="rule" />
+
+      <p class="empty">
+        <span class="heading">{c.empty[0]}</span>
+        <span>{c.empty[1]}</span>
+      </p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .listening {
+    padding-block: var(--space-section);
+    background: var(--color-surface);
+    border-block: var(--border-width) solid var(--color-border-subtle);
+  }
+  .inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .title {
+    margin-top: var(--space-4);
+    font-size: var(--text-heading-xl);
+  }
+  .body {
+    margin-top: var(--space-5);
+    max-width: 34rem;
+  }
+  .screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: var(--width-narrow);
+    margin-top: var(--space-9);
+  }
+  .status {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3);
+    font-size: var(--text-label);
+    font-weight: var(--weight-semibold);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--color-accent-strong);
+  }
+  .quiet {
+    margin-top: var(--space-6);
+    font-size: var(--text-heading-lg);
+  }
+  .for {
+    margin-top: var(--space-8);
+  }
+  .items {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    margin-top: var(--space-4);
+    font-family: var(--font-display);
+    font-size: var(--text-heading-sm);
+  }
+  .rule {
+    width: 48px;
+    margin-block: var(--space-8);
+  }
+  .empty {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    color: var(--color-text-muted);
+  }
+  .empty .heading {
+    font-size: var(--text-heading-sm);
+    color: var(--color-text);
+  }
+</style>

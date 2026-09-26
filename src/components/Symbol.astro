@@ -1,0 +1,65 @@
+---
+// The Amble symbol: a dot at rest inside an open circle.
+//
+// The circle is drawn in one unhurried stroke and left open, like an ensō: it
+// holds without enclosing. The dot is the Rep, the same moss dot that breathes
+// when it's listening. Nothing literal: no path, no footprints, no nodes.
+interface Props {
+  size?: number;
+  // The dot breathes, as on the listening screen (DESIGN_SYSTEM §22).
+  breathe?: boolean;
+  label?: string;
+  class?: string;
+}
+
+const { size = 28, breathe = false, label, class: className } = Astro.props;
+---
+
+<svg
+  class:list={['symbol', className, { breathe }]}
+  width={size}
+  height={size}
+  viewBox="0 0 48 48"
+  role={label ? 'img' : undefined}
+  aria-label={label}
+  aria-hidden={label ? undefined : 'true'}
+>
+  <path class="ring" d="M37.02 13.07A17 17 0 1 1 26.95 7.26" />
+  <circle class="dot" cx="24" cy="24" r="6.5" />
+</svg>
+
+<style>
+  .symbol {
+    flex: none;
+    overflow: visible;
+  }
+  .ring {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 3.25;
+    stroke-linecap: round;
+  }
+  .dot {
+    fill: var(--color-accent);
+    transform-origin: 24px 24px;
+  }
+  .breathe .dot {
+    animation: breathe var(--motion-breath) ease-in-out infinite;
+  }
+  @keyframes breathe {
+    0%,
+    100% {
+      transform: scale(1);
+      opacity: 0.8;
+    }
+    50% {
+      transform: scale(1.1);
+      opacity: 1;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .breathe .dot {
+      animation: none;
+    }
+  }
+</style>

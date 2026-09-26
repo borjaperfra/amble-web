@@ -1,0 +1,35 @@
+---
+import Base from '../../layouts/Base.astro';
+import Hero from './Hero.astro';
+import Reads from './Reads.astro';
+import Interview from './Interview.astro';
+import Defence from './Defence.astro';
+import MapSection from './MapSection.astro';
+import Triage from './Triage.astro';
+import Listening from './Listening.astro';
+import Roadmap from './Roadmap.astro';
+import CareerMd from './CareerMd.astro';
+import YourData from './YourData.astro';
+import Finale from './Finale.astro';
+import { home } from '../../content/home';
+import type { Lang } from '../../i18n/ui';
+
+const lang = (Astro.currentLocale ?? 'en') as Lang;
+const c = home[lang];
+---
+
+<Base joinHref="#join">
+  <main>
+    <Hero c={c.hero} />
+    <Reads c={c.reads} />
+    <Interview c={c.interview} />
+    <Defence c={c.defence} />
+    <MapSection c={c.map} strength={c.strength} sourceNames={c.sourceNames} />
+    <Triage c={c.triage} />
+    <Listening c={c.listening} />
+    <Roadmap c={c.roadmap} />
+    <CareerMd c={c.career} />
+    <YourData c={c.data} />
+    <Finale c={c.finale} />
+  </main>
+</Base>

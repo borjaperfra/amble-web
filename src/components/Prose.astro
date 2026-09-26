@@ -1,0 +1,84 @@
+---
+// Long-form reading pages (privacy, and later the manifesto): one column,
+// reading width, the type scale doing the work.
+interface Props {
+  kicker: string;
+  title: string;
+  lede?: string;
+}
+
+const { kicker, title, lede } = Astro.props;
+---
+
+<main class="prose container">
+  <header class="head">
+    <p class="kicker">{kicker}</p>
+    <h1 class="display title">{title}</h1>
+    {lede && <p class="lede">{lede}</p>}
+  </header>
+  <div class="body">
+    <slot />
+  </div>
+</main>
+
+<style>
+  .prose {
+    max-width: calc(var(--width-reading) + var(--gutter) * 2);
+    padding-block: var(--space-9) var(--space-8);
+  }
+  .head {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    padding-bottom: var(--space-7);
+    border-bottom: var(--border-width) solid var(--color-border-subtle);
+  }
+  .title {
+    font-size: var(--text-display-lg);
+  }
+  .lede {
+    margin-top: var(--space-2);
+  }
+  .body {
+    padding-top: var(--space-7);
+  }
+  .body :global(h2) {
+    margin-top: var(--space-8);
+    font-family: var(--font-display);
+    font-weight: var(--weight-regular);
+    font-size: var(--text-heading-md);
+    line-height: var(--leading-heading);
+    letter-spacing: var(--tracking-heading);
+  }
+  .body :global(h2:first-child) {
+    margin-top: 0;
+  }
+  .body :global(p),
+  .body :global(ul) {
+    margin-top: var(--space-4);
+    color: var(--color-text-muted);
+    text-wrap: pretty;
+  }
+  .body :global(ul) {
+    padding-left: var(--space-5);
+  }
+  .body :global(li + li) {
+    margin-top: var(--space-2);
+  }
+  .body :global(strong) {
+    color: var(--color-text);
+    font-weight: var(--weight-medium);
+  }
+  .body :global(.plain) {
+    margin-top: var(--space-5);
+    padding: var(--space-5);
+    background: var(--color-accent-wash);
+    border-radius: var(--radius-md);
+    color: var(--color-accent-strong);
+  }
+  .body :global(.updated) {
+    margin-top: var(--space-8);
+    font-size: var(--text-body-sm);
+    color: var(--color-text-faint);
+  }
+</style>

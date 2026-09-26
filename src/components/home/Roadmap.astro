@@ -1,0 +1,105 @@
+---
+import SectionIntro from '../SectionIntro.astro';
+import type { HomeContent } from '../../content/home';
+
+interface Props {
+  c: HomeContent['roadmap'];
+}
+
+const { c } = Astro.props;
+---
+
+<section class="section container" aria-labelledby="roadmap-title">
+  <div class="split">
+    <SectionIntro id="roadmap-title" kicker={c.kicker} title={c.title} body={c.body} />
+
+    <ol class="steps" role="list">
+      {
+        c.steps.map((step, i) => (
+          <li class:list={['step', { current: i === 0 }]} data-reveal style={`--i:${i}`}>
+            <span class="marker" aria-hidden="true" />
+            <p class="meta">
+              <span class="version">{step.version}</span>
+              {i === 0 && <span class="now">{c.now}</span>}
+            </p>
+            <p class="heading step-title">{step.title}</p>
+            <p class="step-body">{step.body}</p>
+            {step.extra && <p class="extra">{step.extra}</p>}
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>
+
+<style>
+  .steps {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-7);
+    padding-left: var(--space-7);
+  }
+  .steps::before {
+    content: '';
+    position: absolute;
+    left: 7px;
+    top: 10px;
+    bottom: 10px;
+    width: var(--border-width);
+    background: linear-gradient(to bottom, var(--color-accent-soft), var(--color-border-subtle));
+  }
+  .step {
+    position: relative;
+  }
+  .marker {
+    position: absolute;
+    left: calc(var(--space-7) * -1);
+    top: 5px;
+    width: 15px;
+    height: 15px;
+    border-radius: var(--radius-full);
+    background: var(--color-bg);
+    border: 1.5px solid var(--color-border);
+  }
+  .current .marker {
+    border-color: var(--color-accent);
+    background: radial-gradient(circle, var(--color-accent) 0 3.5px, var(--color-bg) 4px);
+  }
+  .meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    font-size: var(--text-body-sm);
+  }
+  .version {
+    font-family: var(--font-mono);
+    font-size: var(--text-mono);
+    color: var(--color-text-faint);
+  }
+  .now {
+    font-size: var(--text-label);
+    font-weight: var(--weight-semibold);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--color-accent-strong);
+  }
+  .step-title {
+    margin-top: var(--space-2);
+    font-size: var(--text-heading-md);
+  }
+  .step-body {
+    margin-top: var(--space-2);
+    color: var(--color-text-muted);
+    text-wrap: pretty;
+  }
+  .extra {
+    margin-top: var(--space-4);
+    padding: var(--space-4) var(--space-5);
+    font-size: var(--text-body-sm);
+    color: var(--color-accent-strong);
+    background: var(--color-accent-wash);
+    border-radius: var(--radius-md);
+    text-wrap: pretty;
+  }
+</style>

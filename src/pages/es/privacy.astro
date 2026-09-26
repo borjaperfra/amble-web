@@ -1,0 +1,69 @@
+---
+import Base from '../../layouts/Base.astro';
+import Prose from '../../components/Prose.astro';
+import { legal } from '../../config/legal';
+
+const mail = `mailto:${legal.privacyEmail}`;
+---
+
+<Base title="Privacidad — Amble" description="Qué recoge la web de Amble, para qué y cómo pedir que se borre." path="privacy">
+  <Prose kicker="Privacidad" title="Tu email, y nada más." lede="Esto cubre la web de Amble y su lista de espera para la beta. Crecerá cuando crezca el producto, y te avisaremos cuando cambie.">
+    <p class="plain">
+      En corto: guardamos tu email para invitarte a la beta. Sin cookies, sin analítica, sin rastreadores, sin vender
+      nada, sin compartirlo para publicidad. Escríbenos y desaparece.
+    </p>
+
+    <h2>Quién es responsable</h2>
+    <p>
+      {legal.controller}{legal.entity && `, gestionado por ${legal.entity.name} (${legal.entity.taxId}), ${legal.entity.address}`}.
+      Para cualquier cosa sobre tus datos: <a href={mail}>{legal.privacyEmail}</a>.
+    </p>
+
+    <h2>Qué recogemos</h2>
+    <ul>
+      <li><strong>Tu dirección de email</strong>, cuando te apuntas a la lista de espera.</li>
+      <li><strong>El idioma</strong> de la página desde la que te apuntas, para escribirte en él.</li>
+      <li><strong>Cuándo</strong> te apuntaste y cuándo confirmaste, como prueba de tu consentimiento.</li>
+    </ul>
+    <p>
+      Tu dirección IP se usa unos minutos, en memoria, para evitar abusos del formulario. Nunca se guarda. No pedimos ni
+      aceptamos nada más: el formulario rechaza cualquier campo que no sea tu email.
+    </p>
+
+    <h2>Para qué, y con qué base</h2>
+    <p>
+      Para invitarte a la beta cerrada de Amble y contarte cosas sobre ella. Nada más. La base legal es tu consentimiento
+      (art. 6.1.a del RGPD), que das al enviar el formulario y confirmarlo desde tu correo. Puedes retirarlo cuando
+      quieras.
+    </p>
+
+    <h2>Quién más lo trata</h2>
+    <ul>
+      <li><strong>Railway</strong> aloja la web y la base de datos donde se guarda tu email.</li>
+      <li><strong>Resend</strong> envía el email de confirmación y, más adelante, tu invitación a la beta.</li>
+    </ul>
+    <p>
+      Ambos actúan solo siguiendo nuestras instrucciones y pueden tratar datos fuera del Espacio Económico Europeo, con
+      las cláusulas contractuales tipo de la Comisión Europea o el Marco de Privacidad de Datos UE–EE. UU.
+    </p>
+
+    <h2>Cuánto tiempo lo guardamos</h2>
+    <p>
+      Si nunca confirmas tu email, lo borramos a los 30 días. Si lo confirmas, lo guardamos hasta que termine la beta o
+      hasta que nos pidas borrarlo, lo que ocurra antes.
+    </p>
+
+    <h2>Tus derechos</h2>
+    <p>
+      Puedes pedir ver, corregir, exportar o borrar tus datos, oponerte a su uso o limitarlo, y retirar tu
+      consentimiento, escribiendo a <a href={mail}>{legal.privacyEmail}</a>. Respondemos en menos de un mes, normalmente
+      mucho antes. Si crees que no hemos tratado bien tus datos, puedes reclamar ante la Agencia Española de Protección
+      de Datos en <a href="https://www.aepd.es">aepd.es</a>.
+    </p>
+
+    <h2>Cookies</h2>
+    <p>Ninguna. La web no instala cookies ni carga nada de terceros: las fuentes se sirven desde nuestro propio dominio.</p>
+
+    <p class="updated">Última actualización: {legal.updated}.</p>
+  </Prose>
+</Base>

@@ -1,0 +1,110 @@
+---
+import SectionIntro from '../SectionIntro.astro';
+import type { HomeContent } from '../../content/home';
+
+interface Props {
+  c: HomeContent['defence'];
+}
+
+const { c } = Astro.props;
+---
+
+<section class="section container" aria-labelledby="defence-title">
+  <div class="split">
+    <SectionIntro id="defence-title" kicker={c.kicker} title={c.title} body={c.body} />
+
+    <div class="stack">
+      <figure class="sheet">
+        <p class="sheet-kicker">{c.question.label}</p>
+        <p class="context">{c.question.context}</p>
+        <p class="heading ask">{c.question.ask}</p>
+
+        <div class="answer" data-reveal>
+          <p class="who">{c.answer.label}</p>
+          <blockquote>{c.answer.text}</blockquote>
+          <p class="outcome"><span aria-hidden="true">✓</span> {c.answer.outcome}</p>
+        </div>
+      </figure>
+
+      <figure class="sheet retracted" data-reveal style="--i:1">
+        <p class="sheet-kicker retracted-label"><span aria-hidden="true">⊘</span> {c.retracted.label}</p>
+        <p class="claim">“{c.retracted.claim}”</p>
+        <dl class="record">
+          <dt>{c.retracted.askedLabel}</dt>
+          <dd>{c.retracted.asked}</dd>
+          <dt>{c.retracted.answeredLabel}</dt>
+          <dd>{c.retracted.answered}</dd>
+        </dl>
+      </figure>
+
+      <p class="note" data-reveal style="--i:2">{c.note}</p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+  }
+  .context {
+    margin-top: var(--space-4);
+    color: var(--color-text-muted);
+    text-wrap: pretty;
+  }
+  .ask {
+    margin-top: var(--space-3);
+    font-size: var(--text-heading-md);
+  }
+  .answer {
+    margin-top: var(--space-6);
+    padding-top: var(--space-5);
+    border-top: var(--border-width) solid var(--color-border-subtle);
+  }
+  .who {
+    font-size: var(--text-body-sm);
+    font-weight: var(--weight-medium);
+  }
+  .answer blockquote {
+    margin-top: var(--space-2);
+    font-family: var(--font-display);
+    font-size: var(--text-heading-sm);
+    line-height: var(--leading-tight);
+    text-wrap: pretty;
+  }
+  .outcome {
+    margin-top: var(--space-4);
+    font-size: var(--text-body-sm);
+    color: var(--color-accent-strong);
+  }
+  .retracted {
+    background: var(--color-surface);
+    box-shadow: none;
+  }
+  .retracted-label {
+    color: var(--color-retracted);
+  }
+  .claim {
+    margin-top: var(--space-3);
+    color: var(--color-text-muted);
+    text-decoration: line-through;
+    text-decoration-color: var(--color-retracted);
+    text-decoration-thickness: 1px;
+  }
+  .record {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: var(--space-2) var(--space-5);
+    margin-top: var(--space-4);
+    font-size: var(--text-body-sm);
+  }
+  .record dt {
+    color: var(--color-text-faint);
+  }
+  .note {
+    font-size: var(--text-body-sm);
+    color: var(--color-text-muted);
+    padding-inline: var(--space-1);
+  }
+</style>

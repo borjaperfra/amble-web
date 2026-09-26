@@ -1,5 +1,7 @@
 ---
+import { getRelativeLocaleUrl } from 'astro:i18n';
 import { useTranslations, type Lang } from '../i18n/ui';
+import { EMAIL_MAX, EMAIL_PATTERN } from '../lib/email-rules';
 
 interface Props {
   id?: string;
@@ -11,13 +13,23 @@ const { id = 'waitlist' } = Astro.props;
 const messages = {
   ok: t('waitlist.ok'),
   invalid: t('waitlist.invalid'),
+  empty: t('waitlist.empty'),
   'slow-down': t('waitlist.slow-down'),
   error: t('waitlist.error'),
   sending: t('waitlist.sending'),
+  note: t('waitlist.note'),
 };
+const statusId = `${id}-status`;
 ---
 
-<form class="waitlist" method="post" action="/api/waitlist" data-messages={JSON.stringify(messages)}>
+<form
+  class="waitlist"
+  method="post"
+  action="/api/waitlist"
+  novalidate
+  data-messages={JSON.stringify(messages)}
+  data-pattern={EMAIL_PATTERN}
+>
   <input type="hidden" name="locale" value={lang} />
   <div class="honeypot" aria-hidden="true">
     <label>Website <input type="text" name="website" tabindex="-1" autocomplete="off" /></label>
@@ -30,64 +42,107 @@ const messages = {
       type="email"
       name="email"
       required
+      maxlength={EMAIL_MAX}
+      pattern={EMAIL_PATTERN}
       autocomplete="email"
       inputmode="email"
+      autocapitalize="off"
+      autocorrect="off"
+      spellcheck="false"
       placeholder={t('waitlist.placeholder')}
+      aria-describedby={statusId}
     />
     <button class="btn" type="submit">{t('waitlist.cta')}</button>
   </div>
-  <p class="status" role="status" aria-live="polite">{t('waitlist.note')}</p>
+  <p class="status-line">
+    <span class="status" id={statusId} role="status" aria-live="polite">{t('waitlist.note')}</span>
+    <a class="privacy" href={getRelativeLocaleUrl(lang, 'privacy')}>{t('footer.privacy')}</a>
+  </p>
 </form>
 
 <style>
   .waitlist {
     width: 100%;
     max-width: 460px;
+    text-align: left;
   }
   .row {
     display: flex;
-    gap: 8px;
+    gap: var(--space-2);
   }
   .field {
     flex: 1;
     min-width: 0;
-    height: 48px;
-    padding: 0 16px;
-    font: inherit;
-    color: var(--ink);
-    background: var(--paper-light);
-    border: 1px solid var(--border);
+    height: var(--control-height);
+    padding: 0 var(--space-4);
+    color: var(--color-text);
+    background: var(--color-surface);
+    border: var(--border-width) solid var(--color-border);
     border-radius: var(--radius-md);
     transition:
       border-color var(--motion-fast) ease,
       box-shadow var(--motion-fast) ease;
   }
   .field::placeholder {
-    color: var(--ink-tertiary);
+    color: var(--color-text-faint);
   }
   .field:focus {
     outline: none;
-    border-color: var(--moss);
-    box-shadow: 0 0 0 3px var(--moss-wash);
+    border-color: var(--color-focus);
+    box-shadow: 0 0 0 3px var(--color-accent-wash);
   }
-  .status {
-    margin-top: 12px;
+  .field[aria-invalid='true'] {
+    border-color: var(--color-retracted);
+  }
+  .field[aria-invalid='true']:focus {
+    box-shadow: 0 0 0 3px var(--color-retracted-soft);
+  }
+  .status-line {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--space-1) var(--space-4);
+    margin-top: var(--space-3);
+    padding-inline: var(--space-1);
     font-size: var(--text-body-sm);
-    color: var(--ink-tertiary);
+    color: var(--color-text-faint);
+  }
+  .privacy {
+    color: var(--color-text-faint);
+    text-decoration-color: var(--color-border);
+    transition: color var(--motion-fast) ease;
+  }
+  .privacy:hover {
+    color: var(--color-text);
   }
   .waitlist[data-state='ok'] .status {
-    color: var(--moss-dark);
+    color: var(--color-accent-strong);
   }
   .waitlist[data-state='ok'] .row {
     display: none;
   }
+  .waitlist[data-state='ok'] .status-line {
+    justify-content: center;
+  }
+  .waitlist[data-state='invalid'] .status,
+  .waitlist[data-state='empty'] .status,
+  .waitlist[data-state='error'] .status,
+  .waitlist[data-state='slow-down'] .status {
+    color: var(--color-retracted);
+  }
   .honeypot {
     position: absolute;
     left: -9999px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
   }
   @media (max-width: 480px) {
     .row {
       flex-direction: column;
+    }
+    .field {
+      flex: none;
     }
   }
 </style>
@@ -95,26 +150,54 @@ const messages = {
 <script>
   for (const form of document.querySelectorAll<HTMLFormElement>('form.waitlist')) {
     const messages = JSON.parse(form.dataset.messages ?? '{}');
+    const pattern = new RegExp(`^${form.dataset.pattern}$`);
+    const input = form.querySelector<HTMLInputElement>('input[name="email"]')!;
     const status = form.querySelector<HTMLElement>('.status')!;
     const button = form.querySelector<HTMLButtonElement>('button')!;
+    const locale = form.querySelector<HTMLInputElement>('input[name="locale"]')!;
+    const honeypot = form.querySelector<HTMLInputElement>('input[name="website"]')!;
+
+    const show = (state: string) => {
+      form.dataset.state = state;
+      status.textContent = messages[state] ?? messages.error;
+      const invalid = state === 'invalid' || state === 'empty';
+      input.setAttribute('aria-invalid', String(invalid));
+      if (invalid) input.focus();
+    };
+
+    // Spaces can never be part of the address: drop them as they're typed or pasted.
+    input.addEventListener('input', () => {
+      const clean = input.value.replace(/\s+/g, '');
+      if (clean !== input.value) input.value = clean;
+      if (form.dataset.state && form.dataset.state !== 'ok') {
+        form.dataset.state = '';
+        input.removeAttribute('aria-invalid');
+        status.textContent = messages.note;
+      }
+    });
 
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
+      const email = input.value.trim();
+      if (!email) return show('empty');
+      if (!pattern.test(email)) return show('invalid');
+
       button.disabled = true;
       status.textContent = messages.sending;
       let outcome = 'error';
       try {
+        // Exactly the fields the server accepts, nothing else.
+        const body = new URLSearchParams({ email, locale: locale.value, website: honeypot.value });
         const res = await fetch(form.action, {
           method: 'POST',
-          body: new FormData(form),
+          body,
           headers: { accept: 'application/json' },
         });
         outcome = (await res.json()).outcome ?? 'error';
       } catch {
         // Network failure: fall through to the generic error message.
       }
-      form.dataset.state = outcome;
-      status.textContent = messages[outcome] ?? messages.error;
+      show(outcome);
       button.disabled = false;
     });
   }

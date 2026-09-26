@@ -1,0 +1,102 @@
+---
+import Waitlist from '../Waitlist.astro';
+import type { HomeContent } from '../../content/home';
+
+interface Props {
+  c: HomeContent['hero'];
+}
+
+const { c } = Astro.props;
+---
+
+<section class="hero container" aria-labelledby="hero-title" id="join">
+  <p class="tag rise">
+    <span class="tag-dot" aria-hidden="true"></span>
+    {c.tag}
+  </p>
+  <h1 id="hero-title" class="display title rise d1">
+    {c.title[0]}
+    <br />
+    <em>Amble</em>{' '}{c.title[1]}
+  </h1>
+  <p class="subtitle rise d2">{c.subtitle}</p>
+  <div class="form rise d3">
+    <Waitlist id="hero" />
+  </div>
+  <p class="building rise d4">{c.building}</p>
+</section>
+
+<style>
+  .hero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding-block: clamp(var(--space-8), 4rem + 6vw, var(--space-11)) var(--space-section);
+  }
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    height: 28px;
+    padding: 0 var(--space-3);
+    font-size: var(--text-body-sm);
+    font-weight: var(--weight-medium);
+    color: var(--color-accent-strong);
+    background: var(--color-accent-wash);
+    border: var(--border-width) solid var(--color-accent-soft);
+    border-radius: var(--radius-full);
+  }
+  .tag-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: var(--radius-full);
+    background: var(--color-accent);
+  }
+  .title {
+    margin-top: var(--space-6);
+    font-size: var(--text-display-xl);
+  }
+  .subtitle {
+    margin-top: var(--space-6);
+    max-width: 34rem;
+    font-size: var(--text-body-lg);
+    color: var(--color-text-muted);
+    text-wrap: pretty;
+  }
+  .form {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin-top: var(--space-7);
+  }
+  .building {
+    margin-top: var(--space-7);
+    max-width: 28rem;
+    font-size: var(--text-body-sm);
+    color: var(--color-text-faint);
+    text-wrap: pretty;
+  }
+
+  .rise {
+    animation: rise var(--motion-arrive) var(--ease-standard) both;
+  }
+  .d1 {
+    animation-delay: 90ms;
+  }
+  .d2 {
+    animation-delay: 220ms;
+  }
+  .d3 {
+    animation-delay: 340ms;
+  }
+  .d4 {
+    animation-delay: 460ms;
+  }
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+  }
+</style>

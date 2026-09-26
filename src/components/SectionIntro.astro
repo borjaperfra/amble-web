@@ -1,0 +1,39 @@
+---
+// The text half of every home section: kicker, serif title, one paragraph.
+interface Props {
+  kicker: string;
+  title: string;
+  body: string;
+  id?: string;
+  align?: 'start' | 'center';
+}
+
+const { kicker, title, body, id, align = 'start' } = Astro.props;
+---
+
+<div class:list={['intro', align]} data-reveal>
+  <p class="kicker">{kicker}</p>
+  <h2 class="heading title" id={id}>{title}</h2>
+  <p class="lede">{body}</p>
+</div>
+
+<style>
+  .intro {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    max-width: 30rem;
+  }
+  .intro.center {
+    align-items: center;
+    text-align: center;
+    margin-inline: auto;
+    max-width: 36rem;
+  }
+  .title {
+    font-size: var(--text-heading-xl);
+  }
+  .lede {
+    margin-top: var(--space-2);
+  }
+</style>

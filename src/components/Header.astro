@@ -1,0 +1,51 @@
+---
+import { getRelativeLocaleUrl } from 'astro:i18n';
+import Logo from './Logo.astro';
+import { useTranslations, type Lang } from '../i18n/ui';
+
+interface Props {
+  path?: string;
+  // The home already has the form in the hero; other pages link back to it.
+  joinHref?: string;
+}
+
+const lang = (Astro.currentLocale ?? 'en') as Lang;
+const t = useTranslations(lang);
+const { path = '', joinHref = `${getRelativeLocaleUrl(lang)}#join` } = Astro.props;
+const other: Lang = lang === 'en' ? 'es' : 'en';
+---
+
+<header class="header container">
+  <Logo />
+  <nav class="nav" aria-label={t('nav.label')}>
+    <a class="lang text-link" href={getRelativeLocaleUrl(other, path)} hreflang={other} lang={other}>
+      {t('nav.otherLang')}
+    </a>
+    <a class="join text-link" href={joinHref}>{t('nav.join')} <span aria-hidden="true">→</span></a>
+  </nav>
+</header>
+
+<style>
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-block: var(--space-5);
+  }
+  .nav {
+    display: flex;
+    align-items: center;
+    gap: var(--space-5);
+    font-size: var(--text-body-sm);
+  }
+  .join {
+    color: var(--color-text);
+    font-weight: var(--weight-medium);
+  }
+  /* On phones the language switch lives in the footer. */
+  @media (max-width: 480px) {
+    .lang {
+      display: none;
+    }
+  }
+</style>

@@ -1,0 +1,57 @@
+---
+import SectionIntro from '../SectionIntro.astro';
+import type { HomeContent } from '../../content/home';
+
+interface Props {
+  c: HomeContent['data'];
+}
+
+const { c } = Astro.props;
+---
+
+<section class="section container" aria-labelledby="data-title">
+  <SectionIntro id="data-title" kicker={c.kicker} title={c.title} body={c.body} align="center" />
+
+  <ul class="items" role="list">
+    {
+      c.items.map((item, i) => (
+        <li class="item" data-reveal style={`--i:${i}`}>
+          <p class="heading item-title">{item.title}</p>
+          <p class="item-body">{item.body}</p>
+        </li>
+      ))
+    }
+  </ul>
+</section>
+
+<style>
+  .items {
+    display: grid;
+    gap: var(--space-7) var(--space-6);
+    max-width: var(--width-wide);
+    margin: var(--space-8) auto 0;
+  }
+  @media (min-width: 640px) {
+    .items {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (min-width: 1000px) {
+    .items {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+  .item {
+    padding-top: var(--space-5);
+    border-top: var(--border-width) solid var(--color-border);
+  }
+  .item-title {
+    font-size: var(--text-heading-sm);
+  }
+  .item-body {
+    margin-top: var(--space-2);
+    font-size: var(--text-body-sm);
+    color: var(--color-text-muted);
+    text-wrap: pretty;
+  }
+</style>

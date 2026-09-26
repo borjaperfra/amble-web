@@ -1,0 +1,38 @@
+---
+import { getRelativeLocaleUrl } from 'astro:i18n';
+import Symbol from './Symbol.astro';
+import type { Lang } from '../i18n/ui';
+
+interface Props {
+  size?: 'sm' | 'md';
+}
+
+const lang = (Astro.currentLocale ?? 'en') as Lang;
+const { size = 'md' } = Astro.props;
+---
+
+<a class:list={['logo', size]} href={getRelativeLocaleUrl(lang)} aria-label="Amble">
+  <Symbol size={size === 'md' ? 26 : 22} />
+  <span class="word" aria-hidden="true">amble</span>
+</a>
+
+<style>
+  .logo {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: var(--touch-target);
+    color: var(--color-text);
+    text-decoration: none;
+  }
+  .word {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    line-height: 1;
+    letter-spacing: -0.01em;
+    padding-bottom: 0.08em;
+  }
+  .sm .word {
+    font-size: 1.25rem;
+  }
+</style>

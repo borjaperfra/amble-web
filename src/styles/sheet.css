@@ -1,0 +1,64 @@
+/*
+ * A "sheet" is a piece of the product shown on the page: a sheet of paper
+ * lifted slightly off the canvas. It is the only framed surface on the site;
+ * everything else sits on whitespace.
+ */
+
+.sheet {
+  position: relative;
+  background: var(--color-surface-raised);
+  border: var(--border-width) solid var(--color-border-subtle);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sheet);
+  padding: clamp(var(--space-5), 1rem + 2vw, var(--space-7));
+}
+
+.sheet-kicker {
+  font-size: var(--text-label);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--color-text-faint);
+}
+
+.source-tag {
+  display: inline-flex;
+  align-items: center;
+  height: 20px;
+  padding: 0 var(--space-2);
+  font-size: 0.6875rem;
+  font-weight: var(--weight-medium);
+  letter-spacing: 0.02em;
+  color: var(--color-text-muted);
+  background: var(--color-surface);
+  border: var(--border-width) solid var(--color-border-subtle);
+  border-radius: var(--radius-sm);
+}
+
+/* Home sections: text on one side, the product on the other. */
+.split {
+  display: grid;
+  gap: var(--space-8);
+  align-items: center;
+}
+
+@media (min-width: 960px) {
+  .split {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    gap: var(--space-9);
+  }
+  .split.flip > :first-child {
+    order: 2;
+  }
+}
+
+.section {
+  padding-block: var(--space-section);
+}
+
+.rule {
+  height: var(--border-width);
+  border: 0;
+  margin: 0;
+  background: var(--color-border-subtle);
+}

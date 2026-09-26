@@ -1,0 +1,101 @@
+---
+import SectionIntro from '../SectionIntro.astro';
+import type { HomeContent } from '../../content/home';
+
+interface Props {
+  c: HomeContent['career'];
+}
+
+const { c } = Astro.props;
+---
+
+<section class="section container" aria-labelledby="career-title">
+  <div class="split flip">
+    <SectionIntro id="career-title" kicker={c.kicker} title={c.title} body={c.body} />
+
+    <figure class="file" data-reveal>
+      <figcaption class="file-bar">
+        <span class="file-dots" aria-hidden="true"><span></span><span></span><span></span></span>
+        <span>{c.file}</span>
+      </figcaption>
+      <div class="code" role="document">
+        {
+          c.lines.map((line) => (
+            <p class:list={['line', line.kind]}>
+              <span class="text">{line.text}</span>
+              {line.tags && <span class="tags">{line.tags}</span>}
+              {line.flag && (
+                <span class:list={['flag', { retracted: line.retracted }]}>
+                  {line.retracted ? '⊘' : '⚠'} {line.flag}
+                </span>
+              )}
+            </p>
+          ))
+        }
+      </div>
+    </figure>
+  </div>
+</section>
+
+<style>
+  .file {
+    overflow: hidden;
+    background: var(--color-surface-raised);
+    border: var(--border-width) solid var(--color-border-subtle);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sheet);
+  }
+  .file-bar {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-3) var(--space-5);
+    font-family: var(--font-mono);
+    font-size: var(--text-mono);
+    color: var(--color-text-faint);
+    background: var(--color-surface);
+    border-bottom: var(--border-width) solid var(--color-border-subtle);
+  }
+  .file-dots {
+    display: inline-flex;
+    gap: 6px;
+  }
+  .file-dots span {
+    width: 9px;
+    height: 9px;
+    border-radius: var(--radius-full);
+    background: var(--color-border);
+  }
+  .code {
+    margin: 0;
+    padding: var(--space-6) var(--space-5);
+    overflow-x: auto;
+    font-family: var(--font-mono);
+    font-size: var(--text-mono);
+    line-height: 1.75;
+    color: var(--color-text);
+  }
+  .line {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 0.75ch;
+    min-height: 1.75em;
+  }
+  .text {
+    white-space: pre-wrap;
+  }
+  .line.h1,
+  .line.h2 {
+    color: var(--color-accent-strong);
+    font-weight: var(--weight-semibold);
+  }
+  .tags {
+    color: var(--color-text-faint);
+  }
+  .flag {
+    color: var(--color-caution);
+  }
+  .flag.retracted {
+    color: var(--color-retracted);
+  }
+</style>

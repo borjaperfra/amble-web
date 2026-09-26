@@ -1,0 +1,56 @@
+---
+import { getRelativeLocaleUrl } from 'astro:i18n';
+import Logo from './Logo.astro';
+import { useTranslations, type Lang } from '../i18n/ui';
+
+interface Props {
+  path?: string;
+}
+
+const lang = (Astro.currentLocale ?? 'en') as Lang;
+const t = useTranslations(lang);
+const { path = '' } = Astro.props;
+const other: Lang = lang === 'en' ? 'es' : 'en';
+---
+
+<footer class="footer container">
+  <div class="brand">
+    <Logo size="sm" />
+    <p class="tagline">{t('footer.tagline')}</p>
+  </div>
+  <nav class="links" aria-label={t('footer.label')}>
+    <a class="text-link" href={getRelativeLocaleUrl(lang, 'privacy')}>{t('footer.privacy')}</a>
+    <a class="text-link" href={getRelativeLocaleUrl(other, path)} hreflang={other} lang={other}>{t('nav.otherLang')}</a>
+    <span class="copy">© 2026 Amble</span>
+  </nav>
+</footer>
+
+<style>
+  .footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--space-6);
+    padding-block: var(--space-9) var(--space-7);
+  }
+  .brand {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+  .tagline {
+    font-size: var(--text-body-sm);
+    color: var(--color-text-faint);
+  }
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-5);
+    font-size: var(--text-body-sm);
+  }
+  .copy {
+    color: var(--color-text-faint);
+  }
+</style>

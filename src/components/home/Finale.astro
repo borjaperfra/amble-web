@@ -1,0 +1,45 @@
+---
+import Symbol from '../Symbol.astro';
+import Waitlist from '../Waitlist.astro';
+import type { HomeContent } from '../../content/home';
+
+interface Props {
+  c: HomeContent['finale'];
+}
+
+const { c } = Astro.props;
+---
+
+<section class="finale container" aria-labelledby="finale-title">
+  <div class="inner" data-reveal>
+    <Symbol size={40} breathe />
+    <h2 class="display title" id="finale-title">{c.title}</h2>
+    <p class="lede">{c.body}</p>
+    <div class="form">
+      <Waitlist id="finale" />
+    </div>
+  </div>
+</section>
+
+<style>
+  .finale {
+    padding-block: var(--space-section) var(--space-8);
+  }
+  .inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: var(--space-5);
+  }
+  .title {
+    margin-top: var(--space-4);
+    font-size: var(--text-display-lg);
+  }
+  .form {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin-top: var(--space-5);
+  }
+</style>

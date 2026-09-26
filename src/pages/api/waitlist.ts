@@ -2,7 +2,8 @@ import type { APIRoute } from 'astro';
 import { getRelativeLocaleUrl } from 'astro:i18n';
 import { SITE_URL } from 'astro:env/server';
 import type { Lang } from '../../i18n/ui';
-import { join, normalizeEmail, releaseCooldown } from '../../lib/waitlist';
+import { parseEmail } from '../../lib/email-rules';
+import { join, releaseCooldown } from '../../lib/waitlist';
 import { sendConfirmation } from '../../lib/email';
 import { allow } from '../../lib/rate-limit';
 
@@ -10,12 +11,36 @@ export const prerender = false;
 
 type Outcome = 'ok' | 'invalid' | 'error' | 'slow-down';
 
+// The form sends these and nothing else. Anything more is not our form.
+const ALLOWED_FIELDS = new Set(['email', 'locale', 'website']);
+const LOCALES = new Set<Lang>(['en', 'es']);
+const MAX_BODY_BYTES = 1024;
+
+async function readForm(request: Request): Promise<URLSearchParams | null> {
+  const type = request.headers.get('content-type') ?? '';
+  if (!type.toLowerCase().startsWith('application/x-www-form-urlencoded')) return null;
+
+  const declared = Number(request.headers.get('content-length') ?? 0);
+  if (declared > MAX_BODY_BYTES) return null;
+  const raw = await request.text();
+  if (raw.length > MAX_BODY_BYTES) return null;
+
+  const form = new URLSearchParams(raw);
+  const seen = new Set<string>();
+  for (const key of form.keys()) {
+    if (!ALLOWED_FIELDS.has(key) || seen.has(key)) return null;
+    seen.add(key);
+  }
+  return form;
+}
+
 // Works with and without JavaScript: fetch() asks for JSON, a plain form post
 // gets redirected to a page.
 export const POST: APIRoute = async ({ request, clientAddress, redirect }) => {
-  const form = await request.formData();
-  const lang: Lang = form.get('locale') === 'es' ? 'es' : 'en';
   const wantsJson = request.headers.get('accept')?.includes('application/json');
+  const form = await readForm(request).catch(() => null);
+  const localeField = form?.get('locale');
+  const lang: Lang = localeField === 'es' ? 'es' : 'en';
 
   const reply = (outcome: Outcome, status: number) => {
     if (wantsJson) return Response.json({ outcome }, { status });
@@ -23,12 +48,15 @@ export const POST: APIRoute = async ({ request, clientAddress, redirect }) => {
     return redirect(getRelativeLocaleUrl(lang, 'joined') + query, 303);
   };
 
+  if (!form) return reply('invalid', 400);
+  if (localeField !== null && !LOCALES.has(localeField as Lang)) return reply('invalid', 400);
+
   // Honeypot: bots fill every field. Pretend it worked.
   if (form.get('website')) return reply('ok', 200);
 
   if (!allow(clientAddress)) return reply('slow-down', 429);
 
-  const parsed = normalizeEmail(String(form.get('email') ?? ''));
+  const parsed = parseEmail(form.get('email'));
   if (!parsed) return reply('invalid', 400);
 
   try {
@@ -52,10 +80,13 @@ export const POST: APIRoute = async ({ request, clientAddress, redirect }) => {
     }
     return reply('ok', 200);
   } catch (err) {
-    console.error('[waitlist] join failed', err);
+    console.error('[waitlist] join failed', err instanceof Error ? err.message : err);
     return reply('error', 500);
   }
 };
 
-export const GET: APIRoute = () => new Response(null, { status: 405, headers: { allow: 'POST' } });
-
+const notAllowed = () => new Response(null, { status: 405, headers: { allow: 'POST' } });
+export const GET: APIRoute = notAllowed;
+export const PUT: APIRoute = notAllowed;
+export const PATCH: APIRoute = notAllowed;
+export const DELETE: APIRoute = notAllowed;

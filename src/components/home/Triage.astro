@@ -1,0 +1,124 @@
+---
+import SectionIntro from '../SectionIntro.astro';
+import type { HomeContent } from '../../content/home';
+
+interface Props {
+  c: HomeContent['triage'];
+}
+
+const { c } = Astro.props;
+---
+
+<section class="section container" aria-labelledby="triage-title">
+  <div class="split flip">
+    <SectionIntro id="triage-title" kicker={c.kicker} title={c.title} body={c.body} />
+
+    <div class="stack">
+      <figure class="sheet">
+        <p class="sheet-kicker">{c.offerLabel}</p>
+        <p class="heading role">{c.offer.role}</p>
+        <p class="company">{c.offer.company}</p>
+        <ul class="facts" role="list">
+          {c.offer.facts.map((f) => <li>{f}</li>)}
+        </ul>
+
+        <div class="verdicts" aria-hidden="true">
+          {c.verdicts.map((v, i) => <span class:list={['verdict', { chosen: i === c.chosen }]}>{v}</span>)}
+        </div>
+
+        <div class="reason" data-reveal>
+          <p class="who">{c.reasonLabel}</p>
+          <blockquote class="heading">{c.reason}</blockquote>
+        </div>
+      </figure>
+
+      <div class="learned" data-reveal style="--i:1">
+        <p class="sheet-kicker">{c.learnedLabel}</p>
+        <p class="learned-body">
+          <span class="learned-type">{c.learned.type}</span>
+          <span>{c.learned.text}</span>
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+  }
+  .role {
+    margin-top: var(--space-4);
+    font-size: var(--text-heading-lg);
+  }
+  .company {
+    margin-top: var(--space-1);
+    color: var(--color-text-muted);
+  }
+  .facts {
+    display: flex;
+    flex-direction: column;
+    margin-top: var(--space-5);
+    font-size: var(--text-body-sm);
+  }
+  .facts li {
+    padding-block: var(--space-3);
+    border-top: var(--border-width) solid var(--color-border-subtle);
+  }
+  .verdicts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-top: var(--space-5);
+  }
+  .verdict {
+    display: inline-flex;
+    align-items: center;
+    height: 36px;
+    padding: 0 var(--space-4);
+    font-size: var(--text-body-sm);
+    color: var(--color-text-muted);
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--radius-md);
+  }
+  .verdict.chosen {
+    color: var(--color-text-inverse);
+    background: var(--color-action);
+    border-color: var(--color-action);
+  }
+  .reason {
+    margin-top: var(--space-6);
+    padding-top: var(--space-5);
+    border-top: var(--border-width) solid var(--color-border-subtle);
+  }
+  .who {
+    font-size: var(--text-body-sm);
+    font-weight: var(--weight-medium);
+  }
+  .reason blockquote {
+    margin-top: var(--space-2);
+    font-size: var(--text-heading-sm);
+    line-height: var(--leading-tight);
+  }
+  .learned {
+    padding: var(--space-5) clamp(var(--space-5), 1rem + 2vw, var(--space-7));
+    background: var(--color-accent-wash);
+    border-radius: var(--radius-lg);
+  }
+  .learned .sheet-kicker {
+    color: var(--color-accent-strong);
+  }
+  .learned-body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    margin-top: var(--space-2);
+  }
+  .learned-type {
+    font-family: var(--font-display);
+    font-size: var(--text-heading-sm);
+    color: var(--color-accent-strong);
+  }
+</style>

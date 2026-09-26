@@ -1,0 +1,40 @@
+---
+// Evidence as visual weight, never traffic lights (DESIGN_SYSTEM §4).
+// The label always travels with the dots so meaning never rests on shape alone.
+interface Props {
+  strength: 0 | 1 | 2 | 3 | 4;
+  label: string;
+}
+
+const { strength, label } = Astro.props;
+---
+
+<span class="evidence">
+  <span class="dots" aria-hidden="true">
+    {[0, 1, 2, 3].map((i) => <span class:list={['dot', { on: i < strength }]} />)}
+  </span>
+  <span class="label">{label}</span>
+</span>
+
+<style>
+  .evidence {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-body-sm);
+    color: var(--color-text-muted);
+  }
+  .dots {
+    display: inline-flex;
+    gap: 3px;
+  }
+  .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: var(--radius-full);
+    border: 1.25px solid var(--color-accent);
+  }
+  .dot.on {
+    background: var(--color-accent);
+  }
+</style>

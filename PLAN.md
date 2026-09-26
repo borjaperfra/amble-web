@@ -59,7 +59,16 @@ Needs many reviews first; it will happen, not for launch.
 
 `amble.fyi` (free as of 2026-09-26, not bought yet). Resend needs it verified before real emails go out.
 
+## Done (2026-09-26)
+
+- Home in EN and ES, all sections above. Design system in `DESIGN.md`, symbol in `src/components/Symbol.astro`.
+- `/privacy` in both languages. No cookies, no analytics, no third-party requests.
+- Form hardening: urlencoded only, ≤1 KB, exactly `email`/`locale`/`website`, strict ASCII email rule shared by browser and server, spaces stripped as typed, same answer for known and unknown addresses. Unconfirmed signups deleted after 30 days.
+
 ## Open points
 
+- Legal entity for the privacy page (`src/config/legal.ts`): name, tax ID, address.
+- `privacy@amble.fyi` must exist as a real inbox before launch.
 - GitHub sync of your data (section 10) doesn't exist yet: place it in v0 or on the roadmap.
-- A privacy page: the waitlist collects emails, so it needs one before launch (GDPR).
+- Social card (og:image) with the symbol.
+- `/manifesto` and `/how-its-built`.

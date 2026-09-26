@@ -1,19 +1,33 @@
 ---
 import { Font } from 'astro:assets';
 import { getRelativeLocaleUrl } from 'astro:i18n';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
 import { useTranslations, type Lang } from '../i18n/ui';
-import '../styles/global.css';
+import '../styles/tokens.css';
+import '../styles/base.css';
+import '../styles/sheet.css';
 
 interface Props {
   title?: string;
   description?: string;
-  // Path without locale prefix, used for hreflang alternates (e.g. '' or 'manifesto').
+  // Path without locale prefix, used for hreflang alternates and the language switch.
   path?: string;
+  // Header and footer. The quiet pages (joined, confirmed) go without.
+  chrome?: boolean;
+  joinHref?: string;
 }
 
 const lang = (Astro.currentLocale ?? 'en') as Lang;
 const t = useTranslations(lang);
-const { title = t('meta.title'), description = t('meta.description'), path = '' } = Astro.props;
+const {
+  title = t('meta.title'),
+  description = t('meta.description'),
+  path = '',
+  chrome = true,
+  joinHref,
+} = Astro.props;
+const canonical = new URL(getRelativeLocaleUrl(lang, path), Astro.site);
 ---
 
 <!doctype html>
@@ -21,15 +35,45 @@ const { title = t('meta.title'), description = t('meta.description'), path = '' 
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="icon" href="/favicon.ico" />
+    <meta name="theme-color" content="#F4F1EA" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
     <link rel="alternate" hreflang="en" href={new URL(getRelativeLocaleUrl('en', path), Astro.site)} />
     <link rel="alternate" hreflang="es" href={new URL(getRelativeLocaleUrl('es', path), Astro.site)} />
+    <link rel="alternate" hreflang="x-default" href={new URL(getRelativeLocaleUrl('en', path), Astro.site)} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content={lang === 'es' ? 'es_ES' : 'en_US'} />
     <Font cssVariable="--font-inter" preload />
     <Font cssVariable="--font-newsreader" preload />
+    <script is:inline>
+      document.documentElement.classList.add('js');
+    </script>
   </head>
   <body>
+    {chrome && <Header path={path} joinHref={joinHref} />}
     <slot />
+    {chrome && <Footer path={path} />}
+
+    <script>
+      // Things settle into place as they arrive, once (DESIGN_SYSTEM §12).
+      const items = document.querySelectorAll('[data-reveal]');
+      const observer = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (!entry.isIntersecting) continue;
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+          }
+        },
+        { rootMargin: '0px 0px -12% 0px' },
+      );
+      items.forEach((el) => observer.observe(el));
+    </script>
   </body>
 </html>

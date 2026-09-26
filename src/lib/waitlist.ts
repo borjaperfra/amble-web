@@ -6,14 +6,8 @@ const TOKEN_TTL_DAYS = 7;
 // A second submit of the same pending address resends the email, but not more
 // often than this.
 const RESEND_COOLDOWN_SECONDS = 120;
-
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-export function normalizeEmail(raw: string) {
-  const email = raw.trim();
-  if (email.length > 254 || !EMAIL_RE.test(email)) return null;
-  return { email, normalized: email.toLowerCase() };
-}
+// Signups never confirmed are deleted after this (see the privacy page).
+const UNCONFIRMED_RETENTION_DAYS = 30;
 
 const hash = (token: string) => createHash('sha256').update(token).digest('hex');
 
@@ -23,6 +17,11 @@ export type JoinResult =
 
 export async function join(email: string, normalized: string, locale: Lang): Promise<JoinResult> {
   const sql = db();
+  await sql`
+    delete from waitlist
+    where confirmed_at is null
+      and created_at < now() - make_interval(days => ${UNCONFIRMED_RETENTION_DAYS})
+  `;
   const token = randomBytes(32).toString('base64url');
   const tokenHash = hash(token);
 

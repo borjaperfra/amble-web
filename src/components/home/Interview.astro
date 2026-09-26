@@ -1,0 +1,121 @@
+---
+import SectionIntro from '../SectionIntro.astro';
+import type { HomeContent } from '../../content/home';
+
+interface Props {
+  c: HomeContent['interview'];
+}
+
+const { c } = Astro.props;
+---
+
+<section class="section container" aria-labelledby="interview-title">
+  <div class="split flip">
+    <SectionIntro id="interview-title" kicker={c.kicker} title={c.title} body={c.body} />
+
+    <figure class="sheet stage">
+      <p class="sheet-kicker">{c.rep}</p>
+      <div class="question" data-reveal>
+        <p class="context">{c.context}</p>
+        <p class="heading ask">{c.question}</p>
+        <p class="heading prompt">{c.prompt}</p>
+      </div>
+
+      <details class="why" data-reveal style="--i:1">
+        <summary>{c.why}</summary>
+        <p>{c.whyBody}</p>
+      </details>
+
+      <div class="talk" data-reveal style="--i:2" aria-hidden="true">
+        <span class="mic"><span></span></span>
+        <span class="talk-label">{c.talk}</span>
+        <span class="or">{c.orType}</span>
+      </div>
+    </figure>
+  </div>
+</section>
+
+<style>
+  .stage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: var(--space-6);
+    padding-block: clamp(var(--space-7), 2rem + 4vw, var(--space-9));
+  }
+  .question {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    max-width: 26rem;
+  }
+  .context {
+    font-size: var(--text-body);
+    color: var(--color-text-muted);
+  }
+  .ask {
+    font-size: var(--text-heading-md);
+  }
+  .prompt {
+    font-size: var(--text-heading-md);
+    font-style: italic;
+    color: var(--color-accent-strong);
+  }
+  .why {
+    max-width: 24rem;
+    font-size: var(--text-body-sm);
+    color: var(--color-text-muted);
+  }
+  .why summary {
+    display: inline-flex;
+    min-height: var(--touch-target);
+    align-items: center;
+    cursor: pointer;
+    list-style: none;
+    text-decoration: underline;
+    text-decoration-color: var(--color-border);
+    text-underline-offset: 0.25em;
+    transition: color var(--motion-fast) ease;
+  }
+  .why summary::-webkit-details-marker {
+    display: none;
+  }
+  .why summary:hover {
+    color: var(--color-text);
+  }
+  .why p {
+    padding-top: var(--space-1);
+    text-wrap: pretty;
+  }
+  .talk {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+  }
+  .mic {
+    display: grid;
+    place-items: center;
+    width: 64px;
+    height: 64px;
+    border-radius: var(--radius-full);
+    border: var(--border-width) solid var(--color-border);
+    background: var(--color-surface);
+  }
+  .mic span {
+    width: 14px;
+    height: 14px;
+    border-radius: var(--radius-full);
+    background: var(--color-accent);
+  }
+  .talk-label {
+    margin-top: var(--space-1);
+    font-size: var(--text-body-sm);
+    font-weight: var(--weight-medium);
+  }
+  .or {
+    font-size: var(--text-body-sm);
+    color: var(--color-text-faint);
+  }
+</style>

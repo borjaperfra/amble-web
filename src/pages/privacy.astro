@@ -1,0 +1,68 @@
+---
+import Base from '../layouts/Base.astro';
+import Prose from '../components/Prose.astro';
+import { legal } from '../config/legal';
+
+const mail = `mailto:${legal.privacyEmail}`;
+---
+
+<Base title="Privacy — Amble" description="What Amble's website collects, why, and how to have it deleted." path="privacy">
+  <Prose kicker="Privacy" title="Your email, and nothing else." lede="This covers the Amble website and its beta waitlist. It will grow when the product does, and we’ll tell you when it changes.">
+    <p class="plain">
+      In short: we keep your email so we can invite you to the beta. No cookies, no analytics, no trackers, no selling,
+      no sharing for advertising. Write to us and it’s gone.
+    </p>
+
+    <h2>Who is responsible</h2>
+    <p>
+      {legal.controller}{legal.entity && `, operated by ${legal.entity.name} (${legal.entity.taxId}), ${legal.entity.address}`}.
+      For anything about your data: <a href={mail}>{legal.privacyEmail}</a>.
+    </p>
+
+    <h2>What we collect</h2>
+    <ul>
+      <li><strong>Your email address</strong>, when you join the waitlist.</li>
+      <li><strong>The language</strong> of the page you signed up from, to write to you in it.</li>
+      <li><strong>When</strong> you signed up and when you confirmed, as proof of your consent.</li>
+    </ul>
+    <p>
+      Your IP address is used for a few minutes, in memory, to stop abuse of the form. It is never stored. We don’t ask
+      for, and don’t accept, anything else: the form rejects any field other than your email.
+    </p>
+
+    <h2>Why, and on what basis</h2>
+    <p>
+      To invite you to the closed beta of Amble and tell you about it. Nothing else. The legal basis is your consent
+      (GDPR art. 6.1.a), given when you submit the form and confirm it from your inbox. You can withdraw it at any time.
+    </p>
+
+    <h2>Who else handles it</h2>
+    <ul>
+      <li><strong>Railway</strong> hosts the website and the database where your email is stored.</li>
+      <li><strong>Resend</strong> sends the confirmation email and, later, your beta invitation.</li>
+    </ul>
+    <p>
+      Both act on our instructions only and may process data outside the European Economic Area, under the European
+      Commission’s standard contractual clauses or the EU–US Data Privacy Framework.
+    </p>
+
+    <h2>How long we keep it</h2>
+    <p>
+      If you never confirm your email, we delete it after 30 days. If you confirm, we keep it until the beta ends or
+      until you ask us to delete it, whichever comes first.
+    </p>
+
+    <h2>Your rights</h2>
+    <p>
+      You can ask to see, correct, export or delete your data, object to its use or restrict it, and withdraw your
+      consent, by writing to <a href={mail}>{legal.privacyEmail}</a>. We answer within a month, usually much sooner. If
+      you think we’ve handled your data badly, you can complain to the Spanish Data Protection Agency (AEPD) at
+      <a href="https://www.aepd.es">aepd.es</a>, or to the authority where you live.
+    </p>
+
+    <h2>Cookies</h2>
+    <p>None. The site sets no cookies and loads nothing from third parties: fonts are served from our own domain.</p>
+
+    <p class="updated">Last updated {legal.updated}.</p>
+  </Prose>
+</Base>
