@@ -1,9 +1,8 @@
 ---
 // "Private by default", shown rather than promised: one of Maya's claims and
-// the four controls she has over it. Each control plays its effect on the card.
+// the four controls she has over it. Used inside the "Yours" section. Each control plays its effect on the card.
 // The scene cycles through them once it's in view, and hands over to the
 // visitor the moment they pick one.
-import SectionIntro from '../SectionIntro.astro';
 import SourceIcon from '../SourceIcon.astro';
 import type { HomeContent } from '../../content/home';
 
@@ -23,10 +22,7 @@ const icons = {
 };
 ---
 
-<section class="section container" aria-labelledby="data-title">
-  <SectionIntro id="data-title" kicker={c.kicker} title={c.title} align="center" />
-
-  <div class="scene" data-scene data-controls data-mode="why">
+<div class="scene" data-scene data-controls data-mode="why">
     <div class="controls" role="tablist" aria-label={c.title}>
       {
         c.items.map((item) => (
@@ -80,26 +76,18 @@ const icons = {
       </div>
     </figure>
   </div>
-</section>
 
 <style>
   .scene {
-    display: grid;
-    gap: var(--space-6);
-    align-items: center;
-    max-width: var(--width-wide);
-    margin: var(--space-8) auto 0;
-  }
-  @media (min-width: 900px) {
-    .scene {
-      grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
-      gap: var(--space-8);
-    }
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
   }
 
   /* ---------- Controls ---------- */
   .controls {
     display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: var(--space-2);
   }
   .control {

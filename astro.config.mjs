@@ -10,6 +10,11 @@ export default defineConfig({
   integrations: [mdx()],
   // Small site, one stylesheet per page: inline it and skip the render-blocking request.
   build: { inlineStylesheets: 'always' },
+  // Pre-bundle the motion libraries at dev start, so a later install doesn't
+  // leave the dev server serving stale dependency URLs.
+  vite: {
+    optimizeDeps: { include: ['gsap', 'gsap/ScrollTrigger', 'gsap/Flip', 'lenis', 'simple-icons'] },
+  },
   env: {
     schema: {
       DATABASE_URL: envField.string({ context: 'server', access: 'secret' }),

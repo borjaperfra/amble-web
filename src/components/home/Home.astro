@@ -12,8 +12,7 @@ import Listening from './Listening.astro';
 import Opportunity from './Opportunity.astro';
 import Agents from './Agents.astro';
 import Roadmap from './Roadmap.astro';
-import CareerMd from './CareerMd.astro';
-import YourData from './YourData.astro';
+import Yours from './Yours.astro';
 import Finale from './Finale.astro';
 import { home } from '../../content/home';
 import type { Lang } from '../../i18n/ui';
@@ -47,8 +46,7 @@ const c = home[lang];
       <Agents c={c.agents} />
     </div>
     <Roadmap c={c.roadmap} />
-    <CareerMd c={c.career} />
-    <YourData c={c.data} />
+    <Yours c={c.yours} career={c.career} data={c.data} />
     <YourTurn c={c.yourTurn} />
     <Finale c={c.finale} />
   </main>

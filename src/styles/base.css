@@ -219,14 +219,8 @@ input {
   white-space: pre;
 }
 
-.js [data-ink] .word {
+.motion [data-ink] .word {
   opacity: var(--ink-min);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .js [data-ink] .word {
-    opacity: 1;
-  }
 }
 
 /* ---------- Arrival: things settle into place (DESIGN_SYSTEM §12) ---------- */

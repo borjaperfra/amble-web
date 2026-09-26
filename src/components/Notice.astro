@@ -3,6 +3,7 @@ import { getRelativeLocaleUrl } from 'astro:i18n';
 import Base from '../layouts/Base.astro';
 import Waitlist from './Waitlist.astro';
 import Logo from './Logo.astro';
+import Symbol from './Symbol.astro';
 import { useTranslations, type Lang } from '../i18n/ui';
 
 // The quiet pages after the waitlist form: "joined" and "confirmed". They are
@@ -26,6 +27,7 @@ const errors = {
     <Logo />
 
     <section data-variant="default">
+      {kind === 'confirmed' && <Symbol size={120} wake watch breathe class="awake" />}
       <h1 class="heading">{t(`${kind}.title`)}</h1>
       <p>{t(`${kind}.body`)}</p>
     </section>
@@ -68,6 +70,10 @@ const errors = {
     display: flex;
     flex-direction: column;
     gap: var(--space-4);
+  }
+  section :global(.awake) {
+    margin-bottom: var(--space-4);
+    color: var(--color-text);
   }
   section[hidden] {
     display: none;

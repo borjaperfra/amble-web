@@ -15,6 +15,9 @@ const { c } = Astro.props;
     <Symbol size={40} breathe />
     <h2 class="display title" id="finale-title">{c.title}</h2>
     <p class="lede">{c.body}</p>
+    <ul class="perks" role="list">
+      {c.perks.map((p) => <li><span class="tick" aria-hidden="true">✓</span>{p}</li>)}
+    </ul>
     <div class="form">
       <Waitlist id="finale" />
     </div>
@@ -35,6 +38,29 @@ const { c } = Astro.props;
   .title {
     margin-top: var(--space-4);
     font-size: var(--text-display-lg);
+  }
+  .perks {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-3) var(--space-6);
+    margin-top: var(--space-2);
+  }
+  .perks li {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-body);
+  }
+  .tick {
+    display: grid;
+    place-items: center;
+    width: 22px;
+    height: 22px;
+    font-size: var(--text-label);
+    color: var(--color-text-inverse);
+    background: var(--color-accent);
+    border-radius: var(--radius-full);
   }
   .form {
     display: flex;

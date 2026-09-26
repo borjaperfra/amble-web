@@ -23,6 +23,7 @@ const { c } = Astro.props;
         <li class:list={['stop', { current: i === 0 }]} style={`--i:${i}`}>
           <div class="art" aria-hidden="true">
             {i === 0 && <span class="here">{c.now}</span>}
+            {i === 0 && <span class="halo" />}
             {i === 0 && (
               <div class="disc v0">
                 <span class="paper p1" />
@@ -43,12 +44,9 @@ const { c } = Astro.props;
             )}
             {i === 2 && (
               <div class="disc v2">
-                <Symbol size={58} />
-                <span class="wire">
-                  <span class="msg m1" />
-                  <span class="msg m2" />
-                </span>
-                <Symbol size={58} class="mirror" />
+                <span class="chat-b theirs">?</span>
+                <span class="chat-b yours">✓</span>
+                <span class="chat-b theirs small" />
               </div>
             )}
           </div>
@@ -160,11 +158,35 @@ const { c } = Astro.props;
     overflow: hidden;
     color: var(--color-text);
   }
+  /* Now: a solid moss ring and a slow halo, so it's unmistakably where we are. */
   .current .disc {
-    border-color: var(--color-accent-soft);
+    border: 3px solid var(--color-accent);
     box-shadow:
-      0 0 0 12px var(--color-accent-wash),
+      0 0 0 10px var(--color-accent-soft),
       var(--shadow-sheet);
+  }
+  /* The halo sits behind the disc, so the disc can keep clipping its papers. */
+  .halo {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 212px;
+    height: 212px;
+    translate: -50% -50%;
+    border-radius: var(--radius-full);
+    border: 2px solid var(--color-accent);
+    animation: halo 3.6s ease-out infinite;
+    pointer-events: none;
+  }
+  @keyframes halo {
+    from {
+      opacity: 0.55;
+      scale: 1;
+    }
+    to {
+      opacity: 0;
+      scale: 1.28;
+    }
   }
 
   /* v0: papers drift into the eye, one after another */
@@ -268,61 +290,54 @@ const { c } = Astro.props;
     }
   }
 
-  /* v2: two eyes, messages passing */
+  /* v2: their agent asks (slate), yours answers (moss) — the agent-to-agent scene, in miniature */
   .v2 {
-    grid-template-columns: auto 44px auto;
-    align-content: center;
+    display: flex;
+    flex-direction: column;
     justify-content: center;
-    column-gap: 6px;
+    gap: 10px;
+    padding: 0 38px;
   }
-  .v2 :global(.mirror) {
-    scale: -1 1;
+  .chat-b {
+    display: grid;
+    place-items: center;
+    height: 34px;
+    font-weight: var(--weight-semibold);
+    border-radius: 14px;
+    animation: turn 4.2s var(--ease-standard) infinite both;
   }
-  .wire {
-    position: relative;
-    height: 2px;
-    background-image: linear-gradient(to right, var(--color-text-faint) 50%, transparent 0);
-    background-size: 6px 2px;
+  .chat-b.theirs {
+    align-self: flex-start;
+    width: 86px;
+    color: var(--color-other);
+    background: var(--color-other-soft);
+    border-bottom-left-radius: 5px;
   }
-  .msg {
-    position: absolute;
-    top: -4px;
-    width: 10px;
-    height: 10px;
-    border-radius: var(--radius-full);
-    background: var(--color-accent);
-    animation: to-them 2.4s var(--ease-standard) infinite;
+  .chat-b.yours {
+    align-self: flex-end;
+    width: 104px;
+    color: var(--color-text-inverse);
+    background: var(--color-accent-strong);
+    border-bottom-right-radius: 5px;
+    animation-delay: 0.9s;
   }
-  .m2 {
-    background: var(--color-text);
-    animation-name: to-you;
-    animation-delay: 1.2s;
+  .chat-b.small {
+    width: 60px;
+    height: 26px;
+    animation-delay: 1.8s;
   }
-  @keyframes to-them {
-    0% {
-      left: 0;
+  @keyframes turn {
+    0%,
+    8% {
       opacity: 0;
+      translate: 0 6px;
     }
-    15%,
-    80% {
+    18%,
+    86% {
       opacity: 1;
+      translate: none;
     }
     100% {
-      left: calc(100% - 10px);
-      opacity: 0;
-    }
-  }
-  @keyframes to-you {
-    0% {
-      left: calc(100% - 10px);
-      opacity: 0;
-    }
-    15%,
-    80% {
-      opacity: 1;
-    }
-    100% {
-      left: 0;
       opacity: 0;
     }
   }
@@ -364,7 +379,8 @@ const { c } = Astro.props;
   @media (prefers-reduced-motion: reduce) {
     .v0 .paper,
     .v1 .stream,
-    .msg {
+    .chat-b,
+    .halo {
       animation: none;
     }
     .v0 .paper {

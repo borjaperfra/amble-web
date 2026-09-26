@@ -1,5 +1,7 @@
 ---
-import SectionIntro from '../SectionIntro.astro';
+// career.md, writing itself line by line: every line with its source, the
+// co-produced line flagged, the retracted one kept on record. Used inside the
+// "Yours" section.
 import type { HomeContent } from '../../content/home';
 
 interface Props {
@@ -9,33 +11,27 @@ interface Props {
 const { c } = Astro.props;
 ---
 
-<section class="section container" aria-labelledby="career-title">
-  <div class="split flip">
-    <SectionIntro id="career-title" kicker={c.kicker} title={c.title} body={c.line} />
-
-    <figure class="file" data-scene>
-      <figcaption class="file-bar">
-        <span class="file-dots" aria-hidden="true"><span></span><span></span><span></span></span>
-        <span>{c.file}</span>
-      </figcaption>
-      <div class="code" role="document">
-        {
-          c.lines.map((line, l) => (
-            <p class:list={['line', line.kind]} style={`--l:${l}`}>
-              <span class="text">{line.text}</span>
-              {line.tags && <span class="tags">{line.tags}</span>}
-              {line.flag && (
-                <span class:list={['flag', { retracted: line.retracted }]}>
-                  {line.retracted ? '⊘' : '⚠'} {line.flag}
-                </span>
-              )}
-            </p>
-          ))
-        }
-      </div>
-    </figure>
+<figure class="file" data-scene>
+  <figcaption class="file-bar">
+    <span class="file-dots" aria-hidden="true"><span></span><span></span><span></span></span>
+    <span>{c.file}</span>
+  </figcaption>
+  <div class="code" role="document">
+    {
+      c.lines.map((line, l) => (
+        <p class:list={['line', line.kind]} style={`--l:${l}`}>
+          <span class="text">{line.text}</span>
+          {line.tags && <span class="tags">{line.tags}</span>}
+          {line.flag && (
+            <span class:list={['flag', { retracted: line.retracted }]}>
+              {line.retracted ? '⊘' : '⚠'} {line.flag}
+            </span>
+          )}
+        </p>
+      ))
+    }
   </div>
-</section>
+</figure>
 
 <style>
   .file {
@@ -90,7 +86,7 @@ const { c } = Astro.props;
     font-weight: var(--weight-semibold);
   }
   .tags {
-    color: var(--color-text-faint);
+    color: var(--color-accent-strong);
   }
   .flag {
     color: var(--color-caution);
@@ -99,28 +95,26 @@ const { c } = Astro.props;
     color: var(--color-retracted);
   }
 
-  /* The file writes itself: line by line, each source tag landing a beat after its line. */
-  .js .file .line,
-  .js .file .tags,
-  .js .file .flag {
+  /* The file writes itself: line by line, each source tag landing a beat after
+     its line. Hidden states only once motion is running. */
+  .line,
+  .tags,
+  .flag {
     transition:
       opacity var(--motion-slow) ease,
       translate var(--motion-slow) var(--ease-standard);
     transition-delay: calc(0.2s + var(--l) * 0.16s);
   }
-  .js .file .tags,
-  .js .file .flag {
+  .tags,
+  .flag {
     transition-delay: calc(0.5s + var(--l) * 0.16s);
   }
-  .js .file:not(.is-playing) .line {
+  :global(.motion) .file:not(.is-playing) .line {
     opacity: 0;
     translate: -6px 0;
   }
-  .js .file:not(.is-playing) :is(.tags, .flag) {
+  :global(.motion) .file:not(.is-playing) :is(.tags, .flag) {
     opacity: 0;
     translate: 4px 0;
-  }
-  .tags {
-    color: var(--color-accent-strong);
   }
 </style>

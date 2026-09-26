@@ -199,7 +199,9 @@ const { c } = Astro.props;
 
   /* Verdict */
   .outcome {
+    min-height: 2.6em;
     padding-top: var(--space-4);
+    padding-right: 9.5rem;
     font-size: var(--text-body-sm);
     font-weight: var(--weight-medium);
     border-top: var(--border-width) solid var(--color-border-subtle);
@@ -210,9 +212,10 @@ const { c } = Astro.props;
   .retracted .outcome {
     color: var(--color-retracted);
   }
+  /* The verdict sits with the outcome, at the foot of the card: it comes after the answer. */
   .stamp {
     position: absolute;
-    top: 44%;
+    bottom: calc(var(--space-5) - 4px);
     right: var(--space-5);
     display: inline-flex;
     align-items: center;
@@ -249,71 +252,50 @@ const { c } = Astro.props;
     text-decoration-thickness: 1.5px;
   }
 
-  /* ---------- Choreography ---------- */
-  .js .cases :is(.claim, .bubble, .outcome) {
+  /* ---------- Choreography ----------
+     Driven by the script, one step after another: the key line lights up, the
+     question is asked, the answer is typed, and only then the verdict lands.
+     Everything is visible by default; the hidden states apply only once
+     motion is running. */
+  .claim,
+  .bubble,
+  .outcome,
+  .stamp {
     transition:
-      opacity var(--motion-arrive) ease,
-      translate var(--motion-arrive) var(--ease-standard);
+      opacity 0.6s ease,
+      translate 0.7s var(--ease-standard),
+      scale 0.7s var(--ease-standard);
   }
-  .js .cases:not(.is-playing) :is(.claim, .bubble, .outcome) {
+  :global(.motion) .case:not(.is-read) .code-line.key {
+    background-size: 0% 100%;
+  }
+  :global(.motion) .case:not(.is-read) .claim,
+  :global(.motion) .case:not(.is-asked) .bubble.rep,
+  :global(.motion) .case:not(.is-answering) .bubble.person,
+  :global(.motion) .case:not(.is-judged) .outcome {
     opacity: 0;
     translate: 0 8px;
   }
-  .js .cases:not(.is-playing) .stamp {
+  :global(.motion) .case:not(.is-judged) .stamp {
     opacity: 0;
-    scale: 1.8;
+    scale: 1.12;
   }
-  .js .cases:not(.is-playing) .code-line.key {
-    background-size: 0% 100%;
-  }
-  .js .cases:not(.is-playing) .retracted .claim-text {
+  :global(.motion) .case.retracted:not(.is-judged) .claim-text {
     color: var(--color-text);
     text-decoration-color: transparent;
   }
-  .js .cases:not(.is-playing) .retracted .code {
+  :global(.motion) .case.retracted:not(.is-judged) .code {
     background: var(--color-code-bg);
   }
-  .js .cases:not(.is-playing) .retracted .code-line.key {
+  :global(.motion) .case.retracted:not(.is-judged) .code-line.key {
     text-decoration-color: transparent;
   }
-  .js .cases .code-line.key {
-    transition-delay: calc(0.2s + var(--n) * 1.1s);
-  }
-  .js .cases .claim {
-    transition-delay: calc(0.5s + var(--n) * 1.1s);
-  }
-  .js .cases .bubble.rep {
-    transition-delay: calc(0.9s + var(--n) * 1.1s);
-  }
-  .js .cases .bubble.person {
-    transition-delay: calc(1.4s + var(--n) * 1.1s);
-  }
-  .js .cases .stamp {
-    transition:
-      opacity 0.2s ease,
-      scale 0.42s cubic-bezier(0.25, 1.6, 0.5, 1);
-    transition-delay: calc(2.9s + var(--n) * 1.1s);
-  }
-  .js .cases .claim-text,
-  .js .cases .code {
-    transition-delay: calc(3s + var(--n) * 1.1s);
-  }
-  .js .cases .outcome {
-    transition-delay: calc(3.2s + var(--n) * 1.1s);
-  }
-  .case.is-stamped {
-    animation: thud 0.35s ease-out;
-  }
-  @keyframes thud {
-    30% {
-      translate: 0 3px;
-    }
+  .case.is-judged .outcome {
+    transition-delay: 0.35s;
   }
 
   @media (max-width: 600px) {
     .stamp {
-      top: auto;
-      bottom: var(--space-4);
       right: var(--space-4);
     }
     .outcome {
@@ -323,33 +305,44 @@ const { c } = Astro.props;
 </style>
 
 <script>
-  // The answer types itself out, then the card takes the stamp.
-  const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // One case at a time: read, ask, type the answer, then the verdict.
+  const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
+  const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
   for (const scene of document.querySelectorAll<HTMLElement>('[data-defence]')) {
-    if (still) continue;
     const cases = [...scene.querySelectorAll<HTMLElement>('.case')];
+    if (calm) {
+      cases.forEach((k) => k.classList.add('is-read', 'is-asked', 'is-answering', 'is-judged'));
+      continue;
+    }
     const answers = cases.map((k) => k.querySelector<HTMLElement>('.bubble.person')!);
-    answers.forEach((a) => (a.textContent = ''));
+    const texts = answers.map((a) => a.dataset.type ?? a.textContent ?? '');
+    answers.forEach((a) => (a.textContent = ' '));
+
+    const type = async (el: HTMLElement, text: string) => {
+      el.classList.add('is-typing');
+      for (let n = 1; n <= text.length; n++) {
+        el.textContent = text.slice(0, n);
+        await wait(24);
+      }
+      el.classList.remove('is-typing');
+    };
 
     scene.addEventListener(
       'scene:play',
-      () => {
-        cases.forEach((k, i) => {
-          const answer = answers[i];
-          const text = answer.dataset.type ?? '';
-          setTimeout(() => {
-            answer.classList.add('is-typing');
-            let n = 0;
-            const step = () => {
-              n += 1;
-              answer.textContent = text.slice(0, n);
-              if (n < text.length) setTimeout(step, 26);
-              else answer.classList.remove('is-typing');
-            };
-            step();
-          }, 1650 + i * 1100);
-          setTimeout(() => k.classList.add('is-stamped'), 3050 + i * 1100);
-        });
+      async () => {
+        for (const [i, k] of cases.entries()) {
+          k.classList.add('is-read');
+          await wait(700);
+          k.classList.add('is-asked');
+          await wait(800);
+          k.classList.add('is-answering');
+          await wait(250);
+          await type(answers[i], texts[i]);
+          await wait(450);
+          k.classList.add('is-judged');
+          await wait(900);
+        }
       },
       { once: true },
     );

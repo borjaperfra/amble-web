@@ -157,6 +157,8 @@ export interface HomeContent {
     // flag marks assisted-undefended lines; retracted marks lines the Rep stopped claiming.
     lines: { text: string; tags?: string; flag?: string; retracted?: boolean; kind: 'h1' | 'h2' | 'p' | 'li' | 'blank' }[];
   };
+  // career.md and the privacy controls, told together.
+  yours: { kicker: string; title: string; body: string };
   data: {
     kicker: string;
     title: string;
@@ -174,6 +176,7 @@ export interface HomeContent {
   finale: {
     title: string;
     body: string;
+    perks: string[];
   };
   strength: Record<Strength, string>;
   sourceNames: Record<Source, string>;
@@ -475,6 +478,11 @@ const en: HomeContent = {
       { kind: 'li', text: '- Designed the caching strategy for model calls.', flag: 'retracted in interview', retracted: true },
     ],
   },
+  yours: {
+    kicker: 'Yours',
+    title: 'Yours to carry. Yours to delete.',
+    body: 'Everything your Rep knows about you is written into career.md: a plain file you can read, correct and take anywhere, with a source on every line. It stays private until you share it, and you can see, fix or delete any of it, any time.',
+  },
   data: {
     kicker: 'Your data is yours',
     title: 'Private by default.',
@@ -496,6 +504,11 @@ const en: HomeContent = {
   finale: {
     title: 'Remove applications.',
     body: 'Join the closed beta. We’ll write when there’s a place for you.',
+    perks: [
+      'Free access to Amble during the beta',
+      'The offers that fit, on your WhatsApp or Telegram',
+      'Your feedback decides what we build next',
+    ],
   },
   strength: {
     4: 'Strong evidence',
@@ -803,6 +816,11 @@ const es: HomeContent = {
       { kind: 'li', text: '- Diseñó la estrategia de caché de las llamadas al modelo.', flag: 'retirado en la entrevista', retracted: true },
     ],
   },
+  yours: {
+    kicker: 'Tuyo',
+    title: 'Tuyo para llevártelo. Tuyo para borrarlo.',
+    body: 'Todo lo que tu Rep sabe de ti se escribe en career.md: un fichero de texto que puedes leer, corregir y llevarte a cualquier sitio, con una fuente en cada línea. Es privado hasta que decides compartirlo, y puedes ver, arreglar o borrar cualquier parte cuando quieras.',
+  },
   data: {
     kicker: 'Tus datos son tuyos',
     title: 'Privado por defecto.',
@@ -824,6 +842,11 @@ const es: HomeContent = {
   finale: {
     title: 'Adiós a las candidaturas.',
     body: 'Entra en la beta cerrada. Te escribiremos cuando haya sitio para ti.',
+    perks: [
+      'Acceso gratuito a Amble durante la beta',
+      'Las ofertas que encajan, en tu WhatsApp o Telegram',
+      'Tu feedback decide qué construimos después',
+    ],
   },
   strength: {
     4: 'Evidencia sólida',

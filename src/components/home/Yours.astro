@@ -1,0 +1,44 @@
+---
+// "Yours": career.md and the privacy controls, told together — what your Rep
+// knows is a file you can carry, and a record you control.
+import SectionIntro from '../SectionIntro.astro';
+import CareerMd from './CareerMd.astro';
+import YourData from './YourData.astro';
+import type { HomeContent } from '../../content/home';
+
+interface Props {
+  c: HomeContent['yours'];
+  career: HomeContent['career'];
+  data: HomeContent['data'];
+}
+
+const { c, career, data } = Astro.props;
+---
+
+<section class="section container" aria-labelledby="yours-title">
+  <div class="head">
+    <SectionIntro id="yours-title" kicker={c.kicker} title={c.title} body={c.body} />
+  </div>
+  <div class="grid">
+    <CareerMd c={career} />
+    <YourData c={data} />
+  </div>
+</section>
+
+<style>
+  .head :global(.intro) {
+    max-width: 44rem;
+  }
+  .grid {
+    display: grid;
+    gap: var(--space-6);
+    align-items: start;
+    margin-top: var(--space-8);
+  }
+  @media (min-width: 960px) {
+    .grid {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: var(--space-7);
+    }
+  }
+</style>

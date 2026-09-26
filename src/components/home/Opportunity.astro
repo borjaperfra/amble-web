@@ -223,14 +223,33 @@ const readThisWeek = 37;
     font-size: var(--text-body-sm);
     color: var(--color-text-muted);
   }
+  /* A real screen: fixed height, messages anchored to the bottom, older ones
+     scrolling up and out of view as new ones arrive. */
   .chat {
     display: flex;
     flex-direction: column;
+    justify-content: flex-end;
     gap: var(--space-3);
-    min-height: 520px;
+    height: 560px;
+    overflow: hidden;
     padding: var(--space-5) var(--space-4);
     background: var(--color-bg);
     border-radius: 0 0 30px 30px;
+    mask-image: linear-gradient(to bottom, transparent 0, #000 36px);
+  }
+  /* On phones the card is trimmed to what matters, and the screen fits it. */
+  @media (max-width: 600px) {
+    .chat {
+      height: auto;
+      mask-image: none;
+    }
+    .phone {
+      width: min(100%, 340px);
+    }
+    .card .card-facts,
+    .why li:nth-child(n + 2) {
+      display: none;
+    }
   }
   .msg {
     max-width: 92%;

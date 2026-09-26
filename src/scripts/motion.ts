@@ -14,6 +14,10 @@ gsap.registerPlugin(ScrollTrigger, Flip);
 
 export const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+// Styles that hide or dim things before they animate key off this class, so if
+// this module never runs, nothing is left invisible.
+if (!reducedMotion) document.documentElement.classList.add('motion');
+
 let lenis: Lenis | undefined;
 
 export function startSmoothScroll() {
@@ -33,7 +37,7 @@ export function inkStatements() {
       opacity: 1,
       ease: 'none',
       stagger: 0.12,
-      scrollTrigger: { trigger: statement, start: 'top 82%', end: 'bottom 45%', scrub: 0.6 },
+      scrollTrigger: { trigger: statement, start: 'top 85%', end: 'bottom 62%', scrub: 0.6 },
     });
   }
 }

@@ -152,7 +152,7 @@
   --motion-arrive: 640ms;
   --motion-breath: 5s;
   /* Words not yet inked in a scrubbed statement. */
-  --ink-min: 0.12;
+  --ink-min: 0.18;
   --ease-standard: cubic-bezier(0.22, 1, 0.36, 1);
 
   /* ---------- Controls ---------- */

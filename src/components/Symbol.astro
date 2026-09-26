@@ -8,7 +8,7 @@
 // The lid's geometry lives in src/lib/eye.ts, open and closed, so the eye can
 // blink: the lid sweeps down over the iris and the iris is clipped to the
 // lid's edge, so it disappears from the top, the way an eye closes.
-import { OPEN, lidPath, irisClipPath } from '../lib/eye';
+import { OPEN, CLOSED, lidPath, irisClipPath } from '../lib/eye';
 
 interface Props {
   size?: number;
@@ -16,11 +16,14 @@ interface Props {
   breathe?: boolean;
   // The lid draws itself in and the iris follows the pointer, gently.
   watch?: boolean;
+  // Starts closed and opens a moment after the page loads (account activation).
+  wake?: boolean;
   label?: string;
   class?: string;
 }
 
-const { size = 28, breathe = false, watch = false, label, class: className } = Astro.props;
+const { size = 28, breathe = false, watch = false, wake = false, label, class: className } = Astro.props;
+const start = wake ? CLOSED : OPEN;
 const uid = Math.random().toString(36).slice(2, 8);
 const clipId = `lid-${uid}`;
 const irisId = `iris-${uid}`;
@@ -37,7 +40,7 @@ const irisId = `iris-${uid}`;
 >
   <defs>
     <clipPath id={irisId}>
-      <path class="iris-clip" d={irisClipPath(OPEN)} />
+      <path class="iris-clip" d={irisClipPath(start)} />
     </clipPath>
     {
       watch && (
@@ -50,7 +53,7 @@ const irisId = `iris-${uid}`;
   <g clip-path={`url(#${irisId})`}>
     <g class="iris"><path class="dot" d="M32.65 29.46C32.38 30.46 31.76 31.47 31.09 32.26C30.42 33.04 29.51 33.70 28.61 34.17C27.72 34.63 26.68 34.96 25.70 35.06C24.72 35.16 23.64 35.06 22.72 34.77C21.79 34.48 20.89 33.94 20.15 33.34C19.41 32.73 18.80 31.96 18.28 31.15C17.76 30.34 17.30 29.45 17.03 28.49C16.76 27.52 16.53 26.41 16.65 25.37C16.77 24.33 17.13 23.12 17.75 22.27C18.36 21.41 19.39 20.65 20.35 20.24C21.32 19.84 22.52 19.80 23.52 19.85C24.51 19.90 25.46 20.24 26.35 20.55C27.24 20.86 28.06 21.21 28.86 21.70C29.67 22.19 30.55 22.74 31.19 23.49C31.83 24.25 32.46 25.24 32.70 26.24C32.95 27.23 32.92 28.45 32.65 29.46Z" /></g>
   </g>
-  <path class="lid" clip-path={watch ? `url(#${clipId})` : undefined} d={lidPath(OPEN)} />
+  <path class="lid" clip-path={watch ? `url(#${clipId})` : undefined} d={lidPath(start)} data-wake={wake ? '' : undefined} />
 </svg>
 
 <style>
@@ -149,6 +152,37 @@ const irisId = `iris-${uid}`;
   }
 
   const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const setLid = (eye: SVGSVGElement, k: number) => {
+    const shape = mix(OPEN, CLOSED, k);
+    eye.querySelector('.lid')?.setAttribute('d', lidPath(shape));
+    eye.querySelector('.iris-clip')?.setAttribute('d', irisClipPath(shape));
+  };
+  // Open slowly from closed: the eye waking up.
+  const open = (eye: SVGSVGElement, ms = 700) => {
+    if (calm) return setLid(eye, 0);
+    const t0 = performance.now();
+    const frame = (now: number) => {
+      const t = Math.min(1, (now - t0) / ms);
+      setLid(eye, 1 - easeOut(t));
+      if (t < 1) requestAnimationFrame(frame);
+    };
+    requestAnimationFrame(frame);
+  };
+
+  // Every eye on the page closes while the tab is in the background, and opens
+  // again when you come back.
+  const allEyes = () => document.querySelectorAll<SVGSVGElement>('svg.symbol');
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) allEyes().forEach((e) => setLid(e, 1));
+    else allEyes().forEach((e) => open(e, 520));
+  });
+
+  // Eyes that start closed (the account just activated) open after a beat.
+  document.querySelectorAll<SVGPathElement>('.lid[data-wake]').forEach((lid) => {
+    const eye = lid.closest('svg') as SVGSVGElement;
+    setTimeout(() => open(eye, 1100), 700);
+  });
 
   // Any eye closes when clicked or tapped — a longer, deliberate close. Inside a
   // link (the logo), the eye itself only blinks; the wordmark still navigates.
