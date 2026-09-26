@@ -1,0 +1,228 @@
+---
+// The future product, as a silent negotiation in two columns: the company's
+// agent asks, the Rep answers from evidence. One condition doesn't fit and
+// the match holds; change it, and it becomes mutual intent.
+import Symbol from '../Symbol.astro';
+import type { CompaniesContent } from '../../content/companies';
+
+interface Props {
+  c: CompaniesContent['negotiation'];
+}
+
+const { c } = Astro.props;
+---
+
+<figure class="nego" data-scene data-negotiation data-state="hold">
+  <header class="sides">
+    <p class="side agent">
+      <span class="face other"><Symbol size={26} class="mirror" /></span>
+      {c.agent}
+    </p>
+    <p class="side rep">
+      {c.rep}
+      <span class="face"><Symbol size={26} /></span>
+    </p>
+  </header>
+
+  <ol class="rows" role="list">
+    {
+      c.rows.map((r, i) => (
+        <li class="row" style={`--i:${i}`}>
+          <span class="ask">{r.ask}</span>
+          <span class="wire" aria-hidden="true" />
+          <span class="answer yes">✓ {r.answer}</span>
+        </li>
+      ))
+    }
+    <li class="row blocker" style={`--i:${c.rows.length}`}>
+      <span class="ask">{c.blocker.ask}</span>
+      <span class="wire" aria-hidden="true" />
+      <span class="answer no">✕ {c.blocker.no}</span>
+      <span class="answer yes">✓ {c.blocker.yes}</span>
+    </li>
+  </ol>
+
+  <div class="verdict" aria-live="polite">
+    <p class="hold">{c.hold}</p>
+    <p class="mutual">
+      <span class="mutual-title heading">{c.mutual}</span>
+      <span>{c.question}</span>
+    </p>
+  </div>
+
+  <button class="text-link toggle" type="button" data-on={c.blocker.toggle} data-off={c.blocker.toggleBack}>
+    {c.blocker.toggle}
+  </button>
+</figure>
+
+<style>
+  .nego {
+    width: 100%;
+    max-width: 760px;
+    margin: var(--space-8) auto 0;
+    padding: clamp(var(--space-5), 1rem + 2vw, var(--space-7));
+    background: var(--color-surface-raised);
+    border: var(--border-width) solid var(--color-border-subtle);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-sheet);
+  }
+  .sides {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: var(--space-5);
+    border-bottom: var(--border-width) solid var(--color-border-subtle);
+  }
+  .side {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3);
+    font-weight: var(--weight-semibold);
+  }
+  .agent {
+    color: var(--color-other);
+  }
+  .face {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    color: var(--color-text);
+    background: var(--color-accent-wash);
+    border-radius: var(--radius-full);
+  }
+  .face.other {
+    --symbol-iris: var(--color-other);
+    color: var(--color-other);
+    background: var(--color-other-soft);
+  }
+  .face :global(.mirror) {
+    scale: -1 1;
+  }
+  .rows {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding-block: var(--space-5);
+  }
+  .row {
+    display: grid;
+    grid-template-columns: minmax(0, 12rem) 1fr minmax(0, 14rem);
+    align-items: center;
+    gap: var(--space-3);
+    transition: opacity 0.5s ease;
+    transition-delay: calc(0.3s + var(--i) * 0.5s);
+  }
+  :global(.motion) .nego:not(.is-playing) .row {
+    opacity: 0;
+  }
+  .ask {
+    font-size: var(--text-body-sm);
+    color: var(--color-other);
+  }
+  .wire {
+    height: 1.5px;
+    background-image: linear-gradient(to right, var(--color-border) 50%, transparent 0);
+    background-size: 8px 1.5px;
+  }
+  .answer {
+    justify-self: end;
+    padding: var(--space-1) var(--space-3);
+    font-size: var(--text-body-sm);
+    font-weight: var(--weight-medium);
+    border-radius: var(--radius-md);
+  }
+  .answer.yes {
+    color: var(--color-accent-strong);
+    background: var(--color-accent-wash);
+  }
+  .answer.no {
+    color: var(--color-retracted);
+    background: var(--color-retracted-soft);
+  }
+  .blocker .answer {
+    grid-area: 1 / 3;
+    transition: opacity 0.4s ease;
+  }
+  .nego[data-state='hold'] .blocker .yes,
+  .nego[data-state='mutual'] .blocker .no {
+    opacity: 0;
+  }
+
+  .verdict {
+    display: grid;
+    justify-items: center;
+    padding-top: var(--space-5);
+    border-top: var(--border-width) solid var(--color-border-subtle);
+  }
+  .hold,
+  .mutual {
+    grid-area: 1 / 1;
+    transition:
+      opacity 0.5s ease,
+      translate 0.6s var(--ease-standard);
+  }
+  .hold {
+    font-size: var(--text-label);
+    font-weight: var(--weight-semibold);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--color-retracted);
+  }
+  .mutual {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-1);
+  }
+  .mutual-title {
+    font-size: var(--text-heading-lg);
+    color: var(--color-accent-strong);
+  }
+  .nego[data-state='hold'] .mutual,
+  .nego[data-state='mutual'] .hold {
+    opacity: 0;
+    translate: 0 6px;
+  }
+  .toggle {
+    display: flex;
+    margin: var(--space-4) auto 0;
+    background: none;
+    border: 0;
+    cursor: pointer;
+    color: var(--color-accent-strong);
+    font-weight: var(--weight-medium);
+  }
+  @media (max-width: 560px) {
+    .row {
+      grid-template-columns: 1fr auto;
+    }
+    .wire {
+      display: none;
+    }
+    .blocker .answer {
+      grid-area: 1 / 2;
+    }
+  }
+</style>
+
+<script>
+  // Plays through once (hold → change the condition → mutual intent), then
+  // hands the toggle to the visitor.
+  for (const fig of document.querySelectorAll<HTMLElement>('[data-negotiation]')) {
+    const toggle = fig.querySelector<HTMLButtonElement>('.toggle')!;
+    const set = (state: 'hold' | 'mutual') => {
+      fig.dataset.state = state;
+      toggle.textContent = state === 'hold' ? toggle.dataset.on! : toggle.dataset.off!;
+    };
+    toggle.addEventListener('click', () => set(fig.dataset.state === 'hold' ? 'mutual' : 'hold'));
+    fig.addEventListener(
+      'scene:play',
+      () => {
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        setTimeout(() => set('mutual'), 4200);
+      },
+      { once: true },
+    );
+  }
+</script>

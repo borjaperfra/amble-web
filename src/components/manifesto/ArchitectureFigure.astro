@@ -1,0 +1,181 @@
+---
+// Two systems side by side, like a technical plate: today's chain, long and
+// grey, ending in "maybe a conversation"; Amble's, short, in moss.
+import Symbol from '../Symbol.astro';
+import type { ManifestoContent } from '../../content/pages';
+
+interface Props {
+  c: ManifestoContent['figures']['architecture'];
+}
+
+const { c } = Astro.props;
+---
+
+<figure class="arch" data-scene>
+  <div class="plates">
+    <section class="plate today">
+      <p class="plate-label">{c.today}</p>
+      <ol class="chain" role="list">
+        {
+          c.todaySteps.map((st, i) => (
+            <li style={`--i:${i}`} class:list={{ last: i === c.todaySteps.length - 1 }}>
+              {st}
+            </li>
+          ))
+        }
+      </ol>
+    </section>
+
+    <section class="plate amble">
+      <p class="plate-label">{c.amble}</p>
+      <div class="flow">
+        <span class="step">{c.you}</span>
+        <span class="down" aria-hidden="true">↓</span>
+        <div class="listen">
+          <span class="step rep">
+            <Symbol size={20} />
+            {c.rep}
+          </span>
+          <span class="dots" aria-hidden="true">··· <em>{c.listening}</em> ···</span>
+          <span class="step">{c.opportunity}</span>
+        </div>
+        <span class="down" aria-hidden="true">↓</span>
+        <span class="worth">{c.worth}</span>
+        <span class="down" aria-hidden="true">↓</span>
+        <span class="step final">{c.conversation}</span>
+      </div>
+    </section>
+  </div>
+  <figcaption>
+    <span>{c.caption[0]}</span>
+    <span class="strong">{c.caption[1]}</span>
+  </figcaption>
+</figure>
+
+<style>
+  .arch {
+    margin-block: var(--space-6);
+  }
+  .plates {
+    display: grid;
+    gap: var(--space-5);
+  }
+  @media (min-width: 760px) {
+    .plates {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  .plate {
+    padding: var(--space-6);
+    border-radius: var(--radius-lg);
+  }
+  .today {
+    background: var(--color-surface-sunken);
+  }
+  .amble {
+    background: var(--color-surface-raised);
+    border: 1.5px solid var(--color-accent-soft);
+    box-shadow: var(--shadow-sheet);
+  }
+  .plate-label {
+    margin-bottom: var(--space-5);
+    font-size: var(--text-label);
+    font-weight: var(--weight-semibold);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+  .amble .plate-label {
+    color: var(--color-accent-strong);
+  }
+  .chain {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+  .chain li {
+    padding: 3px var(--space-3);
+    font-size: var(--text-body-sm);
+    color: var(--color-text-muted);
+    background: var(--color-surface);
+    border-radius: var(--radius-sm);
+    transition: opacity 0.4s ease;
+    transition-delay: calc(var(--i) * 0.12s);
+  }
+  .chain li + li::before {
+    content: '↓ ';
+    color: var(--color-text-faint);
+  }
+  .chain li.last {
+    font-style: italic;
+  }
+  :global(.motion) .arch:not(.is-playing) .chain li {
+    opacity: 0;
+  }
+  .flow {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+  .step {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: 4px var(--space-3);
+    font-size: var(--text-body-sm);
+    font-weight: var(--weight-medium);
+    background: var(--color-accent-wash);
+    border-radius: var(--radius-sm);
+  }
+  .step.final {
+    color: var(--color-text-inverse);
+    background: var(--color-accent-strong);
+  }
+  .listen {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2);
+  }
+  .dots {
+    font-size: var(--text-body-sm);
+    color: var(--color-accent);
+  }
+  .dots em {
+    font-family: var(--font-display);
+    color: var(--color-accent-strong);
+  }
+  .down {
+    padding-left: var(--space-3);
+    color: var(--color-accent);
+  }
+  .worth {
+    padding-left: var(--space-3);
+    font-family: var(--font-display);
+    font-style: italic;
+    color: var(--color-text-muted);
+  }
+  .flow > * {
+    transition: opacity 0.5s ease;
+  }
+  .flow > :nth-child(n) {
+    transition-delay: 1.2s;
+  }
+  :global(.motion) .arch:not(.is-playing) .flow > * {
+    opacity: 0;
+  }
+  figcaption {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    margin-top: var(--space-5);
+    font-family: var(--font-display);
+    font-size: var(--text-heading-md);
+    color: var(--color-text-muted);
+  }
+  .strong {
+    color: var(--color-accent-strong);
+  }
+</style>

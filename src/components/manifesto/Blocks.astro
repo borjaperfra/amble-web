@@ -1,0 +1,109 @@
+---
+// Renders a run of manifesto blocks: paragraphs, beats set large, chapter
+// headings, lists, the Rep's quote, and figures.
+import Iceberg from '../Iceberg.astro';
+import LoopFigure from './LoopFigure.astro';
+import ArchitectureFigure from './ArchitectureFigure.astro';
+import RemoveFigure from './RemoveFigure.astro';
+import Symbol from '../Symbol.astro';
+import type { Block, ManifestoContent } from '../../content/pages';
+
+interface Props {
+  blocks: Block[];
+  figures: ManifestoContent['figures'];
+}
+
+const { blocks, figures } = Astro.props;
+---
+
+{
+  blocks.map((b) => {
+    if (b.kind === 'figure') {
+      if (b.figure === 'loop') return <LoopFigure c={figures.loop} />;
+      if (b.figure === 'architecture') return <ArchitectureFigure c={figures.architecture} />;
+      if (b.figure === 'remove') return <RemoveFigure c={figures.remove} />;
+      return (
+        <div class="fig-iceberg">
+          <Iceberg
+            size="large"
+            looking={figures.iceberg.looking}
+            notLooking={figures.iceberg.notLooking}
+            question={figures.iceberg.question}
+            tags={figures.iceberg.tags}
+          />
+        </div>
+      );
+    }
+    if (b.kind === 'list')
+      return (
+        <ul class="b-list" role="list">
+          {b.text.map((line, i) => (
+            <li data-reveal style={`--i:${i}`}>
+              {line}
+            </li>
+          ))}
+        </ul>
+      );
+    if (b.kind === 'chapter') return <h2 class="display b-chapter" data-reveal>{b.text}</h2>;
+    if (b.kind === 'beat') return <p class="display b-beat" data-reveal>{b.text}</p>;
+    if (b.kind === 'quote')
+      return (
+        <p class="b-quote" data-reveal>
+          <Symbol size={26} />
+          <span>{b.text}</span>
+        </p>
+      );
+    return <p class="b-p" data-reveal>{b.text}</p>;
+  })
+}
+
+<style>
+  .b-p {
+    font-size: var(--text-body-lg);
+    color: var(--color-text-muted);
+    text-wrap: pretty;
+  }
+  .b-beat {
+    font-size: var(--text-heading-xl);
+    text-wrap: balance;
+  }
+  .b-chapter {
+    margin-top: var(--space-9);
+    padding-top: var(--space-6);
+    font-size: var(--text-display-lg);
+    border-top: var(--border-width) solid var(--color-border);
+    text-wrap: balance;
+  }
+  .b-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    font-family: var(--font-display);
+    font-size: var(--text-heading-md);
+    line-height: var(--leading-heading);
+  }
+  .b-list li:last-child {
+    color: var(--color-accent-strong);
+    font-style: italic;
+  }
+  .b-quote {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3);
+    align-self: flex-start;
+    padding: var(--space-4) var(--space-5);
+    font-family: var(--font-display);
+    font-size: var(--text-heading-md);
+    background: var(--color-surface-raised);
+    border: var(--border-width) solid var(--color-border-subtle);
+    border-radius: 20px 20px 20px 6px;
+    box-shadow: var(--shadow-sheet);
+  }
+  .fig-iceberg {
+    margin-block: var(--space-6);
+    padding: clamp(var(--space-5), 1rem + 3vw, var(--space-8));
+    background: var(--color-surface-raised);
+    border: var(--border-width) solid var(--color-border-subtle);
+    border-radius: var(--radius-xl);
+  }
+</style>

@@ -36,6 +36,14 @@ export interface HomeContent {
     status: { prefix: string; words: string[] };
     beta: { title: string; body: string; closer: string };
   };
+  passive: {
+    title: string;
+    body: string[];
+    closer: string;
+    looking: string;
+    notLooking: string;
+    question: string;
+  };
   problem: {
     title: string;
     verbs: string[];
@@ -161,42 +169,35 @@ export interface HomeContent {
     badge: string;
     theirs: string;
     yours: string;
-    messages: { from: 'theirs' | 'yours'; text: string; evidence?: string; private?: string }[];
-    outcome: string;
+    exchange: { ask: string; answer: string }[];
+    range: { label: string; value: string; floorLabel: string };
+    privateLine: string;
+    steps: string[];
+    closer: string;
   };
   roadmap: {
     kicker: string;
     title: string;
-    now: string;
-    steps: { version: string; title: string; line: string; extra?: string; soon?: string }[];
+    steps: { when: string; title: string; short: string; line: string }[];
   };
   career: {
-    kicker: string;
-    title: string;
-    line: string;
     file: string;
     // flag marks assisted-undefended lines; retracted marks lines the Rep stopped claiming.
     lines: { text: string; tags?: string; flag?: string; retracted?: boolean; kind: 'h1' | 'h2' | 'p' | 'li' | 'blank' }[];
   };
-  data: {
+  ownership: {
     kicker: string;
-    title: string;
-    line: string;
-    items: { icon: 'why' | 'correct' | 'export' | 'delete'; title: string; line: string }[];
-    // The demo card the four controls act on.
-    demo: {
-      private: string;
-      claim: [string, string]; // [first word, rest] — the first word is what gets corrected
-      why: { file: string; excerpt: string };
-      correct: { word: string; note: string };
-      export: { file: string; note: string };
-      deleted: string;
-    };
+    title: [string, string];
+    subtitle: string;
+    actions: { icon: 'read' | 'correct' | 'export' | 'delete'; label: string }[];
+    lines: string[];
+    gone: string;
   };
   finale: {
-    title: string;
-    body: string;
-    perks: string[];
+    pre: string;
+    cta: string;
+    small: string;
+    remove: string;
   };
   strength: Record<Strength, string>;
   sourceNames: Record<Source, string>;
@@ -215,8 +216,7 @@ const en: HomeContent = {
     tag: 'Closed beta',
     title: ['I’m not looking.', 'is.'],
     lead: 'Meet your professional Rep.',
-    subtitle:
-      'An AI agent that gets to know your work, learns what would make you move, and finds the opportunities worth your time.',
+    subtitle: 'It gets to know your work, learns what would make you move, and finds the opportunities worth your time.',
     punch: 'You don’t search. Your Rep does.',
     more: 'See how it works',
     status: { prefix: 'Your Rep is', words: ['reading your work.', 'asking what it couldn’t read.', 'listening.'] },
@@ -225,6 +225,17 @@ const en: HomeContent = {
       body: 'We’re starting with people in tech. Your Rep learns what matters to you. Next, it starts bringing the right opportunities to your phone.',
       closer: 'No searching. No job alerts. No applications.',
     },
+  },
+  passive: {
+    title: 'Not looking doesn’t mean not interested.',
+    body: [
+      'Most people aren’t searching for a job every day. They’re working. They’re building things. They’re getting on with their lives.',
+      'But the right role, the right company, the right problem or the right number might make them listen.',
+    ],
+    closer: 'That’s what your Rep is for.',
+    looking: 'Looking',
+    notLooking: 'Not looking',
+    question: 'but would they move?',
   },
   problem: {
     title: 'Looking for a job has become a job.',
@@ -310,8 +321,8 @@ const en: HomeContent = {
     legend: { claim: 'a claim', source: 'where it was read' },
   },
   yourTurn: {
-    kicker: 'Your turn',
-    title: 'What would your Rep read about you?',
+    kicker: 'Your Rep reads what’s already there',
+    title: 'See what yours could already know.',
     line: 'Type your GitHub username. Your browser asks GitHub directly; nothing reaches us.',
     label: 'GitHub username',
     placeholder: 'your-username',
@@ -500,78 +511,66 @@ const en: HomeContent = {
     actions: ['I’d hear them out', 'Not for me'],
   },
   agents: {
-    kicker: 'Then it talks for you',
-    title: 'Your agent talks to theirs.',
-    line: 'It answers with evidence, keeps what’s private private, and only brings you what both sides want.',
-    badge: 'Coming in v2',
-    theirs: 'Kestrel’s agent',
-    yours: 'Maya’s Rep',
-    messages: [
-      { from: 'theirs', text: 'Can she own evaluation for our agents?' },
-      { from: 'yours', text: 'Yes. She built and ran Lantern’s eval pipeline, and defended its design.', evidence: 'CV · GitHub · Interview' },
-      { from: 'theirs', text: 'What’s her salary floor?' },
-      { from: 'yours', text: 'Your range works. The number stays with her.', private: 'Private' },
-      { from: 'theirs', text: 'We’d like to talk.' },
-      { from: 'yours', text: 'So would she. I’ll set it up.' },
+    kicker: 'Where this goes',
+    title: 'Eventually, you won’t apply at all.',
+    line: 'Your agent talks to theirs.',
+    badge: 'Later · v2',
+    theirs: 'Company agent',
+    yours: 'Your Rep',
+    exchange: [
+      { ask: 'Evidence?', answer: 'Proven' },
+      { ask: 'Conditions?', answer: 'Aligned' },
+      { ask: 'Salary?', answer: 'Range works' },
     ],
-    outcome: 'Both sides want the conversation. Maya decides.',
+    range: { label: 'Range', value: '€110–135K', floorLabel: 'Her floor' },
+    privateLine: 'Your range works. The number stays with her.',
+    steps: ['Both want to talk', 'Introduction'],
+    closer: 'No application. No cold outreach. A conversation when both sides want one.',
   },
   roadmap: {
-    kicker: 'Where it’s going',
-    title: 'Built in steps, in the open.',
-    now: 'Now',
+    kicker: 'Where we are',
+    title: 'We’re starting with your Rep.',
     steps: [
-      { version: 'v0', title: 'Your Rep', line: 'Closed beta. We fix what breaks, with you.', extra: '+ career coach' },
-      { version: 'v1', title: 'It reads the offers', line: 'Brings you only the ones that fit.', soon: 'Next' },
-      { version: 'v2', title: 'Agent to agent', line: 'Yours talks to theirs. No applications.', soon: 'Coming soon' },
+      { when: 'Now', title: 'Meet your Rep', short: 'Understands your work and what matters', line: 'It reads your work, asks what it can’t know and builds your professional map.' },
+      { when: 'Next', title: 'Stop searching', short: 'Finds opportunities worth your attention', line: 'It starts looking for you. The opportunities worth your attention reach your phone.' },
+      { when: 'Then', title: 'Remove applications', short: 'Your Rep talks to theirs', line: 'Company agents talk directly to personal Reps. Applications disappear.' },
     ],
   },
   career: {
-    kicker: 'career.md',
-    title: 'A profile you can carry.',
-    line: 'Everything your Rep knows about you, written into one plain file. Every line says where it came from; co-produced work is flagged until you defend it, and what you retracted stays on record. Read it, correct it, take it anywhere.',
-    file: 'career.md',
+    file: 'maya/career.md',
     lines: [
-      { kind: 'h1', text: '# Maya Lindqvist' },
+      { kind: 'h1', text: '# Work' },
+      { kind: 'h2', text: '## Lantern Labs' },
+      { kind: 'li', text: 'Role: AI Engineer · 2024 —', tags: '[cv]' },
       { kind: 'blank', text: '' },
-      { kind: 'p', text: 'AI engineer who makes models measurable before they ship.', tags: '[int] [web]' },
+      { kind: 'h1', text: '# Capabilities' },
+      { kind: 'h2', text: '## LLM evaluation' },
+      { kind: 'li', text: 'Evidence: strong', tags: '[cv] [gh] [interview]' },
+      { kind: 'li', text: 'tern · plugin system', flag: 'co-produced, undefended' },
+      { kind: 'li', text: 'Caching strategy', flag: 'retracted', retracted: true },
       { kind: 'blank', text: '' },
-      { kind: 'h2', text: '## What the work shows' },
-      { kind: 'li', text: '- Built the eval pipeline for Lantern’s support agents.', tags: '[cv] [gh]' },
-      { kind: 'li', text: '- tern · traces stay local, only scores leave.', tags: '[gh] [int]' },
-      { kind: 'li', text: '- tern · plugin system for custom graders.', tags: '[gh]', flag: 'co-produced, undefended' },
-      { kind: 'blank', text: '' },
-      { kind: 'h2', text: '## Retracted' },
-      { kind: 'li', text: '- Designed the caching strategy for model calls.', flag: 'retracted in interview', retracted: true },
+      { kind: 'h1', text: '# Intent' },
+      { kind: 'li', text: 'Remote, Europe · €115K+ · no solo on-call', tags: '[your choices]' },
     ],
   },
-  data: {
-    kicker: 'Your data is yours',
-    title: 'Private by default.',
-    line: 'Your map, your intent and your answers are yours. You can always see why your Rep thinks something, and change it.',
-    items: [
-      { icon: 'why', title: 'See why', line: 'Every claim, its source.' },
-      { icon: 'correct', title: 'Correct it', line: 'Dispute, fix, add context.' },
-      { icon: 'export', title: 'Take it', line: 'Export, or sync to your GitHub.' },
-      { icon: 'delete', title: 'Delete it', line: 'Gone means gone.' },
+  ownership: {
+    kicker: 'Yours',
+    title: ['Your Rep knows a lot about you.', 'You should own all of it.'],
+    subtitle: 'A profile you can carry.',
+    actions: [
+      { icon: 'read', label: 'Read it' },
+      { icon: 'correct', label: 'Correct it' },
+      { icon: 'export', label: 'Export it' },
+      { icon: 'delete', label: 'Delete it' },
     ],
-    demo: {
-      private: 'Only you can see this',
-      claim: ['Led', 'the evaluation pipeline for support agents.'],
-      why: { file: 'CV_Maya_Lindqvist_2026.pdf · page 1', excerpt: '“…Led the evaluation pipeline for support agents at Lantern Labs…”' },
-      correct: { word: 'Co-led', note: 'Corrected by Maya' },
-      export: { file: 'career.md', note: 'Synced to github.com/mlindqvist/career' },
-      deleted: 'Gone. Nothing kept.',
-    },
+    lines: ['Private by default.', 'Every claim has a source.', 'You decide what leaves your Rep.'],
+    gone: 'Gone means gone.',
   },
   finale: {
-    title: 'Remove applications.',
-    body: 'Join the closed beta. We’ll write when there’s a place for you.',
-    perks: [
-      'Free access to Amble during the beta',
-      'The offers that fit, on your WhatsApp or Telegram',
-      'Your feedback decides what we build next',
-    ],
+    pre: 'Not looking doesn’t mean not listening.',
+    cta: 'Join the closed beta',
+    small: 'Free during the beta. Opportunities that make the cut, straight to your phone.',
+    remove: 'Remove applications.',
   },
   strength: {
     4: 'Strong evidence',
@@ -596,8 +595,7 @@ const es: HomeContent = {
     tag: 'Beta cerrada',
     title: ['Yo no busco.', 'sí.'],
     lead: 'Conoce a tu Rep profesional.',
-    subtitle:
-      'Un agente de IA que conoce tu trabajo, aprende qué te haría cambiar y encuentra las oportunidades que merecen tu tiempo.',
+    subtitle: 'Conoce tu trabajo, aprende qué te haría cambiar y encuentra las oportunidades que merecen tu tiempo.',
     punch: 'Tú no buscas. Tu Rep sí.',
     more: 'Mira cómo funciona',
     status: { prefix: 'Tu Rep está', words: ['leyendo tu trabajo.', 'preguntando lo que no pudo leer.', 'escuchando.'] },
@@ -606,6 +604,17 @@ const es: HomeContent = {
       body: 'Empezamos con gente de tecnología. Tu Rep aprende lo que te importa. Después, empieza a traerte las oportunidades adecuadas al móvil.',
       closer: 'Sin buscar. Sin alertas de empleo. Sin candidaturas.',
     },
+  },
+  passive: {
+    title: 'No buscar no significa no estar interesado.',
+    body: [
+      'La mayoría de la gente no busca trabajo cada día. Está trabajando. Construyendo cosas. Viviendo su vida.',
+      'Pero el puesto adecuado, la empresa adecuada, el problema adecuado o la cifra adecuada podrían hacer que escucharan.',
+    ],
+    closer: 'Para eso está tu Rep.',
+    looking: 'Buscando',
+    notLooking: 'Sin buscar',
+    question: '¿pero se moverían?',
   },
   problem: {
     title: 'Buscar trabajo se ha convertido en un trabajo.',
@@ -691,8 +700,8 @@ const es: HomeContent = {
     legend: { claim: 'una afirmación', source: 'dónde se leyó' },
   },
   yourTurn: {
-    kicker: 'Tu turno',
-    title: '¿Qué leería tu Rep de ti?',
+    kicker: 'Tu Rep lee lo que ya existe',
+    title: 'Mira lo que el tuyo ya podría saber.',
     line: 'Escribe tu usuario de GitHub. Tu navegador se lo pide a GitHub directamente; a nosotros no nos llega nada.',
     label: 'Usuario de GitHub',
     placeholder: 'tu-usuario',
@@ -881,78 +890,66 @@ const es: HomeContent = {
     actions: ['Les escucharía', 'No es para mí'],
   },
   agents: {
-    kicker: 'Y habla por ti',
-    title: 'Tu agente habla con el suyo.',
-    line: 'Responde con evidencia, guarda lo privado y solo te trae lo que quieren los dos lados.',
-    badge: 'Llega en la v2',
-    theirs: 'Agente de Kestrel',
-    yours: 'Rep de Marta',
-    messages: [
-      { from: 'theirs', text: '¿Puede llevar la evaluación de nuestros agentes?' },
-      { from: 'yours', text: 'Sí. Construyó y operó el pipeline de evaluación de Farolillo, y defendió su diseño.', evidence: 'CV · GitHub · Entrevista' },
-      { from: 'theirs', text: '¿Cuál es su suelo salarial?' },
-      { from: 'yours', text: 'Vuestro rango encaja. La cifra se queda con ella.', private: 'Privado' },
-      { from: 'theirs', text: 'Nos gustaría hablar.' },
-      { from: 'yours', text: 'A ella también. Lo organizo.' },
+    kicker: 'Hacia dónde va',
+    title: 'Algún día, no tendrás que aplicar a nada.',
+    line: 'Tu agente habla con el suyo.',
+    badge: 'Más adelante · v2',
+    theirs: 'Agente de empresa',
+    yours: 'Tu Rep',
+    exchange: [
+      { ask: '¿Evidencia?', answer: 'Demostrada' },
+      { ask: '¿Condiciones?', answer: 'Encajan' },
+      { ask: '¿Salario?', answer: 'El rango encaja' },
     ],
-    outcome: 'Los dos lados quieren la conversación. Marta decide.',
+    range: { label: 'Rango', value: '110–135.000 €', floorLabel: 'Su suelo' },
+    privateLine: 'Vuestro rango encaja. La cifra se queda con ella.',
+    steps: ['Los dos quieren hablar', 'Presentación'],
+    closer: 'Sin candidatura. Sin contacto en frío. Una conversación cuando los dos lados la quieren.',
   },
   roadmap: {
-    kicker: 'Hacia dónde va',
-    title: 'Por pasos, y en abierto.',
-    now: 'Ahora',
+    kicker: 'Dónde estamos',
+    title: 'Empezamos por tu Rep.',
     steps: [
-      { version: 'v0', title: 'Tu Rep', line: 'Beta cerrada. Arreglamos lo que falla, contigo.', extra: '+ coach de carrera' },
-      { version: 'v1', title: 'Lee las ofertas', line: 'Te trae solo las que encajan.', soon: 'Siguiente' },
-      { version: 'v2', title: 'De agente a agente', line: 'El tuyo habla con el suyo. Sin candidaturas.', soon: 'Próximamente' },
+      { when: 'Ahora', title: 'Conoce a tu Rep', short: 'Entiende tu trabajo y lo que te importa', line: 'Lee tu trabajo, pregunta lo que no puede saber y construye tu mapa profesional.' },
+      { when: 'Después', title: 'Deja de buscar', short: 'Encuentra las oportunidades que merecen tu atención', line: 'Empieza a buscar por ti. Las oportunidades que merecen tu atención llegan a tu móvil.' },
+      { when: 'Luego', title: 'Adiós a las candidaturas', short: 'Tu Rep habla con el suyo', line: 'Los agentes de empresa hablan directamente con los Reps personales. Las candidaturas desaparecen.' },
     ],
   },
   career: {
-    kicker: 'career.md',
-    title: 'Un perfil que te llevas.',
-    line: 'Todo lo que tu Rep sabe de ti, escrito en un único fichero de texto. Cada línea dice de dónde sale; el trabajo co-producido va marcado hasta que lo defiendes y lo que retiraste queda registrado. Léelo, corrígelo, llévatelo donde quieras.',
-    file: 'career.md',
+    file: 'marta/career.md',
     lines: [
-      { kind: 'h1', text: '# Marta Quiroga' },
+      { kind: 'h1', text: '# Trabajo' },
+      { kind: 'h2', text: '## Farolillo Labs' },
+      { kind: 'li', text: 'Puesto: Ingeniera de IA · 2024 —', tags: '[cv]' },
       { kind: 'blank', text: '' },
-      { kind: 'p', text: 'Ingeniera de IA que hace medibles los modelos antes de que salgan.', tags: '[ent] [web]' },
+      { kind: 'h1', text: '# Capacidades' },
+      { kind: 'h2', text: '## Evaluación de LLMs' },
+      { kind: 'li', text: 'Evidencia: sólida', tags: '[cv] [gh] [entrevista]' },
+      { kind: 'li', text: 'sonda · sistema de plugins', flag: 'co-producido, sin defender' },
+      { kind: 'li', text: 'Estrategia de caché', flag: 'retirado', retracted: true },
       { kind: 'blank', text: '' },
-      { kind: 'h2', text: '## Lo que demuestra el trabajo' },
-      { kind: 'li', text: '- Construyó el pipeline de evaluación de los agentes de Farolillo.', tags: '[cv] [gh]' },
-      { kind: 'li', text: '- sonda · las trazas se quedan en local, solo salen las puntuaciones.', tags: '[gh] [ent]' },
-      { kind: 'li', text: '- sonda · sistema de plugins para evaluadores propios.', tags: '[gh]', flag: 'co-producido, sin defender' },
-      { kind: 'blank', text: '' },
-      { kind: 'h2', text: '## Retirado' },
-      { kind: 'li', text: '- Diseñó la estrategia de caché de las llamadas al modelo.', flag: 'retirado en la entrevista', retracted: true },
+      { kind: 'h1', text: '# Intención' },
+      { kind: 'li', text: 'Remoto, Europa · 115.000 €+ · sin guardias en solitario', tags: '[tus decisiones]' },
     ],
   },
-  data: {
-    kicker: 'Tus datos son tuyos',
-    title: 'Privado por defecto.',
-    line: 'Tu mapa, tu intención y tus respuestas son tuyos. Siempre puedes ver por qué tu Rep piensa algo, y cambiarlo.',
-    items: [
-      { icon: 'why', title: 'Mira el porqué', line: 'Cada afirmación, su fuente.' },
-      { icon: 'correct', title: 'Corrígelo', line: 'Discute, arregla, añade contexto.' },
-      { icon: 'export', title: 'Llévatelo', line: 'Exporta o sincroniza con tu GitHub.' },
-      { icon: 'delete', title: 'Bórralo', line: 'Borrado es borrado.' },
+  ownership: {
+    kicker: 'Tuyo',
+    title: ['Tu Rep sabe mucho de ti.', 'Todo eso debería ser tuyo.'],
+    subtitle: 'Un perfil que te llevas.',
+    actions: [
+      { icon: 'read', label: 'Léelo' },
+      { icon: 'correct', label: 'Corrígelo' },
+      { icon: 'export', label: 'Expórtalo' },
+      { icon: 'delete', label: 'Bórralo' },
     ],
-    demo: {
-      private: 'Solo tú puedes verlo',
-      claim: ['Lideró', 'el pipeline de evaluación de los agentes de soporte.'],
-      why: { file: 'CV_Marta_Quiroga_2026.pdf · página 1', excerpt: '«…Lideró el pipeline de evaluación de los agentes de soporte en Farolillo Labs…»' },
-      correct: { word: 'Co-lideró', note: 'Corregido por Marta' },
-      export: { file: 'career.md', note: 'Sincronizado con github.com/mquiroga/career' },
-      deleted: 'Borrado. No queda nada.',
-    },
+    lines: ['Privado por defecto.', 'Cada afirmación tiene su fuente.', 'Tú decides qué sale de tu Rep.'],
+    gone: 'Borrado es borrado.',
   },
   finale: {
-    title: 'Adiós a las candidaturas.',
-    body: 'Entra en la beta cerrada. Te escribiremos cuando haya sitio para ti.',
-    perks: [
-      'Acceso gratuito a Amble durante la beta',
-      'Las ofertas que encajan, en tu WhatsApp o Telegram',
-      'Tu feedback decide qué construimos después',
-    ],
+    pre: 'No buscar no significa no escuchar.',
+    cta: 'Entra en la beta cerrada',
+    small: 'Gratis durante la beta. Las oportunidades que pasan el corte, directas a tu móvil.',
+    remove: 'Adiós a las candidaturas.',
   },
   strength: {
     4: 'Evidencia sólida',

@@ -1,32 +1,38 @@
 ---
+// The end: back to paper and the eye. One line about who it's for, the
+// headline again, the form, and "Remove applications." Nothing else.
 import Symbol from '../Symbol.astro';
 import Waitlist from '../Waitlist.astro';
 import type { HomeContent } from '../../content/home';
 
 interface Props {
   c: HomeContent['finale'];
+  hero: HomeContent['hero'];
 }
 
-const { c } = Astro.props;
+const { c, hero } = Astro.props;
 ---
 
 <section class="finale container" aria-labelledby="finale-title">
   <div class="inner" data-reveal>
-    <Symbol size={40} breathe />
-    <h2 class="display title" id="finale-title">{c.title}</h2>
-    <p class="lede">{c.body}</p>
-    <ul class="perks" role="list">
-      {c.perks.map((p) => <li><span class="tick" aria-hidden="true">✓</span>{p}</li>)}
-    </ul>
+    <p class="pre heading">{c.pre}</p>
+    <Symbol size={64} watch breathe />
+    <h2 class="display title" id="finale-title">
+      {hero.title[0]}
+      <br />
+      <em>Amble</em>{' '}{hero.title[1]}
+    </h2>
     <div class="form">
-      <Waitlist id="finale" />
+      <Waitlist id="finale" cta={c.cta} />
     </div>
+    <p class="small">{c.small}</p>
+    <p class="remove display">{c.remove}</p>
   </div>
 </section>
 
 <style>
   .finale {
-    padding-block: var(--space-section) var(--space-8);
+    padding-block: var(--space-section) var(--space-7);
   }
   .inner {
     display: flex;
@@ -35,37 +41,29 @@ const { c } = Astro.props;
     text-align: center;
     gap: var(--space-5);
   }
+  .pre {
+    margin-bottom: var(--space-6);
+    font-size: var(--text-heading-lg);
+    font-style: italic;
+    color: var(--color-text-muted);
+  }
   .title {
-    margin-top: var(--space-4);
     font-size: var(--text-display-lg);
-  }
-  .perks {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: var(--space-3) var(--space-6);
-    margin-top: var(--space-2);
-  }
-  .perks li {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-2);
-    font-size: var(--text-body);
-  }
-  .tick {
-    display: grid;
-    place-items: center;
-    width: 22px;
-    height: 22px;
-    font-size: var(--text-label);
-    color: var(--color-text-inverse);
-    background: var(--color-accent);
-    border-radius: var(--radius-full);
   }
   .form {
     display: flex;
     justify-content: center;
     width: 100%;
-    margin-top: var(--space-5);
+    margin-top: var(--space-4);
+  }
+  .small {
+    max-width: 30rem;
+    font-size: var(--text-body-sm);
+    color: var(--color-text-muted);
+  }
+  .remove {
+    margin-top: var(--space-10);
+    font-size: var(--text-heading-xl);
+    color: var(--color-accent-strong);
   }
 </style>

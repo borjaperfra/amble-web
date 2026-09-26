@@ -1,0 +1,85 @@
+---
+// The funnel, turned around: the traditional one starts with who applied and
+// ends asking who to talk to; Amble starts there.
+import type { CompaniesContent } from '../../content/companies';
+
+interface Props {
+  c: CompaniesContent['funnel'];
+}
+
+const { c } = Astro.props;
+---
+
+<figure class="funnel" data-scene>
+  <section class="col old">
+    <p class="label">{c.traditional}</p>
+    <ol role="list">{c.old.map((q, i) => <li style={`--i:${i}`}>{q}</li>)}</ol>
+  </section>
+  <section class="col next">
+    <p class="label">{c.amble}</p>
+    <ol role="list">{c.next.map((q, i) => <li style={`--i:${i + 3}`}>{q}</li>)}</ol>
+  </section>
+</figure>
+
+<style>
+  .funnel {
+    display: grid;
+    gap: var(--space-5);
+    margin-top: var(--space-6);
+  }
+  @media (min-width: 640px) {
+    .funnel {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  .col {
+    padding: var(--space-5);
+    border-radius: var(--radius-lg);
+  }
+  .old {
+    background: var(--color-surface-sunken);
+  }
+  .next {
+    background: var(--color-surface-raised);
+    border: 1.5px solid var(--color-accent-soft);
+  }
+  .label {
+    margin-bottom: var(--space-4);
+    font-size: var(--text-label);
+    font-weight: var(--weight-semibold);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+  .next .label {
+    color: var(--color-accent-strong);
+  }
+  ol {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+  li {
+    font-family: var(--font-display);
+    font-size: var(--text-heading-sm);
+    transition: opacity 0.5s ease;
+    transition-delay: calc(var(--i) * 0.3s);
+  }
+  li + li::before {
+    content: '↓';
+    display: block;
+    font-family: var(--font-ui);
+    font-size: var(--text-body-sm);
+    color: var(--color-text-faint);
+  }
+  .old li {
+    color: var(--color-text-muted);
+  }
+  .old li:last-child,
+  .next li:first-child {
+    color: var(--color-accent-strong);
+  }
+  :global(.motion) .funnel:not(.is-playing) li {
+    opacity: 0;
+  }
+</style>

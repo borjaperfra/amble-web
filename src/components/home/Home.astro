@@ -13,8 +13,8 @@ import Listening from './Listening.astro';
 import Opportunity from './Opportunity.astro';
 import Agents from './Agents.astro';
 import Roadmap from './Roadmap.astro';
-import CareerMd from './CareerMd.astro';
-import YourData from './YourData.astro';
+import Ownership from './Ownership.astro';
+import Passive from './Passive.astro';
 import Finale from './Finale.astro';
 import { home } from '../../content/home';
 import type { Lang } from '../../i18n/ui';
@@ -26,10 +26,12 @@ const c = home[lang];
 <Base joinHref="#join" stages={c.stages}>
   <main>
     <Hero c={c.hero} />
+    <Passive c={c.passive} />
     <Problem c={c.problem} />
     <div data-stage="reads" id="stage-reads">
       <Interlude lines={c.story.interlude} body={c.story.interludeBody} bridge={c.problem.bridge} id="interlude-pdf" />
       <Story c={c.story} strength={c.strength} sourceNames={c.sourceNames} />
+      <div data-count="turn"><YourTurn c={c.yourTurn} /></div>
       <MapSection c={c.map} strength={c.strength} />
     </div>
     <div data-stage="asks" id="stage-asks">
@@ -46,15 +48,11 @@ const c = home[lang];
     </div>
     <div data-stage="tells" id="stage-tells">
       <Opportunity c={c.opportunity} />
-      <Agents c={c.agents} />
     </div>
+    <Agents c={c.agents} />
     <Roadmap c={c.roadmap} />
-    <div data-count="yours">
-      <CareerMd c={c.career} />
-      <YourData c={c.data} />
-    </div>
-    <div data-count="turn"><YourTurn c={c.yourTurn} /></div>
-    <div data-count="finale"><Finale c={c.finale} /></div>
+    <div data-count="yours"><Ownership c={c.ownership} career={c.career} /></div>
+    <div data-count="finale"><Finale c={c.finale} hero={c.hero} /></div>
   </main>
 </Base>
 

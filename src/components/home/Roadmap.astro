@@ -1,10 +1,6 @@
 ---
-// The road, drawn and alive: three small loops on one line.
-//   v0  your work drifts into the Rep's eye
-//   v1  offers stream past a window; only the one that fits lights up
-//   v2  two eyes, yours and theirs, passing messages back and forth
-import SectionIntro from '../SectionIntro.astro';
-import Symbol from '../Symbol.astro';
+// Now / Next / Then as one piece: three points on a line, the first solid,
+// the others still ahead. Transparent about what exists.
 import type { HomeContent } from '../../content/home';
 
 interface Props {
@@ -14,56 +10,19 @@ interface Props {
 const { c } = Astro.props;
 ---
 
-<section class="section container" aria-labelledby="roadmap-title">
-  <SectionIntro id="roadmap-title" kicker={c.kicker} title={c.title} align="center" />
+<section class="roadmap container" aria-labelledby="roadmap-title">
+  <p class="kicker" data-reveal>{c.kicker}</p>
+  <h2 class="display title" id="roadmap-title" data-reveal>{c.title}</h2>
 
-  <ol class="road" role="list" data-scene>
+  <ol class="line" role="list" data-scene>
     {
-      c.steps.map((step, i) => (
-        <li class:list={['stop', { current: i === 0 }]} style={`--i:${i}`}>
-          <div class="art" aria-hidden="true">
-            {i === 0 && <span class="here">{c.now}</span>}
-            {step.soon && <span class:list={['here', 'soon']}>{step.soon}</span>}
-            {i === 0 && <span class="halo" />}
-            {i === 0 && (
-              <div class="disc v0">
-                <Symbol size={46} breathe />
-                <span class="map">
-                  {[4, 3, 1].map((n, r) => (
-                    <span class="row" style={`--r:${r}`}>
-                      <span class="bar" />
-                      <span class="dots">
-                        {[0, 1, 2, 3].map((k) => (
-                          <span class:list={['d', { on: k < n }]} style={`--k:${k}`} />
-                        ))}
-                      </span>
-                    </span>
-                  ))}
-                </span>
-              </div>
-            )}
-            {i === 1 && (
-              <div class="disc v1">
-                <div class="stream">
-                  {Array.from({ length: 12 }, (_, k) => (
-                    <span class:list={['bar', { fit: k === 3 || k === 9 }]} />
-                  ))}
-                </div>
-                <span class="window" />
-              </div>
-            )}
-            {i === 2 && (
-              <div class="disc v2">
-                <span class="chat-b theirs">?</span>
-                <span class="chat-b yours">✓</span>
-                <span class="chat-b theirs small" />
-              </div>
-            )}
-          </div>
-          <p class="version">{step.version}</p>
-          <p class="heading stop-title">{step.title}</p>
-          <p class="stop-line">{step.line}</p>
-          {step.extra && <p class="extra">{step.extra}</p>}
+      c.steps.map((st, i) => (
+        <li class:list={['stop', { now: i === 0 }]} style={`--i:${i}`}>
+          <span class="when">{st.when}</span>
+          <span class="point" aria-hidden="true" />
+          <p class="heading stop-title">{st.title}</p>
+          <p class="short">{st.short}</p>
+          <p class="detail">{st.line}</p>
         </li>
       ))
     }
@@ -71,331 +30,132 @@ const { c } = Astro.props;
 </section>
 
 <style>
-  .road {
-    position: relative;
-    display: grid;
-    gap: var(--space-8);
-    max-width: var(--width-wide);
-    margin: var(--space-8) auto 0;
-  }
-  @media (min-width: 860px) {
-    .road {
-      grid-template-columns: repeat(3, 1fr);
-      gap: var(--space-5);
-    }
-    /* The line the stops sit on: solid where we are, dashed where we're going. */
-    .road::before,
-    .road::after {
-      content: '';
-      position: absolute;
-      top: 138px;
-      height: 2px;
-      transform-origin: left;
-      transition: transform 1.4s var(--ease-standard) 0.2s;
-    }
-    .road::before {
-      left: 17%;
-      width: 16%;
-      background: var(--color-accent);
-    }
-    .road::after {
-      left: 33%;
-      right: 17%;
-      background-image: linear-gradient(to right, var(--color-border) 55%, transparent 0);
-      background-size: 12px 2px;
-      transition-delay: 0.7s;
-    }
-    .js .road:not(.is-playing)::before,
-    .js .road:not(.is-playing)::after {
-      transform: scaleX(0);
-    }
-  }
-
-  .stop {
+  .roadmap {
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
-    gap: var(--space-2);
+    padding-block: var(--space-section);
   }
-  .art {
+  .title {
+    margin-top: var(--space-4);
+    font-size: var(--text-display-lg);
+  }
+  .line {
     position: relative;
     display: grid;
-    place-items: center;
+    gap: var(--space-8);
     width: 100%;
-    height: 276px;
-    margin-bottom: var(--space-3);
+    max-width: var(--width-wide);
+    margin-top: var(--space-8);
   }
-  .here {
-    position: absolute;
-    top: 0;
-    left: 50%;
-    translate: -50% 0;
-    padding: var(--space-1) var(--space-3);
+  @media (min-width: 860px) {
+    .line {
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-6);
+    }
+    /* The line: solid through Now, dashed ahead. */
+    .line::before,
+    .line::after {
+      content: '';
+      position: absolute;
+      top: 52px;
+      height: 2px;
+      transform-origin: left;
+      transition: transform 1.2s var(--ease-standard) 0.2s;
+    }
+    .line::before {
+      left: 16.6%;
+      width: 16.6%;
+      background: var(--color-accent);
+    }
+    .line::after {
+      left: 33.2%;
+      right: 16.6%;
+      background-image: linear-gradient(to right, var(--color-text-faint) 50%, transparent 0);
+      background-size: 10px 2px;
+      transition-delay: 0.7s;
+    }
+    :global(.motion) .line:not(.is-playing)::before,
+    :global(.motion) .line:not(.is-playing)::after {
+      transform: scaleX(0);
+    }
+  }
+  .stop {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+    transition:
+      opacity var(--motion-slow) ease,
+      translate var(--motion-arrive) var(--ease-standard);
+    transition-delay: calc(0.2s + var(--i) * 0.3s);
+  }
+  :global(.motion) .line:not(.is-playing) .stop {
+    opacity: 0;
+    translate: 0 10px;
+  }
+  .when {
     font-size: var(--text-label);
     font-weight: var(--weight-semibold);
     letter-spacing: var(--tracking-label);
     text-transform: uppercase;
-    color: var(--color-text-inverse);
-    background: var(--color-accent);
-    border-radius: var(--radius-full);
-    z-index: 2;
+    color: var(--color-text-muted);
   }
-  /* Future stops: an outlined tag, so "Now" stays the only solid one. */
-  .here.soon {
+  .now .when {
     color: var(--color-accent-strong);
-    background: var(--color-surface-raised);
-    border: 1.5px dashed var(--color-accent);
   }
-  .here.soon::after {
-    display: none;
-  }
-  .here::after {
-    content: '';
-    position: absolute;
-    left: 50%;
-    bottom: -5px;
-    width: 10px;
-    height: 10px;
-    background: inherit;
-    translate: -50% 0;
-    rotate: 45deg;
-    border-radius: 2px;
-    z-index: -1;
-  }
-  .disc {
+  .point {
     position: relative;
     z-index: 1;
-    display: grid;
-    place-items: center;
-    width: 212px;
-    height: 212px;
+    width: 22px;
+    height: 22px;
+    margin: var(--space-2) 0 var(--space-3);
+    background: var(--color-bg);
+    border: 2px dashed var(--color-text-faint);
     border-radius: var(--radius-full);
-    background: var(--color-surface-raised);
-    border: var(--border-width) solid var(--color-border-subtle);
-    box-shadow: var(--shadow-sheet);
-    overflow: hidden;
-    color: var(--color-text);
   }
-  /* Now: a solid moss ring and a slow halo, so it's unmistakably where we are. */
-  .current .disc {
-    border: 3px solid var(--color-accent);
-    box-shadow:
-      0 0 0 10px var(--color-accent-soft),
-      var(--shadow-sheet);
-  }
-  /* The halo sits behind the disc, so the disc can keep its own clipping. */
-  .halo {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 212px;
-    height: 212px;
-    translate: -50% -50%;
-    border-radius: var(--radius-full);
+  .now .point {
+    background: var(--color-accent);
     border: 2px solid var(--color-accent);
-    animation: halo 3.6s ease-out infinite;
-    pointer-events: none;
+    box-shadow: 0 0 0 6px var(--color-accent-soft);
+  }
+  .now .point::after {
+    content: '';
+    position: absolute;
+    inset: -8px;
+    border-radius: inherit;
+    border: 2px solid var(--color-accent);
+    animation: halo 3.2s ease-out infinite;
   }
   @keyframes halo {
     from {
-      opacity: 0.55;
+      opacity: 0.6;
       scale: 1;
     }
     to {
       opacity: 0;
-      scale: 1.28;
+      scale: 1.8;
     }
-  }
-
-  /* v0: the eye over a small map — three capabilities whose evidence fills in,
-     dot by dot, the language of chapter 1. */
-  .v0 {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 16px;
-  }
-  .v0 :global(.symbol) {
-    color: var(--color-text);
-  }
-  .map {
-    display: flex;
-    flex-direction: column;
-    gap: 9px;
-  }
-  .row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .bar {
-    width: 58px;
-    height: 7px;
-    border-radius: 4px;
-    background: var(--color-surface-sunken);
-  }
-  .row:first-child .bar {
-    background: var(--color-text-faint);
-  }
-  .dots {
-    display: inline-flex;
-    gap: 4px;
-  }
-  .d {
-    width: 9px;
-    height: 9px;
-    border-radius: var(--radius-full);
-    border: 1.5px solid var(--color-accent);
-  }
-  .d.on {
-    background: var(--color-accent);
-    animation: fill 4.8s var(--ease-standard) infinite both;
-    animation-delay: calc(var(--r) * 0.35s + var(--k) * 0.22s);
-  }
-  @keyframes fill {
-    0%,
-    6% {
-      background: transparent;
-    }
-    16%,
-    90% {
-      background: var(--color-accent);
-    }
-    100% {
-      background: transparent;
-    }
-  }
-
-  /* v1: offers stream past a window; only the fitting one is moss */
-  .v1 .stream {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    animation: stream 7s linear infinite;
-  }
-  .v1 .bar {
-    display: block;
-    width: 112px;
-    height: 20px;
-    border-radius: 5px;
-    background: var(--color-surface-sunken);
-  }
-  .v1 .bar.fit {
-    background: var(--color-accent);
-    border-color: var(--color-accent);
-  }
-  .v1 .window {
-    position: absolute;
-    inset: 50% auto auto 50%;
-    width: 128px;
-    height: 36px;
-    translate: -50% -50%;
-    border: 2px solid var(--color-accent);
-    border-radius: 9px;
-    box-shadow: 0 0 0 999px rgb(253 252 249 / 0.6);
-  }
-  @keyframes stream {
-    from {
-      translate: 0 -90px;
-    }
-    to {
-      translate: 0 90px;
-    }
-  }
-
-  /* v2: their agent asks (slate), yours answers (moss) — the agent-to-agent scene, in miniature */
-  .v2 {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 10px;
-    padding: 0 38px;
-  }
-  .chat-b {
-    display: grid;
-    place-items: center;
-    height: 34px;
-    font-weight: var(--weight-semibold);
-    border-radius: 14px;
-    animation: turn 4.2s var(--ease-standard) infinite both;
-  }
-  .chat-b.theirs {
-    align-self: flex-start;
-    width: 86px;
-    color: var(--color-other);
-    background: var(--color-other-soft);
-    border-bottom-left-radius: 5px;
-  }
-  .chat-b.yours {
-    align-self: flex-end;
-    width: 104px;
-    color: var(--color-text-inverse);
-    background: var(--color-accent-strong);
-    border-bottom-right-radius: 5px;
-    animation-delay: 0.9s;
-  }
-  .chat-b.small {
-    width: 60px;
-    height: 26px;
-    animation-delay: 1.8s;
-  }
-  @keyframes turn {
-    0%,
-    8% {
-      opacity: 0;
-      translate: 0 6px;
-    }
-    18%,
-    86% {
-      opacity: 1;
-      translate: none;
-    }
-    100% {
-      opacity: 0;
-    }
-  }
-
-  .version {
-    font-family: var(--font-mono);
-    font-size: var(--text-mono);
-    color: var(--color-text-faint);
   }
   .stop-title {
     font-size: var(--text-heading-lg);
   }
-  .stop-line {
-    max-width: 22ch;
+  .short {
+    font-size: var(--text-label);
+    font-weight: var(--weight-semibold);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--color-accent-strong);
+  }
+  .detail {
+    max-width: 26ch;
+    margin-top: var(--space-1);
     color: var(--color-text-muted);
     text-wrap: balance;
   }
-  .extra {
-    margin-top: var(--space-3);
-    padding: var(--space-1) var(--space-3);
-    font-size: var(--text-body-sm);
-    font-weight: var(--weight-medium);
-    color: var(--color-accent-strong);
-    background: var(--color-accent-wash);
-    border-radius: var(--radius-full);
-  }
-
-  /* Stops arrive in order */
-  .js .road .stop {
-    transition:
-      opacity var(--motion-arrive) ease,
-      translate var(--motion-arrive) var(--ease-standard);
-    transition-delay: calc(0.2s + var(--i) * 0.3s);
-  }
-  .js .road:not(.is-playing) .stop {
-    opacity: 0;
-    translate: 0 12px;
-  }
   @media (prefers-reduced-motion: reduce) {
-    .d.on,
-    .v1 .stream,
-    .chat-b,
-    .halo {
+    .now .point::after {
       animation: none;
     }
   }

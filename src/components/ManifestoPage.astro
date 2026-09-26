@@ -1,6 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
-import Symbol from './Symbol.astro';
+import Blocks from './manifesto/Blocks.astro';
 import { manifesto } from '../content/pages';
 import type { Lang } from '../i18n/ui';
 
@@ -13,28 +13,17 @@ const c = manifesto[lang];
     <header class="head">
       <p class="kicker">{c.kicker}</p>
       <h1 class="display title">{c.title}</h1>
+      <p class="thesis">
+        <span>{c.thesis[0]}</span>
+        <em>{c.thesis[1]}</em>
+      </p>
     </header>
 
     <div class="essay">
-      {
-        c.essay.map((b) =>
-          b.kind === 'list' ? (
-            <ul class="e-list" role="list">
-              {(b.text as string[]).map((line, i) => (
-                <li data-reveal style={`--i:${i}`}>{line}</li>
-              ))}
-            </ul>
-          ) : b.kind === 'beat' ? (
-            <p class="display e-beat" data-reveal>{b.text}</p>
-          ) : (
-            <p class="e-p" data-reveal>{b.text}</p>
-          ),
-        )
-      }
+      <Blocks blocks={c.intro} figures={c.figures} />
     </div>
 
     <p class="kicker principles-label">{c.principlesLabel}</p>
-
     <ol class="principles" role="list">
       {
         c.principles.map((p, i) => (
@@ -47,16 +36,9 @@ const c = manifesto[lang];
       }
     </ol>
 
-    <footer class="closing" data-reveal>
-      <Symbol size={64} watch breathe />
-      <div class="closing-text">
-        {
-          c.closing.map((line, i) => (
-            <p class:list={['c-line', { last: i === c.closing.length - 1, formula: line.includes('↔') }]}>{line}</p>
-          ))
-        }
-      </div>
-    </footer>
+    <div class="essay future">
+      <Blocks blocks={c.future} figures={c.figures} />
+    </div>
   </main>
 </Base>
 
@@ -74,33 +56,22 @@ const c = manifesto[lang];
   .title {
     font-size: var(--text-display-xl);
   }
-  .essay {
+  .thesis {
     display: flex;
     flex-direction: column;
-    gap: var(--space-7);
-    max-width: 44rem;
-    margin-top: var(--space-9);
-  }
-  .e-list {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-3);
     font-family: var(--font-display);
     font-size: var(--text-heading-lg);
     line-height: var(--leading-heading);
   }
-  .e-list li:last-child {
+  .thesis em {
     color: var(--color-accent-strong);
-    font-style: italic;
   }
-  .e-p {
-    font-size: var(--text-body-lg);
-    color: var(--color-text-muted);
-    text-wrap: pretty;
-  }
-  .e-beat {
-    font-size: var(--text-display-lg);
-    text-wrap: balance;
+  .essay {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+    max-width: 46rem;
+    margin-top: var(--space-9);
   }
   .principles-label {
     margin-top: var(--space-10);
@@ -112,7 +83,7 @@ const c = manifesto[lang];
   .principle {
     display: grid;
     gap: var(--space-2) var(--space-7);
-    padding-block: var(--space-7);
+    padding-block: var(--space-6);
     border-bottom: var(--border-width) solid var(--color-border-subtle);
   }
   @media (min-width: 860px) {
@@ -133,36 +104,5 @@ const c = manifesto[lang];
     font-size: var(--text-body-lg);
     color: var(--color-text-muted);
     text-wrap: pretty;
-  }
-  .closing {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--space-6);
-    margin-top: var(--space-section);
-    text-align: center;
-  }
-  .closing-text {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-3);
-    max-width: 44rem;
-  }
-  .c-line {
-    font-size: var(--text-body-lg);
-    color: var(--color-text-muted);
-  }
-  .c-line.formula {
-    margin-block: var(--space-4);
-    font-family: var(--font-mono);
-    font-size: var(--text-heading-md);
-    color: var(--color-accent-strong);
-  }
-  .c-line.last {
-    margin-top: var(--space-4);
-    font-family: var(--font-display);
-    font-size: var(--text-display-lg);
-    line-height: var(--leading-display);
-    color: var(--color-text);
   }
 </style>

@@ -1,7 +1,6 @@
 ---
 // career.md, writing itself line by line: every line with its source, the
 // co-produced line flagged, the retracted one kept on record.
-import SectionIntro from '../SectionIntro.astro';
 import type { HomeContent } from '../../content/home';
 
 interface Props {
@@ -11,9 +10,6 @@ interface Props {
 const { c } = Astro.props;
 ---
 
-<section class="section container" aria-labelledby="career-title">
-  <div class="split career">
-    <SectionIntro id="career-title" kicker={c.kicker} title={c.title} body={c.line} />
 <figure class="file" data-scene>
   <figcaption class="file-bar">
     <span class="file-dots" aria-hidden="true"><span></span><span></span><span></span></span>
@@ -35,15 +31,8 @@ const { c } = Astro.props;
     }
   </div>
 </figure>
-  </div>
-</section>
 
 <style>
-  /* Same axis as the sections around it. */
-  .career {
-    max-width: var(--width-wide);
-    margin-inline: auto;
-  }
   .file {
     overflow: hidden;
     background: var(--color-surface-raised);
@@ -90,9 +79,11 @@ const { c } = Astro.props;
   .text {
     white-space: pre-wrap;
   }
-  .line.h1,
-  .line.h2 {
+  .line.h1 {
     color: var(--color-accent-strong);
+    font-weight: var(--weight-semibold);
+  }
+  .line.h2 {
     font-weight: var(--weight-semibold);
   }
   .tags {

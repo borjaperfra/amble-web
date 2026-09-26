@@ -3,15 +3,37 @@ import type { Lang } from '../i18n/ui';
 // Long-form pages: the manifesto and how Amble is built. Same shape per
 // language, rendered by ManifestoPage and HowBuiltPage.
 
+export type Block =
+  | { kind: 'p' | 'beat' | 'chapter' | 'quote'; text: string }
+  | { kind: 'list'; text: string[] }
+  | { kind: 'figure'; figure: 'loop' | 'iceberg' | 'architecture' | 'remove' };
+
 export interface ManifestoContent {
   meta: { title: string; description: string };
   kicker: string;
   title: string;
-  // The argument, in blocks: plain paragraphs, and short "beat" lines set large.
-  essay: { kind: 'p' | 'beat' | 'list'; text: string | string[] }[];
+  thesis: [string, string];
+  intro: Block[];
   principlesLabel: string;
   principles: { title: string; body: string }[];
-  closing: string[];
+  future: Block[];
+  figures: {
+    loop: { ai: string; applications: string; application: string; filters: string[]; noise: string; lines: [string, string]; cut: string };
+    iceberg: { looking: string; notLooking: string; question: string; tags: string[] };
+    architecture: {
+      today: string;
+      todaySteps: string[];
+      amble: string;
+      you: string;
+      rep: string;
+      listening: string;
+      opportunity: string;
+      worth: string;
+      conversation: string;
+      caption: [string, string];
+    };
+    remove: { before: string[]; struck: number[]; after: string[]; middle: string; final: string };
+  };
 }
 
 export interface HowBuiltContent {
@@ -31,30 +53,59 @@ export interface HowBuiltContent {
 const manifestoEn: ManifestoContent = {
   meta: {
     title: 'Manifesto — Amble',
-    description: 'Amble represents people. It doesn’t rank them. Nine principles behind your professional Rep.',
+    description: 'The job market is built around people looking for jobs. Amble is built for people who aren’t.',
   },
   kicker: 'Manifesto',
-  title: 'Recruiting is broken. AI finished the job.',
-  essay: [
+  title: 'Remove applications.',
+  thesis: ['The job market is built around people looking for jobs.', 'Amble is built for people who aren’t.'],
+  intro: [
+    { kind: 'p', text: 'Recruiting has worked the same way for decades.' },
+    { kind: 'p', text: 'A company publishes a job. People find it. They apply. Someone filters the applications.' },
     {
       kind: 'list',
       text: [
-        'LinkedIn turned professional identity into a profile.',
-        'Job boards turned finding work into search.',
-        'ATSs turned people into keywords.',
-        'Then AI made applying essentially free.',
+        'The internet made it possible to apply to more jobs.',
+        'LinkedIn made everyone searchable.',
+        'ATSs made it possible to filter more people.',
+        'Then AI made applying almost free.',
       ],
     },
     {
       kind: 'p',
-      text: 'Now one person can apply to hundreds of jobs. Companies answer with more filters, more automation and more screening. So we get more applications, more noise, and less information about whether two sides should actually talk.',
+      text: 'Now we can generate applications faster than anyone can meaningfully read them. Companies respond with more automation, more screening and more filters.',
     },
-    { kind: 'beat', text: 'We don’t need a better application. We need to remove the application.' },
+    { kind: 'beat', text: 'More applications. More filters. More noise.' },
+    { kind: 'figure', figure: 'loop' },
+    { kind: 'p', text: 'We don’t think the answer is a better application.' },
+    { kind: 'beat', text: 'We think the application is the problem.' },
+
+    { kind: 'chapter', text: 'Most people aren’t looking.' },
+    { kind: 'p', text: 'And that’s the part the current system handles badly.' },
     {
       kind: 'p',
-      text: 'The best person for a role may never apply. They’re working. They’re not checking job boards. They’re not updating LinkedIn. They’re not “open to work.” That doesn’t mean there’s nothing they’d move for.',
+      text: 'Some of the best people for a role are already doing good work somewhere else. They aren’t browsing job boards. They aren’t updating their CV. They aren’t applying.',
     },
-    { kind: 'beat', text: 'That’s what a Rep is for.' },
+    { kind: 'figure', figure: 'iceberg' },
+    { kind: 'beat', text: 'But not looking isn’t the same as not listening.' },
+    {
+      kind: 'p',
+      text: 'There may be a company they’d join. A problem they’d want to solve. More ownership they’d take. A team they’d want to work with. A number that would change the equation.',
+    },
+    {
+      kind: 'p',
+      text: 'Today, discovering that requires one side to interrupt the other. Recruiters send cold messages. People browse jobs they mostly don’t want. Both sides repeat information the other could already know.',
+    },
+    { kind: 'beat', text: 'There should be a better way to discover mutual intent.' },
+
+    { kind: 'chapter', text: 'Give everyone a Rep.' },
+    { kind: 'p', text: 'Your Rep knows what you’ve actually done, what you can demonstrate and what would make you move.' },
+    { kind: 'list', text: ['Then you go back to work.', 'Your Rep listens.', 'Most weeks, nothing happens.', 'That’s a feature.'] },
+    {
+      kind: 'p',
+      text: 'When something deserves your attention, it comes to you, already filtered against your work, your conditions and the things you’ve taught your Rep to care about. No searching. No job alerts. No application. Just:',
+    },
+    { kind: 'quote', text: 'I found something worth your attention.' },
+    { kind: 'figure', figure: 'architecture' },
   ],
   principlesLabel: 'What we build by',
   principles: [
@@ -95,42 +146,116 @@ const manifestoEn: ManifestoContent = {
       body: 'With the people who use it, and in public where we can. The format your profile is written in will be open for anyone to read and use.',
     },
   ],
-  closing: [
-    'The old system starts with a job and waits for applications.',
-    'We think the next one starts with two sides knowing what they want.',
-    'Intent ↔ evidence ↔ intent.',
-    'No applications.',
-    'Remove applications.',
+  future: [
+    { kind: 'chapter', text: 'Eventually, your Rep won’t search jobs either.' },
+    {
+      kind: 'list',
+      text: [
+        'Companies will have agents of their own.',
+        'They’ll describe the work, the evidence they need, the conditions and the range.',
+        'Their agent will find the people who could actually do it.',
+        'Your Rep will decide whether it’s worth your attention.',
+      ],
+    },
+    { kind: 'p', text: 'Neither side needs to reveal everything before there’s mutual interest.' },
+    { kind: 'beat', text: 'Your agent talks to theirs.' },
+    { kind: 'p', text: 'And when both sides want the conversation, humans talk.' },
+    { kind: 'figure', figure: 'remove' },
   ],
+  figures: {
+    loop: {
+      ai: 'AI',
+      applications: 'Applications',
+      application: 'Application',
+      filters: ['Filter', 'Screen', 'Rank', 'Filter', 'Screen', 'Rank'],
+      noise: 'More noise',
+      lines: ['More applications create more filtering.', 'More filtering creates more applications.'],
+      cut: 'Remove applications.',
+    },
+    iceberg: {
+      looking: 'Looking',
+      notLooking: 'Not looking',
+      question: 'but would they move?',
+      tags: ['right work', 'right team', 'right ownership', 'right number'],
+    },
+    architecture: {
+      today: 'Today',
+      todaySteps: ['Job', 'Job board', 'Search', 'Application', 'ATS', 'Screening', 'Recruiter', 'Maybe a conversation'],
+      amble: 'Amble',
+      you: 'You',
+      rep: 'Rep',
+      listening: 'listening',
+      opportunity: 'Opportunity',
+      worth: 'worth it?',
+      conversation: 'Conversation',
+      caption: ['The old system waits for you to apply.', 'Your Rep doesn’t.'],
+    },
+    remove: {
+      before: ['Company', 'Job', 'Application', 'Screening', 'Person'],
+      struck: [2, 3],
+      after: ['Company intent', 'Evidence', 'Person intent'],
+      middle: 'No application in the middle.',
+      final: 'Remove applications.',
+    },
+  },
 };
 
 const manifestoEs: ManifestoContent = {
   meta: {
     title: 'Manifiesto — Amble',
-    description: 'Amble representa a personas. No las clasifica. Nueve principios detrás de tu Rep profesional.',
+    description: 'El mercado laboral está construido para quien busca trabajo. Amble está construido para quien no.',
   },
   kicker: 'Manifiesto',
-  title: 'El reclutamiento estaba roto. La IA lo ha rematado.',
-  essay: [
+  title: 'Adiós a las candidaturas.',
+  thesis: ['El mercado laboral está construido para quien busca trabajo.', 'Amble está construido para quien no.'],
+  intro: [
+    { kind: 'p', text: 'El reclutamiento funciona igual desde hace décadas.' },
+    { kind: 'p', text: 'Una empresa publica una oferta. La gente la encuentra. Aplica. Alguien filtra las candidaturas.' },
     {
       kind: 'list',
       text: [
-        'LinkedIn convirtió la identidad profesional en un perfil.',
-        'Los portales de empleo convirtieron encontrar trabajo en buscar.',
-        'Los ATS convirtieron a las personas en palabras clave.',
-        'Después, la IA hizo que aplicar fuera prácticamente gratis.',
+        'Internet hizo posible aplicar a más ofertas.',
+        'LinkedIn hizo a todo el mundo localizable.',
+        'Los ATS hicieron posible filtrar a más gente.',
+        'Después, la IA hizo que aplicar fuera casi gratis.',
       ],
     },
     {
       kind: 'p',
-      text: 'Ahora una persona puede aplicar a cientos de ofertas. Las empresas responden con más filtros, más automatización y más cribado. Así que tenemos más candidaturas, más ruido y menos información sobre si dos partes deberían hablar de verdad.',
+      text: 'Ahora generamos candidaturas más rápido de lo que nadie puede leerlas con sentido. Las empresas responden con más automatización, más cribado y más filtros.',
     },
-    { kind: 'beat', text: 'No necesitamos una candidatura mejor. Necesitamos eliminar la candidatura.' },
+    { kind: 'beat', text: 'Más candidaturas. Más filtros. Más ruido.' },
+    { kind: 'figure', figure: 'loop' },
+    { kind: 'p', text: 'No creemos que la respuesta sea una candidatura mejor.' },
+    { kind: 'beat', text: 'Creemos que el problema es la candidatura.' },
+
+    { kind: 'chapter', text: 'La mayoría de la gente no está buscando.' },
+    { kind: 'p', text: 'Y esa es la parte que el sistema actual gestiona peor.' },
     {
       kind: 'p',
-      text: 'La mejor persona para un puesto puede que nunca aplique. Está trabajando. No mira portales de empleo. No actualiza LinkedIn. No está «open to work». Eso no significa que no haya nada por lo que se movería.',
+      text: 'Algunas de las mejores personas para un puesto ya están haciendo un buen trabajo en otra parte. No miran portales de empleo. No actualizan su CV. No aplican.',
     },
-    { kind: 'beat', text: 'Para eso existe un Rep.' },
+    { kind: 'figure', figure: 'iceberg' },
+    { kind: 'beat', text: 'Pero no buscar no es lo mismo que no escuchar.' },
+    {
+      kind: 'p',
+      text: 'Puede haber una empresa a la que se unirían. Un problema que querrían resolver. Más responsabilidad que asumirían. Un equipo con el que querrían trabajar. Una cifra que cambiaría la ecuación.',
+    },
+    {
+      kind: 'p',
+      text: 'Hoy, descubrirlo exige que una parte interrumpa a la otra. Los recruiters envían mensajes en frío. La gente mira ofertas que casi nunca quiere. Los dos lados repiten información que el otro ya podría saber.',
+    },
+    { kind: 'beat', text: 'Debería haber una forma mejor de descubrir la intención mutua.' },
+
+    { kind: 'chapter', text: 'Un Rep para cada persona.' },
+    { kind: 'p', text: 'Tu Rep sabe lo que de verdad has hecho, lo que puedes demostrar y qué te haría cambiar.' },
+    { kind: 'list', text: ['Después tú vuelves al trabajo.', 'Tu Rep escucha.', 'Casi todas las semanas, no pasa nada.', 'Es una función.'] },
+    {
+      kind: 'p',
+      text: 'Cuando algo merece tu atención, te llega ya filtrado según tu trabajo, tus condiciones y lo que le has enseñado a tu Rep a valorar. Sin buscar. Sin alertas de empleo. Sin candidatura. Solo:',
+    },
+    { kind: 'quote', text: 'He encontrado algo que merece tu atención.' },
+    { kind: 'figure', figure: 'architecture' },
   ],
   principlesLabel: 'Con lo que construimos',
   principles: [
@@ -171,13 +296,58 @@ const manifestoEs: ManifestoContent = {
       body: 'Con quienes lo usan, y en público donde podamos. El formato en el que se escribe tu perfil será abierto para que cualquiera lo lea y lo use.',
     },
   ],
-  closing: [
-    'El sistema antiguo empieza con una oferta y espera candidaturas.',
-    'Creemos que el siguiente empieza con dos partes que saben lo que quieren.',
-    'Intención ↔ evidencia ↔ intención.',
-    'Sin candidaturas.',
-    'Adiós a las candidaturas.',
+  future: [
+    { kind: 'chapter', text: 'Algún día, tu Rep tampoco buscará ofertas.' },
+    {
+      kind: 'list',
+      text: [
+        'Las empresas tendrán sus propios agentes.',
+        'Describirán el trabajo, la evidencia que necesitan, las condiciones y el rango.',
+        'Su agente encontrará a las personas que de verdad podrían hacerlo.',
+        'Tu Rep decidirá si merece tu atención.',
+      ],
+    },
+    { kind: 'p', text: 'Ninguna parte necesita revelarlo todo antes de que haya interés mutuo.' },
+    { kind: 'beat', text: 'Tu agente habla con el suyo.' },
+    { kind: 'p', text: 'Y cuando los dos lados quieren la conversación, hablan las personas.' },
+    { kind: 'figure', figure: 'remove' },
   ],
+  figures: {
+    loop: {
+      ai: 'IA',
+      applications: 'Candidaturas',
+      application: 'Candidatura',
+      filters: ['Filtrar', 'Cribar', 'Ordenar', 'Filtrar', 'Cribar', 'Ordenar'],
+      noise: 'Más ruido',
+      lines: ['Más candidaturas generan más filtros.', 'Más filtros generan más candidaturas.'],
+      cut: 'Adiós a las candidaturas.',
+    },
+    iceberg: {
+      looking: 'Buscando',
+      notLooking: 'Sin buscar',
+      question: '¿pero se moverían?',
+      tags: ['el trabajo adecuado', 'el equipo adecuado', 'la responsabilidad adecuada', 'la cifra adecuada'],
+    },
+    architecture: {
+      today: 'Hoy',
+      todaySteps: ['Oferta', 'Portal de empleo', 'Búsqueda', 'Candidatura', 'ATS', 'Cribado', 'Recruiter', 'Quizá una conversación'],
+      amble: 'Amble',
+      you: 'Tú',
+      rep: 'Rep',
+      listening: 'escuchando',
+      opportunity: 'Oportunidad',
+      worth: '¿merece la pena?',
+      conversation: 'Conversación',
+      caption: ['El sistema antiguo espera a que apliques.', 'Tu Rep no.'],
+    },
+    remove: {
+      before: ['Empresa', 'Oferta', 'Candidatura', 'Cribado', 'Persona'],
+      struck: [2, 3],
+      after: ['Intención de la empresa', 'Evidencia', 'Intención de la persona'],
+      middle: 'Sin candidatura en medio.',
+      final: 'Adiós a las candidaturas.',
+    },
+  },
 };
 
 const howEn: HowBuiltContent = {

@@ -1,0 +1,53 @@
+---
+// Right after the hero: who Amble is for. Not people looking — people who
+// aren't, but would listen for the right thing.
+import Iceberg from '../Iceberg.astro';
+import type { HomeContent } from '../../content/home';
+
+interface Props {
+  c: HomeContent['passive'];
+}
+
+const { c } = Astro.props;
+---
+
+<section class="passive container" aria-labelledby="passive-title">
+  <div class="text">
+    <h2 class="display title" id="passive-title" data-reveal>{c.title}</h2>
+    {c.body.map((p, i) => <p class="lede body" data-reveal style={`--i:${i + 1}`}>{p}</p>)}
+    <p class="closer heading" data-reveal style="--i:3">{c.closer}</p>
+  </div>
+  <div class="art" data-reveal>
+    <Iceberg looking={c.looking} notLooking={c.notLooking} question={c.question} />
+  </div>
+</section>
+
+<style>
+  .passive {
+    display: grid;
+    gap: var(--space-8);
+    align-items: center;
+    max-width: calc(var(--width-wide) + var(--gutter) * 2);
+    padding-block: var(--space-section);
+  }
+  @media (min-width: 900px) {
+    .passive {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+      gap: var(--space-9);
+    }
+  }
+  .text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+  .title {
+    font-size: var(--text-display-lg);
+    margin-bottom: var(--space-3);
+  }
+  .closer {
+    margin-top: var(--space-3);
+    font-size: var(--text-heading-md);
+    color: var(--color-accent-strong);
+  }
+</style>

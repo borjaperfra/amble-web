@@ -1,0 +1,151 @@
+---
+// Your inbox is a tidy box of people who applied. The people you'd actually
+// want to talk to are outside it, scattered — and the eye is looking there.
+import Symbol from '../Symbol.astro';
+import type { CompaniesContent } from '../../content/companies';
+
+interface Props {
+  c: CompaniesContent['inbox'];
+}
+
+const { c } = Astro.props;
+const applied = Array.from({ length: 21 }, (_, i) => i);
+const outside = [
+  { x: 12, y: 30, tag: 0 },
+  { x: 58, y: 18, tag: 1 },
+  { x: 84, y: 46 },
+  { x: 30, y: 70, tag: 2 },
+  { x: 70, y: 78, tag: 3 },
+  { x: 46, y: 50 },
+];
+---
+
+<figure class="inbox" data-scene>
+  <div class="box">
+    <p class="box-label">{c.inbox} · <span>{c.applied}</span></p>
+    <div class="grid" aria-hidden="true">
+      {applied.map((i) => <span class="p" style={`--i:${i}`} />)}
+    </div>
+  </div>
+
+  <div class="outside">
+    <p class="out-label">{c.outside}</p>
+    <div class="field">
+      {
+        outside.map((o, i) => (
+          <span class="person" style={`left:${o.x}%;top:${o.y}%;--i:${i}`}>
+            <span class="dot" />
+            {o.tag !== undefined && <span class="tag">{c.tags[o.tag]}</span>}
+          </span>
+        ))
+      }
+      <span class="eye" aria-hidden="true"><Symbol size={34} watch /></span>
+    </div>
+  </div>
+</figure>
+
+<style>
+  .inbox {
+    display: grid;
+    gap: var(--space-6);
+    width: 100%;
+    max-width: var(--width-wide);
+    margin-top: var(--space-9);
+    text-align: left;
+  }
+  @media (min-width: 860px) {
+    .inbox {
+      grid-template-columns: minmax(0, 4fr) minmax(0, 7fr);
+      align-items: stretch;
+    }
+  }
+  .box {
+    padding: var(--space-5);
+    background: var(--color-surface-sunken);
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--radius-md);
+  }
+  .box-label,
+  .out-label {
+    font-size: var(--text-label);
+    font-weight: var(--weight-semibold);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+  .box-label span {
+    color: var(--color-text-faint);
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(7, 14px);
+    justify-content: space-between;
+    row-gap: 14px;
+    margin-top: var(--space-5);
+  }
+  .p {
+    width: 14px;
+    height: 14px;
+    border-radius: var(--radius-full);
+    background: var(--color-border);
+    transition: opacity 0.3s ease;
+    transition-delay: calc(var(--i) * 40ms);
+  }
+  :global(.motion) .inbox:not(.is-playing) .p {
+    opacity: 0;
+  }
+  .outside {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+  .out-label {
+    color: var(--color-accent-strong);
+  }
+  .field {
+    position: relative;
+    flex: 1;
+    min-height: 240px;
+    border: 1.5px dashed var(--color-accent-soft);
+    border-radius: var(--radius-md);
+  }
+  .person {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    translate: -50% -50%;
+    transition: opacity 0.6s ease;
+    transition-delay: calc(1s + var(--i) * 0.3s);
+  }
+  :global(.motion) .inbox:not(.is-playing) .person {
+    opacity: 0;
+  }
+  .dot {
+    width: 16px;
+    height: 16px;
+    flex: none;
+    border-radius: var(--radius-full);
+    background: var(--color-accent);
+    box-shadow: 0 0 0 5px var(--color-accent-wash);
+  }
+  .tag {
+    padding: 2px var(--space-2);
+    font-size: var(--text-label);
+    white-space: nowrap;
+    color: var(--color-accent-strong);
+    background: var(--color-surface-raised);
+    border-radius: var(--radius-sm);
+  }
+  .eye {
+    position: absolute;
+    right: 12px;
+    top: 12px;
+    color: var(--color-text);
+  }
+  @media (max-width: 560px) {
+    .tag {
+      display: none;
+    }
+  }
+</style>

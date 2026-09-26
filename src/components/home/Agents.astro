@@ -1,8 +1,7 @@
 ---
-// Agent to agent (v2): the company's agent asks, Maya's Rep answers with
-// evidence, keeps what's private private, and the conversation ends with both
-// sides wanting to talk — and Maya deciding. Marked as coming.
-import SectionIntro from '../SectionIntro.astro';
+// A glimpse of where Amble goes (v2): the company's agent asks, your Rep
+// answers, the salary is checked without revealing her floor, and only then
+// do humans talk. Short on purpose.
 import Symbol from '../Symbol.astro';
 import type { HomeContent } from '../../content/home';
 
@@ -13,60 +12,70 @@ interface Props {
 const { c } = Astro.props;
 ---
 
-<section class="section container" aria-labelledby="agents-title">
-  <p class="badge-row" data-reveal><span class="version-badge">{c.badge}</span></p>
-  <SectionIntro id="agents-title" kicker={c.kicker} title={c.title} body={c.line} align="center" />
+<section class="agents container" aria-labelledby="agents-title">
+  <p class="badge" data-reveal>{c.badge}</p>
+  <p class="kicker" data-reveal>{c.kicker}</p>
+  <h2 class="display title" id="agents-title" data-reveal>{c.title}</h2>
+  <p class="line heading" data-reveal>{c.line}</p>
 
-  <div class="scene" data-scene>
+  <figure class="scene" data-scene>
     <header class="sides">
       <p class="side theirs">
         <span class="face other"><Symbol size={30} class="mirror" /></span>
         {c.theirs}
       </p>
-      <span class="wire" aria-hidden="true"></span>
       <p class="side yours">
         {c.yours}
         <span class="face"><Symbol size={30} /></span>
       </p>
     </header>
 
-    <ol class="talk" role="list">
+    <ol class="exchange" role="list">
       {
-        c.messages.map((m, i) => (
-          <li class:list={['msg', m.from]} style={`--i:${i}`}>
-            <p class="bubble">{m.text}</p>
-            {m.evidence && <p class="evidence">✓ {m.evidence}</p>}
-            {m.private && (
-              <p class="private">
-                <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
-                  <rect x="5" y="10.5" width="14" height="10" rx="2" />
-                  <path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5" />
-                </svg>
-                {m.private} · € ••••
-              </p>
-            )}
+        c.exchange.map((x, i) => (
+          <li class="row" style={`--i:${i}`}>
+            <span class="ask">{x.ask}</span>
+            <span class="wire" aria-hidden="true">
+              <span class="to" />
+              <span class="back" />
+            </span>
+            <span class="answer">✓ {x.answer}</span>
           </li>
         ))
       }
     </ol>
 
-    <p class="outcome" style={`--i:${c.messages.length}`}>
-      <span class="outcome-faces" aria-hidden="true">
-        <span class="face other"><Symbol size={22} class="mirror" /></span>
-        <span class="face"><Symbol size={22} /></span>
-      </span>
-      {c.outcome}
-    </p>
-  </div>
+    <div class="salary" style={`--i:${c.exchange.length}`}>
+      <p class="range">
+        <span class="range-label">{c.range.label}</span>
+        <span class="range-value">{c.range.value}</span>
+      </p>
+      <p class="overlap" aria-hidden="true"><span /></p>
+      <p class="range hidden">
+        <span class="range-label">{c.range.floorLabel}</span>
+        <span class="range-value blur">€ ••••</span>
+      </p>
+      <p class="private">{c.privateLine}</p>
+    </div>
+
+    <ol class="steps" role="list">
+      {c.steps.map((st, i) => <li style={`--i:${c.exchange.length + 1 + i}`}>↓ <span>{st}</span></li>)}
+    </ol>
+  </figure>
+
+  <p class="closer" data-reveal>{c.closer}</p>
 </section>
 
 <style>
-  .badge-row {
+  .agents {
     display: flex;
-    justify-content: center;
-    margin-bottom: var(--space-4);
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding-block: var(--space-section);
   }
-  .version-badge {
+  .badge {
+    margin-bottom: var(--space-4);
     padding: var(--space-1) var(--space-3);
     font-size: var(--text-label);
     font-weight: var(--weight-semibold);
@@ -76,20 +85,32 @@ const { c } = Astro.props;
     border: 1.5px dashed var(--color-accent-soft);
     border-radius: var(--radius-full);
   }
+  .title {
+    max-width: 16ch;
+    margin-top: var(--space-4);
+    font-size: var(--text-display-lg);
+  }
+  .line {
+    margin-top: var(--space-4);
+    font-size: var(--text-heading-md);
+    font-style: italic;
+    color: var(--color-accent-strong);
+  }
+
   .scene {
-    max-width: 760px;
-    margin: var(--space-8) auto 0;
+    width: 100%;
+    max-width: 720px;
+    margin-top: var(--space-8);
     padding: clamp(var(--space-5), 1rem + 2vw, var(--space-7));
     background: var(--color-surface-raised);
     border: var(--border-width) solid var(--color-border-subtle);
     border-radius: var(--radius-xl);
     box-shadow: var(--shadow-sheet);
   }
-
   .sides {
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    gap: var(--space-4);
     padding-bottom: var(--space-5);
     border-bottom: var(--border-width) solid var(--color-border-subtle);
   }
@@ -99,14 +120,8 @@ const { c } = Astro.props;
     gap: var(--space-3);
     font-weight: var(--weight-semibold);
   }
-  .side.theirs {
+  .theirs {
     color: var(--color-other);
-  }
-  .wire {
-    flex: 1;
-    height: 2px;
-    background-image: linear-gradient(to right, var(--color-border) 50%, transparent 0);
-    background-size: 8px 2px;
   }
   .face {
     display: grid;
@@ -126,101 +141,158 @@ const { c } = Astro.props;
     scale: -1 1;
   }
 
-  .talk {
+  /* Each question travels right, the answer comes back. */
+  .exchange {
     display: flex;
     flex-direction: column;
     gap: var(--space-4);
     padding-block: var(--space-6);
   }
-  .msg {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-1);
-    max-width: 78%;
+  .row {
+    display: grid;
+    grid-template-columns: 9rem 1fr 9rem;
+    align-items: center;
+    gap: var(--space-3);
   }
-  .msg.theirs {
-    align-self: flex-start;
-  }
-  .msg.yours {
-    align-self: flex-end;
-    align-items: flex-end;
-  }
-  .bubble {
-    padding: var(--space-3) var(--space-4);
-    font-size: var(--text-body);
-    line-height: var(--leading-tight);
-    border-radius: 18px;
-  }
-  .theirs .bubble {
+  .ask {
+    justify-self: start;
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--text-body-sm);
     color: var(--color-text);
     background: var(--color-other-soft);
-    border-bottom-left-radius: 6px;
+    border-radius: var(--radius-md);
   }
-  .yours .bubble {
+  .answer {
+    justify-self: end;
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--text-body-sm);
+    font-weight: var(--weight-medium);
     color: var(--color-text-inverse);
     background: var(--color-accent-strong);
-    border-bottom-right-radius: 6px;
+    border-radius: var(--radius-md);
   }
-  .evidence,
-  .private {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-2);
-    font-size: var(--text-body-sm);
+  .wire {
+    position: relative;
+    height: 14px;
   }
-  .evidence {
-    color: var(--color-accent-strong);
+  .wire .to,
+  .wire .back {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 1.5px;
+    transform-origin: left;
   }
-  .private {
-    padding: 2px var(--space-3);
-    color: var(--color-caution);
-    background: var(--color-caution-soft);
-    border-radius: var(--radius-full);
+  .wire .to {
+    top: 3px;
+    background: var(--color-other);
   }
-  .private svg {
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 1.8;
+  .wire .back {
+    bottom: 3px;
+    background: var(--color-accent);
+    transform-origin: right;
   }
 
-  .outcome {
+  .salary {
+    display: grid;
+    gap: var(--space-2);
+    padding: var(--space-5);
+    background: var(--color-surface);
+    border-radius: var(--radius-lg);
+  }
+  .range {
     display: flex;
-    align-items: center;
-    gap: var(--space-4);
-    padding-top: var(--space-5);
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .range-label {
+    font-size: var(--text-body-sm);
+    color: var(--color-text-muted);
+  }
+  .range-value {
+    font-family: var(--font-display);
+    font-size: var(--text-heading-md);
+  }
+  .blur {
+    filter: blur(6px);
+    user-select: none;
+  }
+  .overlap {
+    position: relative;
+    height: 10px;
+    margin: var(--space-1) 0;
+    background: linear-gradient(to right, var(--color-other-soft) 0 70%, transparent 0) 0 0 / 100% 4px no-repeat,
+      linear-gradient(to right, transparent 0 45%, var(--color-accent-soft) 0) 0 6px / 100% 4px no-repeat;
+  }
+  .overlap span {
+    position: absolute;
+    left: 57%;
+    top: 50%;
+    width: 12px;
+    height: 12px;
+    translate: -50% -50%;
+    background: var(--color-accent);
+    border-radius: var(--radius-full);
+    box-shadow: 0 0 0 4px var(--color-accent-wash);
+  }
+  .private {
+    margin-top: var(--space-2);
     font-family: var(--font-display);
     font-size: var(--text-heading-sm);
-    border-top: var(--border-width) solid var(--color-border-subtle);
+    color: var(--color-accent-strong);
   }
-  .outcome-faces {
-    display: inline-flex;
+  .steps {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+    margin-top: var(--space-5);
+    color: var(--color-text-faint);
   }
-  .outcome-faces .face {
-    width: 36px;
-    height: 36px;
-    box-shadow: 0 0 0 3px var(--color-surface-raised);
+  .steps span {
+    font-family: var(--font-display);
+    font-size: var(--text-heading-sm);
+    color: var(--color-text);
   }
-  .outcome-faces .face + .face {
-    margin-left: -8px;
+  .steps li:last-child span {
+    font-size: var(--text-heading-md);
+    color: var(--color-accent-strong);
+  }
+  .closer {
+    max-width: 30rem;
+    margin-top: var(--space-6);
+    color: var(--color-text-muted);
   }
 
-  /* One message after another, at the pace of a conversation. */
-  .js .scene :is(.msg, .outcome) {
+  /* Choreography: one exchange after another, then the salary, then the steps. */
+  .row,
+  .salary,
+  .steps li {
     transition:
       opacity var(--motion-slow) ease,
       translate var(--motion-arrive) var(--ease-standard);
-    transition-delay: calc(0.3s + var(--i) * 0.75s);
+    transition-delay: calc(0.3s + var(--i) * 0.8s);
   }
-  .js .scene:not(.is-playing) :is(.msg, .outcome) {
+  .wire .to,
+  .wire .back {
+    transition: transform 0.5s var(--ease-standard);
+  }
+  .wire .to {
+    transition-delay: calc(0.45s + var(--i) * 0.8s);
+  }
+  .wire .back {
+    transition-delay: calc(0.75s + var(--i) * 0.8s);
+  }
+  :global(.motion) .scene:not(.is-playing) :is(.row, .salary, .steps li) {
     opacity: 0;
-    translate: 0 10px;
+    translate: 0 8px;
+  }
+  :global(.motion) .scene:not(.is-playing) .wire :is(.to, .back) {
+    transform: scaleX(0);
   }
   @media (max-width: 560px) {
-    .msg {
-      max-width: 92%;
-    }
-    .side {
-      font-size: var(--text-body-sm);
+    .row {
+      grid-template-columns: auto 1fr auto;
     }
   }
 </style>
