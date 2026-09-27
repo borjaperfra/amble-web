@@ -84,14 +84,14 @@ const cards: Card[] = [
     lines: [['I’m not looking.', ''], ['', 'Amble'], [' is.', '']],
     sub: 'Your professional Rep · Closed beta',
     size: 96,
-    sheet: { label: 'YOUR REP', forLabel: 'Listening for', items: ['the right problem', 'more ownership', 'remote', 'the right number'], status: 'Listening' },
+    sheet: { label: 'YOUR REP', forLabel: 'Listening for', items: ['AI Engineer · FDE', 'the right problem', 'remote, Europe', '€70–85K'], status: 'Listening' },
   },
   {
     file: 'og-es.png',
     lines: [['Yo no busco.', ''], ['', 'Amble'], [' sí.', '']],
     sub: 'Tu Rep profesional · Beta cerrada',
     size: 96,
-    sheet: { label: 'TU REP', forLabel: 'Atento a', items: ['el problema adecuado', 'más responsabilidad', 'remoto', 'la cifra adecuada'], status: 'Escuchando' },
+    sheet: { label: 'TU REP', forLabel: 'Atento a', items: ['AI Engineer · FDE', 'el problema adecuado', 'remoto, Europa', '70–85 k€'], status: 'Escuchando' },
   },
   {
     file: 'og-companies-en.png',

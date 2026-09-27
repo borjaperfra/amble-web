@@ -36,7 +36,7 @@ const {
 } = Astro.props;
 const canonical = new URL(getRelativeLocaleUrl(lang, path), Astro.site);
 // Bump OG_VERSION whenever the cards change: X and LinkedIn cache images by URL.
-const OG_VERSION = '2026-09-27';
+const OG_VERSION = '2026-09-27b';
 const ogImage = new URL(`${og ? `/og-${og}-${lang}.png` : `/og-${lang}.png`}?v=${OG_VERSION}`, Astro.site).href;
 ---
 

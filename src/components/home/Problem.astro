@@ -395,6 +395,6 @@ const statements = [c.title, c.verbs.join(' '), c.never];
       if (scene.dataset.step !== String(n)) scene.dataset.step = String(n);
     };
     // The scene holds still; each scroll gesture plays one beat.
-    steppedScene({ trigger: scene, pin: scene.querySelector<HTMLElement>('.pin')!, steps: 4, onStep: setStep, hold: (n) => [900, 2200, 1600, 1600][n] });
+    steppedScene({ trigger: scene, pin: scene.querySelector<HTMLElement>('.pin')!, steps: 4, onStep: setStep, hold: (n) => [400, 1300, 900, 700][n] });
   }
 </script>

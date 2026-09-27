@@ -43,10 +43,12 @@ export function startSmoothScroll() {
 type Stepped = { st: ScrollTrigger; steps: number; hold: (step: number) => number };
 const scenes: Stepped[] = [];
 
-const STEP_DURATION = 1.1; // seconds to glide from one step to the next
+const STEP_DURATION = 0.9; // seconds to glide from one step to the next
 const QUIET_MS = 200; // a gap this long between events ends a gesture
 
-let busy = false; // gliding to a step
+let busy = false; // gliding to a step, or letting its animations finish
+let queued = 0; // a fresh gesture made while busy: played as soon as the step is done
+let queuedScene: Stepped | null = null;
 let swallowing = false; // the gesture that moved a step (or was stopped) isn't over yet
 let lastEvent = 0; // last swallowed event, to tell one gesture from the next
 let lastAbs = 0; // last swallowed delta, to spot a fresh gesture under inertia
@@ -81,15 +83,37 @@ function go(s: Stepped, y: number, dir: number) {
   busy = true;
   swallowing = true;
   lastEvent = performance.now();
-  lastAbs = Infinity; // only a pause starts the next gesture
+  lastAbs = Math.max(lastAbs, 60); // inertia decays; a new flick is a spike above it
   lenis?.scrollTo(posOf(s, next), {
     duration: STEP_DURATION,
     easing: (t) => 1 - Math.pow(1 - t, 3),
     force: true,
     onComplete: () => {
-      setTimeout(() => (busy = false), s.hold(next));
+      setTimeout(release, s.hold(next));
     },
   });
+}
+
+// The step is done. A gesture made meanwhile isn't lost: it plays now.
+function release() {
+  busy = false;
+  const dir = queued;
+  const s = queuedScene;
+  queued = 0;
+  queuedScene = null;
+  if (!dir || !s || !lenis) return;
+  const y = lenis.scroll;
+  if (sceneFor(y, dir) === s) return go(s, y, dir);
+  // At the scene's edge the kept gesture leaves it, gently.
+  lenis.scrollTo(y + dir * window.innerHeight * 0.6, { duration: 0.9, force: true });
+}
+function queue(dir: number) {
+  if (!lenis) return;
+  const y = lenis.scroll;
+  const s = scenes.find((sc) => y >= sc.st.start - 2 && y <= sc.st.end + 2);
+  if (!s) return;
+  queued = dir;
+  queuedScene = s;
 }
 
 // Every wheel and touch event passes here before Lenis moves the page.
@@ -101,6 +125,16 @@ function gate({ deltaY, event }: { deltaX: number; deltaY: number; event: WheelE
     touchTravel = 0;
     touchFired = false;
     return true;
+  }
+  if (event.type === 'touchmove' && busy) {
+    // A new swipe while a step is playing: remember it.
+    touchTravel += deltaY;
+    if (!touchFired && Math.abs(touchTravel) > 36) {
+      touchFired = true;
+      queue(Math.sign(touchTravel));
+    }
+    if (event.cancelable) event.preventDefault();
+    return false;
   }
   if (event.type === 'touchend') return true;
   const dir = Math.sign(deltaY);
@@ -117,6 +151,8 @@ function gate({ deltaY, event }: { deltaX: number; deltaY: number; event: WheelE
   if (swallowing && !isTouch) {
     const fresh = now - lastEvent > QUIET_MS || (abs > lastAbs * 2.5 && abs > 12);
     if (!fresh || busy) {
+      // A new gesture while a step plays is kept for when it's done.
+      if (fresh && busy) queue(dir);
       lastEvent = now;
       lastAbs = abs;
       if (event.cancelable) event.preventDefault();
@@ -184,10 +220,10 @@ export function steppedScene(opts: {
   pin: HTMLElement;
   steps: number;
   onStep: (step: number) => void;
-  // ms each step's animations keep running once it's reached (default 1200)
+  // ms each step's animations keep running once it's reached (default 500)
   hold?: number | ((step: number) => number);
 }) {
-  const { trigger, pin, steps, onStep, hold = 1200 } = opts;
+  const { trigger, pin, steps, onStep, hold = 500 } = opts;
   const st = ScrollTrigger.create({
     trigger,
     pin,

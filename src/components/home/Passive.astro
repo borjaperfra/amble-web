@@ -591,6 +591,6 @@ const words = (s: string) => s.split(' ');
       if (scene.dataset.step !== String(n)) scene.dataset.step = String(n);
     };
     // The scene holds still; each scroll gesture plays one beat.
-    steppedScene({ trigger: scene, pin: scene.querySelector<HTMLElement>('.pin')!, steps: 4, onStep: setStep, hold: 1800 });
+    steppedScene({ trigger: scene, pin: scene.querySelector<HTMLElement>('.pin')!, steps: 4, onStep: setStep, hold: 700 });
   }
 </script>
