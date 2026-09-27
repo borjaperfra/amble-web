@@ -18,6 +18,11 @@ const t = useTranslations(lang);
 const { path = '', joinHref = `${getRelativeLocaleUrl(lang)}#join`, stages, joinLabel = t('nav.join') } = Astro.props;
 const other: Lang = lang === 'en' ? 'es' : 'en';
 const launch = SITE_MODE === 'launch';
+const pages = [
+  { path: 'companies', label: t('nav.companies') },
+  { path: 'manifesto', label: t('nav.manifesto') },
+  { path: 'how-its-built', label: t('nav.howBuilt') },
+];
 ---
 
 <header class="header container">
@@ -26,9 +31,9 @@ const launch = SITE_MODE === 'launch';
     {
       !launch && (
         <>
-          <a class="page text-link" href={getRelativeLocaleUrl(lang, 'companies')}>{t('nav.companies')}</a>
-          <a class="page text-link" href={getRelativeLocaleUrl(lang, 'manifesto')}>{t('nav.manifesto')}</a>
-          <a class="page text-link" href={getRelativeLocaleUrl(lang, 'how-its-built')}>{t('nav.howBuilt')}</a>
+          {pages.map((p) => (
+            <a class="page text-link" href={getRelativeLocaleUrl(lang, p.path)}>{p.label}</a>
+          ))}
         </>
       )
     }
@@ -36,6 +41,13 @@ const launch = SITE_MODE === 'launch';
       {t('nav.otherLang')}
     </a>
     {!launch && <a class="join text-link" href={joinHref}>{joinLabel} <span aria-hidden="true">→</span></a>}
+    {
+      !launch && (
+        <button class="menu-btn" type="button" aria-label={t('nav.menu')} aria-haspopup="dialog" aria-expanded="false" aria-controls="site-menu" data-menu-open>
+          <svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><path d="M3 7h16M3 15h16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /></svg>
+        </button>
+      )
+    }
   </nav>
 </header>
 
@@ -56,13 +68,50 @@ const launch = SITE_MODE === 'launch';
               </li>
             ))}
           </ol>
-          <span class="loop-now" aria-hidden="true" />
+          <span class="loop-now" aria-hidden="true"><span class="loop-now-n" /><span class="loop-now-label" /></span>
         </nav>
       )
     }
     <a class="btn float-join" href={joinHref}>{joinLabel}</a>
+    {
+      !launch && (
+        <button class="menu-btn" type="button" aria-label={t('nav.menu')} aria-haspopup="dialog" aria-expanded="false" aria-controls="site-menu" data-menu-open>
+          <svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><path d="M3 7h16M3 15h16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /></svg>
+        </button>
+      )
+    }
   </div>
 </div>
+
+{
+  !launch && (
+    <dialog class="menu" id="site-menu" aria-label={t('nav.menu')}>
+      <div class="container menu-head">
+        <Logo />
+        <button class="menu-btn" type="button" aria-label={t('nav.close')} data-menu-close autofocus>
+          <svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><path d="M5 5l12 12M17 5L5 17" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /></svg>
+        </button>
+      </div>
+      <nav class="container menu-nav" aria-label={t('nav.label')}>
+        <ul class="menu-pages" role="list">
+          {pages.map((p) => (
+            <li>
+              <a href={getRelativeLocaleUrl(lang, p.path)} aria-current={p.path === path ? 'page' : undefined}>
+                {p.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+        <div class="menu-foot">
+          <a class="btn menu-join" href={joinHref}>{joinLabel}</a>
+          <a class="text-link" href={getRelativeLocaleUrl(other, path)} hreflang={other} lang={other}>
+            {t('nav.otherLang')}
+          </a>
+        </div>
+      </nav>
+    </dialog>
+  )
+}
 
 <style>
   .header {
@@ -171,9 +220,119 @@ const launch = SITE_MODE === 'launch';
   }
 
   .float-join {
+    flex: none;
     height: 38px;
     padding: 0 var(--space-4);
     font-size: var(--text-body-sm);
+  }
+  /* The step number always shows; the stage's name gives way first. */
+  .loop-now {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .loop-now-label:not(:empty)::before {
+    content: ' · ';
+    white-space: pre;
+  }
+
+  /* ---------- Menu: on narrow screens the pages leave the header for it ---------- */
+  .menu-btn {
+    display: none;
+    flex: none;
+    place-items: center;
+    width: var(--touch-target);
+    height: var(--touch-target);
+    margin-right: calc(var(--space-2) * -1);
+    padding: 0;
+    color: var(--color-text);
+    background: none;
+    border: 0;
+    border-radius: var(--radius-full);
+    cursor: pointer;
+  }
+  .menu-btn:hover {
+    background: var(--color-accent-wash);
+  }
+  .menu {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    max-width: none;
+    height: 100dvh;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    color: var(--color-text);
+    background: var(--color-bg);
+    border: 0;
+    opacity: 0;
+    translate: 0 -8px;
+    transition:
+      opacity var(--motion-slow) ease,
+      translate var(--motion-slow) var(--ease-standard),
+      overlay var(--motion-slow) allow-discrete,
+      display var(--motion-slow) allow-discrete;
+  }
+  .menu[open] {
+    display: flex;
+    flex-direction: column;
+    opacity: 1;
+    translate: 0 0;
+  }
+  @starting-style {
+    .menu[open] {
+      opacity: 0;
+      translate: 0 -8px;
+    }
+  }
+  :global(html.menu-open) {
+    overflow: hidden;
+  }
+  .menu::backdrop {
+    background: transparent;
+  }
+  .menu-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-block: var(--space-5);
+  }
+  .menu-head .menu-btn {
+    display: grid;
+  }
+  .menu-nav {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: var(--space-7);
+    padding-block: var(--space-5) var(--space-7);
+  }
+  .menu-pages li + li {
+    border-top: var(--border-width) solid var(--color-border-subtle);
+  }
+  .menu-pages a {
+    display: block;
+    padding-block: var(--space-4);
+    font-family: var(--font-display);
+    font-size: var(--text-heading-lg);
+    line-height: 1.15;
+    color: var(--color-text);
+    text-decoration: none;
+  }
+  .menu-pages a[aria-current='page'] {
+    color: var(--color-accent-strong);
+  }
+  .menu-foot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-3);
+  }
+  .menu-join {
+    width: 100%;
   }
 
   /* The page's own logo travels between pages (view transitions). */
@@ -185,9 +344,23 @@ const launch = SITE_MODE === 'launch';
     .page {
       display: none;
     }
+    .menu-btn {
+      display: grid;
+    }
   }
   @media (max-width: 480px) {
     .lang {
+      display: none;
+    }
+    .nav,
+    .float-inner {
+      gap: var(--space-3);
+    }
+    .float-join {
+      padding: 0 var(--space-3);
+    }
+    /* In the bar the eye alone says Amble: the step and the button need the room. */
+    .float :global(.logo .word) {
       display: none;
     }
   }
@@ -205,7 +378,10 @@ const launch = SITE_MODE === 'launch';
         l.classList.toggle('is-active', i === at);
         l.classList.toggle('is-past', at >= 0 && i < at);
       });
-      if (now) now.textContent = at >= 0 ? `${at + 1}/${order.length} · ${links[at].textContent?.replace(/^\s*\d+/, '').trim()}` : '';
+      if (now) {
+        now.children[0].textContent = at >= 0 ? `${at + 1}/${order.length}` : '';
+        now.children[1].textContent = at >= 0 ? (links[at].textContent?.replace(/^\s*\d+/, '').trim() ?? '') : '';
+      }
     };
     // On each scroll: the stage whose section holds the middle of the screen.
     const sections = [...document.querySelectorAll<HTMLElement>('[data-stage]')];
@@ -232,5 +408,46 @@ const launch = SITE_MODE === 'launch';
       bar.classList.toggle('is-shown', show);
       bar.inert = !show;
     }).observe(header);
+  }
+
+  // The menu: a modal dialog, so focus stays inside and Escape closes it. The
+  // page behind doesn't scroll while it's open; pages with smooth scrolling
+  // hear about it through amble:scroll-lock.
+  const menu = document.querySelector<HTMLDialogElement>('#site-menu');
+  const openers = [...document.querySelectorAll<HTMLButtonElement>('[data-menu-open]')];
+  if (menu) {
+    let opener: HTMLElement | null = null;
+    let locked = false;
+    const lock = (on: boolean) => {
+      if (on === locked) return;
+      locked = on;
+      document.documentElement.classList.toggle('menu-open', on);
+      window.dispatchEvent(new CustomEvent('amble:scroll-lock', { detail: on }));
+      openers.forEach((b) => b.setAttribute('aria-expanded', String(on)));
+    };
+    // Unlocked right away rather than on the dialog's close event, which some
+    // browsers deliver late: an in-page link needs the page free to scroll.
+    const shut = (refocus = true) => {
+      if (menu.open) menu.close();
+      lock(false);
+      if (refocus) opener?.focus({ preventScroll: true });
+    };
+    for (const b of openers) {
+      b.addEventListener('click', () => {
+        opener = b;
+        menu.showModal();
+        lock(true);
+      });
+    }
+    menu.addEventListener('cancel', () => shut()); // Escape
+    menu.addEventListener('close', () => lock(false));
+    menu.querySelector('[data-menu-close]')?.addEventListener('click', () => shut());
+    menu.addEventListener('click', (e) => {
+      if ((e.target as HTMLElement).closest('a')) shut(false);
+    });
+    // Wide enough for the header's own links: the menu goes.
+    window.matchMedia('(min-width: 1081px)').addEventListener('change', (e) => {
+      if (e.matches) shut(false);
+    });
   }
 </script>

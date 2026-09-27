@@ -19,6 +19,7 @@ export const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)
 if (!reducedMotion) document.documentElement.classList.add('motion');
 
 let lenis: Lenis | undefined;
+let locked = false; // the site menu is open (Header.astro)
 
 export function startSmoothScroll() {
   if (reducedMotion || lenis) return lenis;
@@ -26,6 +27,12 @@ export function startSmoothScroll() {
   lenis.on('scroll', ScrollTrigger.update);
   lenis.on('scroll', holdAtEntry);
   window.addEventListener('keydown', onKey);
+  // The site menu is open: the page behind holds still, steps included.
+  window.addEventListener('amble:scroll-lock', (e) => {
+    locked = (e as CustomEvent<boolean>).detail;
+    if (locked) lenis?.stop();
+    else lenis?.start();
+  });
   gsap.ticker.add((time) => lenis?.raf(time * 1000));
   gsap.ticker.lagSmoothing(0);
   return lenis;
@@ -62,8 +69,8 @@ const stepOf = (s: Stepped, y: number) => Math.round(((y - s.st.start) / (s.st.e
 
 // The scene a move in this direction would play, if any. At the last step
 // going down (or the first going up) there is none: the move leaves. A scene
-// already half on screen counts as reached: its first step is showing, so the
-// next gesture plays the second one instead of just settling the pin.
+// already half on screen counts as reached: a gesture there glides it into
+// place on its entry step, and the next one plays on (see go).
 // That only holds for a gesture that starts there; one that merely passes
 // through on its way in is stopped at the first step instead (holdAtEntry).
 const APPROACH = 0.5; // of the viewport
@@ -79,7 +86,10 @@ let gestureFrom = 0; // where the current gesture started
 
 function go(s: Stepped, y: number, dir: number) {
   const at = Math.min(s.steps - 1, Math.max(0, stepOf(s, y)));
-  const next = Math.min(s.steps - 1, Math.max(0, at + dir));
+  // Still approaching the scene: this gesture only settles it on its entry
+  // step (the first going down, the last going up); the next one plays on.
+  const before = dir > 0 ? y < s.st.start - 2 : y > s.st.end + 2;
+  const next = before ? at : Math.min(s.steps - 1, Math.max(0, at + dir));
   const run = ++glide;
   busy = true;
   swallowing = true;
@@ -126,6 +136,7 @@ function queue(dir: number) {
 
 // Every wheel and touch event passes here before Lenis moves the page.
 function gate({ deltaY, event }: { deltaX: number; deltaY: number; event: WheelEvent | TouchEvent }) {
+  if (locked) return false;
   if (!lenis || event.ctrlKey) return true;
   lastInput = performance.now();
   const isTouch = event.type.startsWith('touch');
@@ -214,7 +225,7 @@ function holdAtEntry(l: Lenis) {
 
 const KEYS: Record<string, number> = { ArrowDown: 1, PageDown: 1, ' ': 1, ArrowUp: -1, PageUp: -1 };
 function onKey(e: KeyboardEvent) {
-  if (!lenis || e.altKey || e.ctrlKey || e.metaKey) return;
+  if (!lenis || locked || e.altKey || e.ctrlKey || e.metaKey) return;
   if ((e.target as HTMLElement).closest?.('input, textarea, select, [contenteditable]')) return;
   const dir = e.key === ' ' && e.shiftKey ? -1 : KEYS[e.key];
   if (!dir) return;

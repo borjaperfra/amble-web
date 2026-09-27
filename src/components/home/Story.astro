@@ -30,6 +30,8 @@ const claims = c.sources.flatMap((src) =>
 ---
 
 <section class="story" data-step="3" data-layout="group" aria-labelledby="story-title">
+  <!-- On phones the title comes first and scrolls away, so the steps get the screen. -->
+  <div class="container chapter-lead" aria-hidden="true"><p class="display chapter">{c.chapter}</p></div>
   <div class="story-pin">
     <div class="container story-grid">
       <div class="captions">
@@ -141,6 +143,9 @@ const claims = c.sources.flatMap((src) =>
   /* ---------- Frame ---------- */
   .story {
     position: relative;
+  }
+  .chapter-lead {
+    display: none;
   }
   .story-pin {
     display: flex;
@@ -689,6 +694,66 @@ const claims = c.sources.flatMap((src) =>
     .caps .claim-tags:not(:has(.assisted)) {
       display: none;
     }
+
+    /* Live, the scene has to fit one screen. The title plays first and scrolls
+       away; the kicker numbers the steps; the stage takes what's left. */
+    .story.is-live .chapter-lead {
+      display: block;
+      padding-top: var(--space-8);
+    }
+    .story.is-live .story-pin {
+      height: 100svh;
+    }
+    .story.is-live .story-grid {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      height: 100%;
+    }
+    .story.is-tight .caption-body,
+    .story.is-live .captions .chapter,
+    .story.is-live .progress {
+      display: none;
+    }
+    .story.is-live .stage-wrap {
+      flex: 1;
+      min-height: 0;
+      width: 100%;
+    }
+    .story.is-live .stage {
+      height: 100%;
+      aspect-ratio: auto;
+      transform-origin: top center;
+    }
+    /* A tighter deck, and only the lines that matter: the ones claims come from. */
+    .story.is-live .doc[data-doc='web'] { --y: 7; }
+    .story.is-live .doc[data-doc='gh'] { --y: 14; }
+    .story.is-live .doc[data-doc='cv'] { --y: 21; }
+    .story.is-live .doc-line:not([data-slot], .name, .meta) {
+      display: none;
+    }
+    /* In the capabilities a claim is its badge: the words were read a step ago,
+       and the phone has room for the count, not the sentences. */
+    .story.is-live .caps .claim-body {
+      display: none;
+    }
+    .story.is-live .cap-claims {
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 2cqw;
+      padding-left: 0;
+      border-left: 0;
+    }
+    .story.is-live .cap-head {
+      flex-direction: row;
+      flex-wrap: wrap;
+      align-items: baseline;
+      justify-content: space-between;
+      column-gap: 3cqw;
+    }
+    .story.is-live .cap-count {
+      display: none;
+    }
   }
 </style>
 
@@ -702,13 +767,37 @@ const claims = c.sources.flatMap((src) =>
     const slot = (el: HTMLElement) => story.querySelector<HTMLElement>(`[data-slot="${el.dataset.claim}"]`)!;
     const list = (el: HTMLElement) => story.querySelector<HTMLElement>(`[data-list="${el.dataset.cap}"]`)!;
 
+    story.classList.add('is-live');
+
+    // On phones the scene must fit one screen, whatever is left under the
+    // captions. The text can't shrink below its minimum size, so when the
+    // stage is short the whole stage scales down to fit: measured once with the
+    // claims in their capabilities (as rendered), and again for the documents.
+    const stage = story.querySelector<HTMLElement>('.stage')!;
+    const caps = story.querySelector<HTMLElement>('.caps')!;
+    const cv = story.querySelector<HTMLElement>('.doc[data-doc="cv"]')!;
+    const narrow = window.matchMedia('(max-width: 959px)');
+    const capsBottom = () => caps.offsetTop + caps.offsetHeight;
+    let groupH = capsBottom();
+    const fit = () => {
+      stage.style.scale = '';
+      if (!narrow.matches) return;
+      if (story.dataset.layout === 'group') groupH = capsBottom();
+      const need = Math.max(groupH, cv.offsetTop + cv.offsetHeight) + 8;
+      const scaleFor = () => stage.clientHeight / need;
+      // A short screen first gives up the captions' second line, then scales.
+      story.classList.remove('is-tight');
+      if (scaleFor() < 0.8) story.classList.add('is-tight');
+      const k = scaleFor();
+      if (k < 1) stage.style.scale = String(k);
+    };
+
     // Start from the beginning: every claim back in its source line.
     for (const el of claims) {
       const line = slot(el);
       line.style.setProperty('--ci', el.style.getPropertyValue('--ci'));
       line.append(el);
     }
-    story.classList.add('is-live');
     story.dataset.layout = 'read';
     story.dataset.step = '-1';
 
@@ -753,6 +842,11 @@ const claims = c.sources.flatMap((src) =>
     });
 
     // Then the scene holds still; each scroll gesture plays one step.
-    steppedScene({ trigger: story, pin: story.querySelector<HTMLElement>('.story-pin')!, steps: 4, onStep: setStep, hold: 700 });
+    fit();
+    ScrollTrigger.addEventListener('refreshInit', () => (stage.style.scale = ''));
+    ScrollTrigger.addEventListener('refresh', fit);
+
+    const pin = story.querySelector<HTMLElement>('.story-pin')!;
+    steppedScene({ trigger: pin, pin, steps: 4, onStep: setStep, hold: 700 });
   }
 </script>

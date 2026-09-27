@@ -87,13 +87,15 @@ const { c } = Astro.props;
   }
   .cases {
     display: grid;
+    /* minmax(0, …): a long code line mustn't widen the card past the screen. */
+    grid-template-columns: minmax(0, 1fr);
     gap: var(--space-6);
     max-width: var(--width-wide);
     margin: var(--space-scene) auto 0;
   }
   @media (min-width: 860px) {
     .cases {
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
   .case {
@@ -117,6 +119,7 @@ const { c } = Astro.props;
   }
   .code-head {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
     gap: var(--space-3);
@@ -133,6 +136,7 @@ const { c } = Astro.props;
     font-size: var(--text-mono);
   }
   .assisted {
+    white-space: nowrap;
     font-size: var(--text-body-sm);
     color: var(--color-code-caution);
   }
@@ -336,6 +340,25 @@ const { c } = Astro.props;
     }
     .outcome {
       padding-right: 8.5rem;
+    }
+    /* On a phone a long line wraps, its continuation indented under it. */
+    .code-line {
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      padding-left: calc(var(--space-4) + 2ch);
+      text-indent: -2ch;
+    }
+  }
+  /* Too narrow to share a line: the stamp lands under the outcome. */
+  @media (max-width: 480px) {
+    .outcome {
+      min-height: 0;
+      padding-right: 0;
+    }
+    .stamp {
+      position: static;
+      align-self: flex-end;
+      margin-top: calc(var(--space-2) - var(--space-5));
     }
   }
 </style>

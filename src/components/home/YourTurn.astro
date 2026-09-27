@@ -304,6 +304,25 @@ const lang = (Astro.currentLocale ?? 'en') as Lang;
     padding-top: var(--space-5);
     border-top: var(--border-width) solid var(--color-border-subtle);
   }
+  /* On phones the long call to action doesn't fit on one line: it takes the
+     full width and wraps, with "Try another" centred under it. */
+  @media (max-width: 560px) {
+    .result-foot {
+      flex-direction: column;
+      align-items: stretch;
+      gap: var(--space-4);
+    }
+    .result-foot .btn {
+      height: auto;
+      min-height: var(--control-height);
+      padding-block: var(--space-3);
+      white-space: normal;
+      text-align: center;
+    }
+    .again {
+      align-self: center;
+    }
+  }
   .again {
     background: none;
     border: 0;

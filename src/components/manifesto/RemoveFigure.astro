@@ -48,6 +48,15 @@ const { c } = Astro.props;
     font-size: clamp(1.05rem, 0.6rem + 1.6vw, 1.9rem);
     white-space: nowrap;
   }
+  /* On a phone the full chain doesn't fit one line: it wraps, and closes up
+     into one as the middle goes. */
+  @media (max-width: 700px) {
+    .chain {
+      flex-wrap: wrap;
+      row-gap: 0.3em;
+      max-width: 100%;
+    }
+  }
   .end {
     color: var(--color-text);
   }

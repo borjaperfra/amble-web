@@ -153,7 +153,9 @@ const { c } = Astro.props;
     flex-direction: column;
     align-items: flex-start;
     gap: 2px;
-    width: min(100%, 300px);
+    /* The offset comes out of the width, so a card never pokes past the column. */
+    width: min(100% - var(--offset, 0px), 300px);
+    margin-left: var(--offset, 0px);
     padding: var(--space-4) var(--space-5);
     transition:
       opacity var(--motion-slow) ease,
@@ -161,11 +163,11 @@ const { c } = Astro.props;
     transition-delay: calc(0.5s + var(--i) * 0.2s);
   }
   .person:nth-child(2) {
-    margin-left: var(--space-8);
+    --offset: var(--space-8);
     rotate: 0.8deg;
   }
   .person:nth-child(3) {
-    margin-left: var(--space-4);
+    --offset: var(--space-4);
     rotate: -0.6deg;
   }
   .name {
@@ -221,7 +223,7 @@ const { c } = Astro.props;
       right: calc(var(--space-2) * -1);
     }
     .person:nth-child(2) {
-      margin-left: var(--space-5);
+      --offset: var(--space-5);
     }
   }
 

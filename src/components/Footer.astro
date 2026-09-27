@@ -22,16 +22,18 @@ const launch = SITE_MODE === 'launch';
       <nav class="links" aria-label={t('footer.label')}>
         {
           !launch && (
-            <>
+            <div class="group">
               <a class="text-link" href={getRelativeLocaleUrl(lang, 'companies')}>{t('nav.companies')}</a>
               <a class="text-link" href={getRelativeLocaleUrl(lang, 'manifesto')}>{t('nav.manifesto')}</a>
               <a class="text-link" href={getRelativeLocaleUrl(lang, 'how-its-built')}>{t('nav.howBuilt')}</a>
-            </>
+            </div>
           )
         }
-        <a class="text-link" href={getRelativeLocaleUrl(lang, 'privacy')}>{t('footer.privacy')}</a>
-        <a class="text-link" href={getRelativeLocaleUrl(other, path)} hreflang={other} lang={other}>{t('nav.otherLang')}</a>
-        <span class="copy">© 2026 Amble</span>
+        <div class="group meta">
+          <a class="text-link" href={getRelativeLocaleUrl(lang, 'privacy')}>{t('footer.privacy')}</a>
+          <a class="text-link" href={getRelativeLocaleUrl(other, path)} hreflang={other} lang={other}>{t('nav.otherLang')}</a>
+          <span class="copy">© 2026 Amble</span>
+        </div>
       </nav>
     </div>
 
@@ -72,8 +74,35 @@ const launch = SITE_MODE === 'launch';
     gap: var(--space-5);
     font-size: var(--text-body-sm);
   }
+  .group {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-5);
+  }
   .copy {
     color: var(--color-text-faint);
+  }
+
+  /* Phones: centred, in three tiers. The tagline; the pages; then the small
+     print (privacy, language, copyright). */
+  @media (max-width: 959px) {
+    .row {
+      flex-direction: column;
+      text-align: center;
+    }
+    .links {
+      flex-direction: column;
+      gap: var(--space-4);
+    }
+    .group {
+      justify-content: center;
+      gap: var(--space-3) var(--space-5);
+    }
+    .meta {
+      font-size: var(--text-label);
+      color: var(--color-text-muted);
+    }
   }
 
   .signoff {

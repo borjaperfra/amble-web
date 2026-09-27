@@ -249,6 +249,79 @@ const { c } = Astro.props;
     color: var(--color-accent-strong);
     font-weight: var(--weight-medium);
   }
+
+  /* ---------- Phones: the card and what it teaches share one screen ---------- */
+  @media (max-width: 899px) {
+    .scene {
+      gap: var(--space-5);
+    }
+    .offer {
+      gap: var(--space-1);
+      padding: var(--space-4);
+    }
+    .offer-role {
+      font-size: var(--text-heading-sm);
+    }
+    .offer-company,
+    .facts li {
+      font-size: var(--text-body-sm);
+    }
+    .facts {
+      gap: var(--space-1);
+      margin-top: var(--space-2);
+    }
+    .facts li {
+      padding: 2px var(--space-2);
+    }
+    .verdicts {
+      flex-wrap: nowrap;
+      gap: var(--space-1);
+      margin-top: var(--space-3);
+    }
+    .verdict {
+      flex: 1 1 auto;
+      justify-content: center;
+      min-width: 0;
+      height: 32px;
+      padding: 0 6px;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+    .reason {
+      display: block;
+      margin-top: var(--space-3);
+      padding-top: var(--space-3);
+    }
+    .who::after {
+      content: ' ·';
+    }
+    .reason .heading {
+      font-size: var(--text-body);
+    }
+    .learned {
+      gap: var(--space-3);
+    }
+    .rules {
+      gap: var(--space-2);
+    }
+    .rule {
+      position: relative;
+      z-index: 5; /* above the deck while it flies in from the card */
+      flex-direction: row;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: var(--space-3);
+      min-height: 48px;
+      padding: var(--space-3) var(--space-4);
+    }
+    .rule-text {
+      text-align: right;
+    }
+    .closer {
+      margin-top: var(--space-2);
+      font-size: var(--text-heading-sm);
+    }
+  }
   .scene.is-live .to-listening {
     opacity: 0;
     transition: opacity var(--motion-slow) ease;
@@ -272,15 +345,34 @@ const { c } = Astro.props;
     scene.classList.add('is-live');
 
     // The deck is as tall as its tallest card, plus room for the cards behind it.
+    // On phones the cards peek out less, so the deck and the rules fit one screen.
+    const phone = window.matchMedia('(max-width: 899px)');
+    const peek = () => (phone.matches ? 10 : 26);
+
     const measure = () => {
       const tallest = Math.max(...offers.map((o) => o.offsetHeight));
-      deck.style.setProperty('--deck-height', `${tallest + 56}px`);
+      deck.style.setProperty('--deck-height', `${tallest + peek() * (offers.length - 1) + 4}px`);
+    };
+
+    // On phones an answer's rule flies out of Maya's reason into its slot, so
+    // you see where it came from.
+    const fill = (i: number) => {
+      const rule = rules[i];
+      rule.classList.add('is-filled');
+      if (!phone.matches) return;
+      const from = offers[i].querySelector('.reason')!.getBoundingClientRect();
+      const to = rule.getBoundingClientRect();
+      gsap.fromTo(
+        rule,
+        { x: from.left - to.left, y: from.top - to.top, scale: 0.9 },
+        { x: 0, y: 0, scale: 1, duration: 0.8, ease: 'power3.inOut', clearProps: 'transform' },
+      );
     };
 
     const stack = () => {
       offers.forEach((o, i) => {
         o.classList.remove('is-answered');
-        gsap.set(o, { x: 0, y: i * 26, scale: 1 - i * 0.04, rotate: 0, opacity: 1, zIndex: offers.length - i });
+        gsap.set(o, { x: 0, y: i * peek(), scale: 1 - i * 0.04, rotate: 0, opacity: 1, zIndex: offers.length - i });
         gsap.set(o.querySelector('.reason'), { opacity: 0, y: 6 });
       });
       rules.forEach((r) => r.classList.remove('is-filled'));
@@ -293,11 +385,11 @@ const { c } = Astro.props;
         const at = i * 3.1;
         tl.call(() => o.classList.add('is-answered'), [], at + 0.9);
         tl.to(o.querySelector('.reason'), { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out' }, at + 1.3);
-        tl.call(() => rules[i].classList.add('is-filled'), [], at + 2.0);
+        tl.call(() => fill(i), [], at + 2.0);
         if (i < offers.length - 1) {
           tl.to(o, { x: '-6%', y: -24, rotate: -4, opacity: 0, duration: 0.7, ease: 'power2.in' }, at + 2.7);
           offers.slice(i + 1).forEach((next, j) => {
-            tl.to(next, { y: j * 26, scale: 1 - j * 0.04, duration: 0.6, ease: 'power3.out' }, at + 2.9);
+            tl.to(next, { y: j * peek(), scale: 1 - j * 0.04, duration: 0.6, ease: 'power3.out' }, at + 2.9);
           });
         }
       });
@@ -306,6 +398,18 @@ const { c } = Astro.props;
     measure();
     stack();
     window.addEventListener('resize', measure, { passive: true });
-    scene.addEventListener('scene:play', play, { once: true });
+    // On phones the scene waits until the rules under the deck are on screen
+    // too: they're the point, and with them in view so is the card above.
+    if (phone.matches) {
+      const whole = new IntersectionObserver(
+        ([entry]) => {
+          if (!entry.isIntersecting) return;
+          whole.disconnect();
+          play();
+        },
+        { rootMargin: '-56px 0px 0px 0px', threshold: 1 },
+      );
+      whole.observe(scene.querySelector('.rules')!);
+    } else scene.addEventListener('scene:play', play, { once: true });
   }
 </script>

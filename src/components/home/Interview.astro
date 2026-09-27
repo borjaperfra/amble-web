@@ -148,9 +148,25 @@ const { c, sourceNames } = Astro.props;
     stroke: var(--color-bg);
     stroke-width: 3;
   }
+  /* Phones: the two clues side by side, the question below; the threads drop
+     from each clue and meet in a knot just above it. */
   @media (max-width: 899px) {
-    .threads {
-      display: none;
+    .scene {
+      gap: var(--space-7);
+    }
+    .clues {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-4);
+    }
+    .clue {
+      padding: var(--space-4);
+    }
+    .clue-text {
+      font-size: var(--text-body);
+    }
+    .reads {
+      font-size: 1.25rem;
     }
   }
 
@@ -309,20 +325,30 @@ const { c, sourceNames } = Astro.props;
     const clues = [...scene.querySelectorAll<HTMLElement>('[data-clue]')];
     const ask = scene.querySelector<HTMLElement>('[data-ask]')!;
     const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const wide = window.matchMedia('(min-width: 900px)');
 
     const draw = () => {
       const base = scene.getBoundingClientRect();
       const target = ask.getBoundingClientRect();
-      const kx = target.left - base.left - 28;
-      const ky = target.top - base.top + target.height / 2;
+      // Wide: the knot sits left of the question. Phones: just above it.
+      const kx = wide.matches ? target.left - base.left - 28 : target.left - base.left + target.width / 2;
+      const ky = wide.matches ? target.top - base.top + target.height / 2 : target.top - base.top - 22;
       knot.setAttribute('cx', String(kx));
       knot.setAttribute('cy', String(ky));
       clues.forEach((clue, i) => {
         const r = clue.getBoundingClientRect();
-        const sx = r.right - base.left;
-        const sy = r.top - base.top + r.height / 2;
-        const mid = (sx + kx) / 2;
-        const d = `M${sx} ${sy} C ${mid} ${sy}, ${mid} ${ky}, ${kx} ${ky} L ${kx + 26} ${ky}`;
+        let d: string;
+        if (wide.matches) {
+          const sx = r.right - base.left;
+          const sy = r.top - base.top + r.height / 2;
+          const mid = (sx + kx) / 2;
+          d = `M${sx} ${sy} C ${mid} ${sy}, ${mid} ${ky}, ${kx} ${ky} L ${kx + 26} ${ky}`;
+        } else {
+          const sx = r.left - base.left + r.width / 2;
+          const sy = r.bottom - base.top;
+          const mid = (sy + ky) / 2;
+          d = `M${sx} ${sy} C ${sx} ${mid}, ${kx} ${mid}, ${kx} ${ky} L ${kx} ${ky + 20}`;
+        }
         const path = paths[i];
         path.setAttribute('d', d);
         const length = path.getTotalLength();
@@ -340,6 +366,7 @@ const { c, sourceNames } = Astro.props;
 
     draw();
     new ResizeObserver(draw).observe(scene);
+    wide.addEventListener('change', draw);
     scene.addEventListener('scene:play', play, { once: true });
   }
 

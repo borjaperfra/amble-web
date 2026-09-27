@@ -132,6 +132,75 @@ const { c } = Astro.props;
       scale: 0 1;
     }
   }
+  /* Stacked (phones): the rail runs down the left, each stop's words beside
+     its point, so the line joins the three points without crossing any text.
+     Each stop still draws its own half-segments, from its edges to the air
+     around its point. */
+  @media (max-width: 859px) {
+    .line {
+      --pad: var(--space-5); /* half the space between two stops */
+      gap: 0;
+      max-width: 24rem;
+    }
+    .stop {
+      position: relative;
+      display: grid;
+      grid-template-columns: 22px minmax(0, 1fr);
+      column-gap: var(--space-5);
+      row-gap: var(--space-2);
+      align-items: start;
+      justify-items: start;
+      padding-block: var(--pad);
+      text-align: left;
+    }
+    .stop > :not(.track) {
+      grid-column: 2;
+    }
+    .track {
+      --gap: 8px;
+      grid-column: 1;
+      grid-row: 1 / span 4;
+      position: static;
+      /* the point's centre sits on the "when" line */
+      margin: -3px 0 0;
+    }
+    .detail {
+      margin-top: 0;
+    }
+    .track::before,
+    .track::after {
+      content: '';
+      position: absolute;
+      left: 10px;
+      width: 2px;
+      background-image: linear-gradient(to bottom, var(--color-text-faint) 50%, transparent 0);
+      background-size: 2px 10px;
+      transform-origin: top;
+      transition: scale 0.9s var(--ease-standard);
+      transition-delay: calc(0.3s + var(--i) * 0.3s);
+    }
+    /* point centre: --pad - 3px + 11px */
+    .track::before {
+      top: 0;
+      height: calc(var(--pad) + 8px - var(--r) - var(--gap));
+    }
+    .track::after {
+      top: calc(var(--pad) + 8px + var(--r) + var(--gap));
+      bottom: 0;
+    }
+    .stop:first-child .track::before,
+    .stop:last-child .track::after {
+      display: none;
+    }
+    .now .track::after,
+    .soon .track::before {
+      background: var(--color-accent);
+    }
+    :global(.motion) .line:not(.is-playing) .track::before,
+    :global(.motion) .line:not(.is-playing) .track::after {
+      scale: 1 0;
+    }
+  }
   .point {
     position: relative;
     z-index: 1;
