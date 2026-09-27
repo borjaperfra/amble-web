@@ -57,7 +57,7 @@ Needs many reviews first; it will happen, not for launch.
 
 ## Domain
 
-`amble.fyi`, live on Railway since 2026-09-26 in **launch mode**: `SITE_MODE=launch` serves only the hero with the form, the privacy page and the waitlist; every other page redirects home in its language. `SITE_MODE=full` (default) is the whole site. Behind Railway's proxy, `security.allowedDomains` in `astro.config.mjs` is needed for Astro to trust `X-Forwarded-Proto`, or its origin check rejects the form's posts.
+`amble.fyi`, live on Railway. **Full site since 2026-09-27** (`SITE_MODE=full`). Deploys are CLI uploads (`npx @railway/cli up --ci`), not from GitHub: push to `main` and upload. Before that, it ran in **launch mode**: `SITE_MODE=launch` serves only the hero with the form, the privacy page and the waitlist; every other page redirects home in its language. `SITE_MODE=full` (default) is the whole site. Behind Railway's proxy, `security.allowedDomains` in `astro.config.mjs` is needed for Astro to trust `X-Forwarded-Proto`, or its origin check rejects the form's posts.
 
 ## Done (2026-09-26)
 
@@ -88,11 +88,28 @@ Needs many reviews first; it will happen, not for launch.
 - Art direction carried through the second half (`ART_DIRECTION_AUDIT.md`): `DotField`, `AgentLine`, hairlines instead of cards.
 - Launch mode at amble.fyi; one welcome email instead of double opt-in (see Waitlist and Domain).
 
+## Done (2026-09-27) — full site live
+
+- Hero down to three things: eye, headline, one paragraph with the form.
+- Pinned scenes rebuilt in paper (Not looking, Looking for a job, companies' How it works); chapter 1 gets a fixed title. One gesture = one step; entering with momentum stops at the first step; a gesture made mid-step is kept and played when the step's animations end (`steppedScene` in `src/scripts/motion.ts`, per-scene `hold`).
+- Map as a document with sources and the coach's note; Silence is a feature in three levels; triage without the question pills; the phone buzzes; v2 back to the conversation; roadmap Now → Soon solid.
+- No "this, not that" constructions anywhere (home, manifesto, how it's built, companies).
+- Manifesto figures: people cards with notes, the Rep between the week's offers and you, the close from the launch film.
+- Companies: H1 "An AI agent that sources, checks and reaches real candidates"; inbox vs the people outside; five-step flow (role → agent → evidence → private range → schedule); the brief that reaches you. Salary rule block removed (said once, in the flow and the brief).
+- How it's built: two-row pipelines; paper figures for defence and intent.
+- Social cards per page (home, companies; EN/ES) with `twitter:*` tags and a versioned URL (`OG_VERSION` in `Base.astro` — bump it when the cards change). `npm run og` repairs NaN glyph points from opentype.js.
+- Waitlist verified in production. Welcome email idempotency key now includes the site and language (one Resend account for every environment). Company success copy.
+- Privacy page names the operator (Borja Pérez Francés) until there is a company.
+- `privacy@amble.fyi` reaches Borja through the Cloudflare Email Routing catch-all.
+
 ## Open points
+
+- Two test rows in the production waitlist (`delivered+prodcheck@resend.dev`, candidate and company): delete them.
+- Check the link preview on X and WhatsApp with a fresh URL (e.g. `amble.fyi/?s=1`); Meta's Sharing Debugger needs a Facebook login.
+- Optional: a dedicated routing rule for `privacy@` in case the catch-all is ever removed.
 
 - ~~Career coach agent~~ Done 2026-09-27: told inside the Map. Under "What it still doesn't know · Leading a team", a coach note turns the gap into a next step (surface evidence first, then one step if you want it); a line below the columns for when you want to move (what to say, who to talk to, what your career.md says). The roadmap's Now line mentions it. No page of its own.
 
-- Legal entity for the privacy page (`src/config/legal.ts`): name, tax ID, address.
-- `privacy@amble.fyi` must exist as a real inbox before launch.
+- Legal entity for the privacy page (`src/config/legal.ts`), when there is one: it replaces the operator's name.
 - GitHub sync of your data (section 10) doesn't exist yet: place it in v0 or on the roadmap.
 - v1 offer reading: look at career-ops' MIT job-board connectors (`providers/` in github.com/career-ops-hq/career-ops) as a possible base, with attribution. Reviewed 2026-09-27; nothing else from it (scores, ATS keywords, apply-better positioning) fits Amble.
