@@ -74,12 +74,12 @@ export const POST: APIRoute = async ({ request, clientAddress, redirect }) => {
     // The Resend account is shared by every environment, so the key names the
     // site as well as the row; and the language, since a retry may change it.
     const key = `waitlist-welcome/${new URL(SITE_URL).host}/${result.id}/${lang}`;
+    // The row is saved either way. If Resend is down or over its daily cap the
+    // person is still on the list: the welcome stays pending, and
+    // scripts/send-welcomes.mts sends it later.
     const sent = await sendWelcome(parsed.email, lang, audienceField, key);
-    if (!sent) {
-      await releaseCooldown(result.id);
-      return reply('error', 502);
-    }
-    await markWelcomed(result.id);
+    if (sent) await markWelcomed(result.id);
+    else await releaseCooldown(result.id);
     await bump('join', lang, audienceField === 'company' ? 'company' : '').catch(() => {});
     return reply('ok', 200);
   } catch (err) {
