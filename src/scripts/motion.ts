@@ -80,19 +80,27 @@ let gestureFrom = 0; // where the current gesture started
 function go(s: Stepped, y: number, dir: number) {
   const at = Math.min(s.steps - 1, Math.max(0, stepOf(s, y)));
   const next = Math.min(s.steps - 1, Math.max(0, at + dir));
+  const run = ++glide;
   busy = true;
   swallowing = true;
   lastEvent = performance.now();
   lastAbs = Math.max(lastAbs, 60); // inertia decays; a new flick is a spike above it
+  const done = () => {
+    if (run !== glide) return;
+    glide++;
+    setTimeout(release, s.hold(next));
+  };
   lenis?.scrollTo(posOf(s, next), {
     duration: STEP_DURATION,
     easing: (t) => 1 - Math.pow(1 - t, 3),
     force: true,
-    onComplete: () => {
-      setTimeout(release, s.hold(next));
-    },
+    onComplete: done,
   });
+  // If anything stops the glide before it lands, onComplete never comes and
+  // busy would block every gesture from then on: let go anyway.
+  setTimeout(done, STEP_DURATION * 1000 + 150);
 }
+let glide = 0; // the glide in flight, so only one of its two endings releases it
 
 // The step is done. A gesture made meanwhile isn't lost: it plays now.
 function release() {
@@ -136,7 +144,9 @@ function gate({ deltaY, event }: { deltaX: number; deltaY: number; event: WheelE
     if (event.cancelable) event.preventDefault();
     return false;
   }
-  if (event.type === 'touchend') return true;
+  // Lenis stops any running scroll animation on a native touchend, which would
+  // cut a step's glide short: a swipe that moved a step ends here.
+  if (event.type === 'touchend') return !(busy || touchFired);
   const dir = Math.sign(deltaY);
   if (!dir) return true;
   const now = performance.now();
