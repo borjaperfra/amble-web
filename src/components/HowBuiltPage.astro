@@ -1,6 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import Flow from './Flow.astro';
+import Symbol from './Symbol.astro';
 import { howBuilt } from '../content/pages';
 import type { Lang } from '../i18n/ui';
 
@@ -27,6 +28,46 @@ const c = howBuilt[lang];
                 <p class="text">{p}</p>
               ))}
               {s.flow && <Flow steps={s.flow} emphasis={s.emphasis ?? 1} />}
+              {s.defence && (
+                <figure class="fig defence" data-scene aria-hidden="true">
+                  <div class="sheet claim">
+                    <p class="claim-text heading">{s.defence.claim}</p>
+                    <p class="claim-src">{s.defence.source}</p>
+                  </div>
+                  <div class="sheet ask">
+                    <p class="ask-label"><Symbol size={20} />{s.defence.askLabel}</p>
+                    <p class="ask-text heading">{s.defence.ask}</p>
+                    <p class="answer">{s.defence.answer}</p>
+                  </div>
+                  <div class="outcome">
+                    <p class="outcome-label">{s.defence.outcomeLabel}</p>
+                    <p class="outcome-claim heading">{s.defence.claim}</p>
+                    <p class="outcome-text">{s.defence.outcome}</p>
+                  </div>
+                </figure>
+              )}
+              {s.intent && (
+                <figure class="fig intent" data-scene aria-hidden="true">
+                  <div class="sheet offer">
+                    <p class="offer-role heading">{s.intent.role}</p>
+                    <p class="facts">
+                      {s.intent.facts.map((f) => (
+                        <span>{f}</span>
+                      ))}
+                    </p>
+                    <p class="verdict-row">
+                      <span class="verdict">{s.intent.verdict}</span>
+                      <span class="reason heading">{s.intent.reason}</span>
+                    </p>
+                  </div>
+                  <span class="arrow">→</span>
+                  <div class="intent-rule">
+                    <p class="rule-type">{s.intent.ruleType}</p>
+                    <p class="rule-text heading">{s.intent.rule}</p>
+                    <p class="rule-pending">{s.intent.pending}</p>
+                  </div>
+                </figure>
+              )}
               {s.states && (
                 <dl class="states">
                   {s.states.map((st) => (
@@ -126,5 +167,176 @@ const c = howBuilt[lang];
   }
   .state:nth-child(3) dt {
     color: var(--color-caution);
+  }
+
+  /* ---------- Paper figures: the home's sheets and notes ---------- */
+  .fig {
+    display: grid;
+    gap: var(--space-4);
+    margin: var(--space-6) 0 var(--space-2);
+  }
+  .sheet {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    padding: var(--space-4) var(--space-5);
+    background: var(--color-surface-raised);
+    border: var(--border-width) solid var(--color-border-subtle);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sheet);
+    transition:
+      opacity var(--motion-slow) ease,
+      translate var(--motion-arrive) var(--ease-standard);
+  }
+  @media (min-width: 760px) {
+    .defence {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      align-items: start;
+    }
+  }
+  .claim-text,
+  .outcome-claim {
+    font-size: var(--text-heading-sm);
+  }
+  .claim-src {
+    font-size: var(--text-label);
+    font-weight: var(--weight-medium);
+    color: var(--color-caution);
+  }
+  .ask {
+    transition-delay: 0.5s;
+  }
+  .ask-label,
+  .outcome-label,
+  .rule-type {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-label);
+    font-weight: var(--weight-semibold);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+  .ask-text {
+    font-size: var(--text-heading-sm);
+  }
+  .answer {
+    margin-top: var(--space-2);
+    font-size: var(--text-body-sm);
+    color: var(--color-text-muted);
+  }
+  /* The outcome: the claim struck, but kept. */
+  .outcome {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    padding: var(--space-4) var(--space-5);
+    border: 1.5px dashed var(--color-border);
+    border-radius: var(--radius-lg);
+    transition: opacity var(--motion-slow) ease 1.1s;
+  }
+  .outcome-label {
+    color: var(--color-retracted);
+  }
+  .outcome-claim {
+    color: var(--color-text-muted);
+    text-decoration: line-through;
+    text-decoration-color: var(--color-retracted);
+  }
+  .outcome-text {
+    font-size: var(--text-body-sm);
+    color: var(--color-text-muted);
+  }
+
+  .intent {
+    align-items: center;
+  }
+  @media (min-width: 760px) {
+    .intent {
+      grid-template-columns: minmax(0, 1.4fr) auto minmax(0, 1fr);
+    }
+  }
+  .offer-role {
+    font-size: var(--text-heading-md);
+  }
+  .facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-top: var(--space-2);
+  }
+  .facts span {
+    padding: 2px var(--space-3);
+    font-size: var(--text-body-sm);
+    background: var(--color-surface);
+    border: var(--border-width) solid var(--color-border-subtle);
+    border-radius: var(--radius-full);
+  }
+  .verdict-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-top: var(--space-4);
+    padding-top: var(--space-3);
+    border-top: var(--border-width) solid var(--color-border-subtle);
+  }
+  .verdict {
+    padding: var(--space-1) var(--space-4);
+    font-size: var(--text-body-sm);
+    font-weight: var(--weight-medium);
+    color: var(--color-text-inverse);
+    background: var(--color-action);
+    border-radius: var(--radius-md);
+  }
+  .reason {
+    font-size: var(--text-body);
+    font-style: italic;
+  }
+  .arrow {
+    justify-self: center;
+    font-size: var(--text-heading-md);
+    color: var(--color-accent);
+  }
+  @media (max-width: 759px) {
+    .arrow {
+      rotate: 90deg;
+    }
+  }
+  /* The rule it leaves: a moss note, still a proposal. */
+  .intent-rule {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: var(--space-4) var(--space-5);
+    background: var(--color-accent-wash);
+    border: var(--border-width) solid var(--color-accent-soft);
+    border-radius: var(--radius-md);
+    rotate: 1deg;
+    transition:
+      opacity var(--motion-slow) ease 0.8s,
+      rotate var(--motion-arrive) var(--ease-standard) 0.8s;
+  }
+  .rule-type {
+    color: var(--color-accent-strong);
+  }
+  .rule-text {
+    font-size: var(--text-heading-md);
+  }
+  .rule-pending {
+    margin-top: var(--space-1);
+    font-size: var(--text-label);
+    color: var(--color-text-muted);
+  }
+
+  :global(.motion) .fig:not(.is-playing) .sheet {
+    opacity: 0;
+    translate: 0 10px;
+  }
+  :global(.motion) .fig:not(.is-playing) :is(.outcome, .intent-rule) {
+    opacity: 0;
+  }
+  :global(.motion) .fig:not(.is-playing) .intent-rule {
+    rotate: 6deg;
   }
 </style>

@@ -16,11 +16,7 @@ const { c } = Astro.props;
 
 <section class="section container" aria-labelledby="triage-title">
   <div class="head">
-    <SectionIntro id="triage-title" kicker={c.kicker} title={c.title} body={c.line} />
-    <ul class="questions" role="list">
-      {c.questions.map((q, i) => <li data-reveal style={`--i:${i}`}>{q}</li>)}
-    </ul>
-    <p class="teach" data-reveal>{c.teach}</p>
+    <SectionIntro id="triage-title" kicker={c.kicker} title={c.title} body={`${c.line} ${c.teach}`} />
   </div>
 
   <div class="scene" data-scene data-triage>
@@ -242,24 +238,6 @@ const { c } = Astro.props;
   .scene.is-live .rule.is-filled > * {
     opacity: 1;
     transition: opacity var(--motion-slow) ease 0.15s;
-  }
-  .questions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-2) var(--space-3);
-    margin-top: var(--space-6);
-  }
-  .questions li {
-    padding: var(--space-2) var(--space-4);
-    font-family: var(--font-display);
-    font-size: var(--text-heading-sm);
-    background: var(--color-surface-raised);
-    border: var(--border-width) solid var(--color-border-subtle);
-    border-radius: var(--radius-full);
-  }
-  .teach {
-    margin-top: var(--space-5);
-    color: var(--color-text-muted);
   }
   .closer {
     margin-top: var(--space-4);

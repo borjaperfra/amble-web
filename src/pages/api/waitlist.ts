@@ -4,6 +4,7 @@ import type { Lang } from '../../i18n/ui';
 import { parseEmail } from '../../lib/email-rules';
 import { join, markWelcomed, releaseCooldown } from '../../lib/waitlist';
 import { sendWelcome } from '../../lib/email';
+import { SITE_URL } from 'astro:env/server';
 import { allow } from '../../lib/rate-limit';
 import { bump } from '../../lib/counts';
 
@@ -70,7 +71,10 @@ export const POST: APIRoute = async ({ request, clientAddress, redirect }) => {
     // who is on it.
     if (result.kind === 'quiet') return reply('ok', 200);
 
-    const sent = await sendWelcome(parsed.email, lang, audienceField, `waitlist-welcome/${result.id}`);
+    // The Resend account is shared by every environment, so the key names the
+    // site as well as the row; and the language, since a retry may change it.
+    const key = `waitlist-welcome/${new URL(SITE_URL).host}/${result.id}/${lang}`;
+    const sent = await sendWelcome(parsed.email, lang, audienceField, key);
     if (!sent) {
       await releaseCooldown(result.id);
       return reply('error', 502);

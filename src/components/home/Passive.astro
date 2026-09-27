@@ -1,7 +1,14 @@
 ---
-// Right after the hero: who Amble is for. Not people looking — people who
-// aren't, but would listen for the right thing.
-import DotField from '../DotField.astro';
+// Right after the hero, in its voice. Sheets of paper, like the rest of the
+// story, in one pinned scene of four beats:
+//
+//   0  a row of people; only one is open to work
+//   1  but you're not: your card comes forward, with your week
+//   2  notes settle around you: what would make you listen
+//   3  your Rep's sheet arrives and keeps them, listening
+//
+// Without motion, the scene renders its last beat, statements first.
+import Symbol from '../Symbol.astro';
 import type { HomeContent } from '../../content/home';
 
 interface Props {
@@ -9,45 +16,581 @@ interface Props {
 }
 
 const { c } = Astro.props;
+const words = (s: string) => s.split(' ');
 ---
 
-<section class="passive container" aria-labelledby="passive-title">
-  <div class="text">
-    <h2 class="display title" id="passive-title" data-reveal>{c.title}</h2>
-    {c.body.map((p, i) => <p class="lede body" data-reveal style={`--i:${i + 1}`}>{p}</p>)}
-    <p class="closer heading" data-reveal style="--i:3">{c.closer}</p>
-  </div>
-  <div class="art">
-    <DotField lookingLabel={c.looking.toLowerCase()} conditions={c.conditions} caption={c.question} />
+<section class="passive" aria-labelledby="passive-title" data-step="3">
+  <div class="pin container">
+    <div class="says">
+      {
+        c.statements.map((s, i) => (
+          <p class="say display" data-say={i}>
+            {words(s).map((w, j) => (
+              <span class="w" style={`--w:${j}`}>
+                {w}{' '}
+              </span>
+            ))}
+          </p>
+        ))
+      }
+      <div class="say thesis-block" data-say="3">
+        <h2 class="display thesis" id="passive-title">
+          {words(c.title).map((w, j) => (
+            <span class="w" style={`--w:${j}`}>
+              {w}{' '}
+            </span>
+          ))}
+        </h2>
+        <p class="closer heading">{c.closer}</p>
+      </div>
+    </div>
+
+    <div class="stage" aria-hidden="true">
+      {
+        c.people.map((p, i) => (
+          <div class:list={['sheet-card', 'person', `p${i}`]}>
+            <p class="name heading">{p.name}</p>
+            <p class="role">{p.role}</p>
+            <span class:list={['status', { open: p.looking }]}>{p.looking ? c.status.looking : c.status.not}</span>
+          </div>
+        ))
+      }
+
+      <div class="sheet-card you">
+        <p class="name heading"><span class="me" />{c.you.name}</p>
+        <p class="role">{c.you.role}</p>
+        <span class="status">{c.status.not}</span>
+        <div class="week">
+          <div>
+            <p class="week-label">{c.you.weekLabel}</p>
+            <ul role="list">
+              {c.you.week.map((w) => <li>{w}</li>)}
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      {
+        c.conditions.map((text, i) => (
+          <div class:list={['sheet-card', 'note', `n${i}`]} style={`--i:${i}`}>
+            <p class="note-label">{c.noteLabel}</p>
+            <p class="note-text heading">{text}</p>
+          </div>
+        ))
+      }
+
+      <span class="thread" />
+
+      <div class="sheet-card rep">
+        <p class="rep-head">
+          <span class="rep-eye"><Symbol size={44} /></span>
+          {c.rep.label}
+        </p>
+        <p class="rep-for">{c.rep.listening}</p>
+        <ul class="rep-list" role="list">
+          {c.conditions.map((text) => <li class="heading">{text}</li>)}
+        </ul>
+        <p class="rep-status heading"><span class="breath" />{c.rep.status}</p>
+      </div>
+    </div>
   </div>
 </section>
 
 <style>
   .passive {
-    display: grid;
-    gap: var(--space-8);
-    align-items: center;
-    max-width: calc(var(--width-wide) + var(--gutter) * 2);
     padding-block: var(--space-section);
   }
-  @media (min-width: 900px) {
-    .passive {
-      grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
-      gap: var(--space-9);
-    }
-  }
-  .text {
+  .pin {
     display: flex;
     flex-direction: column;
-    gap: var(--space-4);
+    gap: var(--space-7);
+    max-width: calc(var(--width-wide) + var(--gutter) * 2);
   }
-  .title {
+
+  /* The statements: static, they stack; live, they share one cell. */
+  .says {
+    display: grid;
+    gap: var(--space-4);
+    justify-items: center;
+    text-align: center;
+  }
+  .say {
     font-size: var(--text-chapter);
-    margin-bottom: var(--space-3);
+    text-wrap: balance;
+  }
+  .thesis-block {
+    margin-top: var(--space-5);
+  }
+  .thesis {
+    max-width: 20ch;
+    margin-inline: auto;
+    font-size: var(--text-thesis);
+    line-height: 1.02;
   }
   .closer {
-    margin-top: var(--space-3);
+    margin-top: var(--space-5);
     font-size: var(--text-heading-md);
     color: var(--color-accent-strong);
   }
+
+  /* ---------- The stage: sheets of paper placed by position ---------- */
+  .stage {
+    position: relative;
+    width: 100%;
+    height: 400px;
+  }
+  .sheet-card {
+    position: absolute;
+    left: var(--x);
+    top: var(--y);
+    width: var(--cw, 184px);
+    translate: -50% -50%;
+    rotate: var(--r, 0deg);
+    scale: var(--s, 1);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-1);
+    padding: var(--space-5);
+    background: var(--color-surface-raised);
+    border: var(--border-width) solid var(--color-border-subtle);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sheet);
+    opacity: var(--o, 1);
+    transition:
+      left 1.1s var(--ease-standard),
+      top 1.1s var(--ease-standard),
+      width 1.1s var(--ease-standard),
+      scale 1.1s var(--ease-standard),
+      rotate 1.1s var(--ease-standard),
+      opacity var(--motion-slow) ease;
+  }
+  .name {
+    font-size: var(--text-heading-sm);
+  }
+  .role {
+    font-size: var(--text-body-sm);
+    color: var(--color-text-muted);
+  }
+  .status {
+    margin-top: var(--space-3);
+    padding: var(--space-1) var(--space-3);
+    font-size: var(--text-label);
+    font-weight: var(--weight-medium);
+    color: var(--color-text-muted);
+    background: var(--color-surface);
+    border: var(--border-width) solid var(--color-border-subtle);
+    border-radius: var(--radius-full);
+  }
+  .status.open {
+    color: var(--color-text-inverse);
+    background: var(--color-action);
+    border-color: var(--color-action);
+  }
+
+  /* People: a row, the one in the middle is you. Static, they're gone. */
+  .person {
+    --o: 0;
+    --y: 50%;
+  }
+  .p0 { --x: 10%; }
+  .p1 { --x: 30%; }
+  .p2 { --x: 70%; }
+  .p3 { --x: 90%; }
+
+  /* You: a moss edge and a dot that breathes, so the eye knows where to look. */
+  .you {
+    --cw: 240px;
+    --x: 27%;
+    --y: 50%;
+    z-index: 2;
+    border-color: var(--color-accent);
+    box-shadow:
+      0 0 0 1.5px var(--color-accent),
+      0 0 0 8px var(--color-accent-wash),
+      var(--shadow-sheet);
+  }
+  .you .name {
+    color: var(--color-accent-strong);
+  }
+  .you .name {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+  .me {
+    position: relative;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--color-accent);
+  }
+  .me::after,
+  .breath::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 1.5px solid var(--color-accent);
+    animation: ripple 2.4s ease-out infinite;
+  }
+  @keyframes ripple {
+    from {
+      scale: 1;
+      opacity: 0.9;
+    }
+    to {
+      scale: 2.8;
+      opacity: 0;
+    }
+  }
+  .you .status {
+    color: var(--color-text);
+    border-color: var(--color-text-faint);
+  }
+  /* Your week unfolds from the card. */
+  .week {
+    display: grid;
+    grid-template-rows: 1fr;
+    width: 100%;
+    transition: grid-template-rows 0.9s var(--ease-standard);
+  }
+  .week > div {
+    overflow: hidden;
+  }
+  .week-label {
+    margin-top: var(--space-4);
+    padding-top: var(--space-4);
+    border-top: var(--border-width) solid var(--color-border-subtle);
+    font-size: var(--text-label);
+    font-weight: var(--weight-semibold);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--color-text-faint);
+  }
+  .week ul {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    margin-top: var(--space-2);
+    font-size: var(--text-body-sm);
+  }
+
+  /* Notes: what would make you listen. Static, they're kept by the Rep. */
+  .note {
+    --cw: max-content;
+    --o: 0;
+    --x: 73%;
+    --y: 50%;
+    gap: var(--space-2);
+    padding: var(--space-4) var(--space-5);
+    /* A note, not a sheet: a moss wash, no lift. */
+    background: var(--color-accent-wash);
+    border-color: var(--color-accent-soft);
+    border-radius: var(--radius-md);
+    box-shadow: none;
+    transition-delay: calc(var(--i) * 0.16s);
+  }
+  .note-label {
+    white-space: nowrap;
+    font-size: var(--text-label);
+    font-weight: var(--weight-semibold);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--color-accent-strong);
+  }
+  .note-text {
+    font-size: var(--text-heading-sm);
+    font-style: italic;
+  }
+
+  /* Your Rep's sheet. */
+  .rep {
+    --cw: 290px;
+    --x: 73%;
+    --y: 50%;
+    gap: var(--space-2);
+    z-index: 2;
+  }
+  .rep-head {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-label);
+    font-weight: var(--weight-semibold);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+  .rep-for {
+    margin-top: var(--space-3);
+    font-size: var(--text-body-sm);
+    color: var(--color-text-muted);
+  }
+  .rep-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+  .rep-list li {
+    font-size: var(--text-heading-sm);
+    font-style: italic;
+  }
+  /* Listening: said out loud, with a dot that breathes and ripples. */
+  .rep-status {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3);
+    align-self: stretch;
+    margin: var(--space-4) calc(var(--space-5) * -1) calc(var(--space-5) * -1);
+    padding: var(--space-4) var(--space-5);
+    font-size: var(--text-heading-md);
+    color: var(--color-accent-strong);
+    background: var(--color-accent-wash);
+    border-top: var(--border-width) solid var(--color-accent-soft);
+    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  }
+  .breath {
+    position: relative;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--color-accent);
+    animation: breathe 3.2s ease-in-out infinite;
+  }
+  @keyframes breathe {
+    50% {
+      opacity: 0.55;
+      scale: 0.85;
+    }
+  }
+  /* The eye looks around: the iris drifts side to side, resting at each end. */
+  .rep-eye {
+    display: inline-flex;
+    color: var(--color-text);
+  }
+  .rep-eye :global(.iris) {
+    animation: scan 5s ease-in-out infinite;
+  }
+  @keyframes scan {
+    0%,
+    100% {
+      translate: 0 0;
+    }
+    20%,
+    32% {
+      translate: -4.5px 0.5px;
+    }
+    58%,
+    72% {
+      translate: 4.5px 0.5px;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .breath,
+    .me::after,
+    .breath::after,
+    .rep-eye :global(.iris) {
+      animation: none;
+    }
+  }
+
+  /* The thread between you and your Rep. */
+  .thread {
+    position: absolute;
+    top: 50%;
+    left: calc(27% + 120px);
+    width: calc(46% - 265px);
+    height: 2px;
+    background: var(--color-accent);
+    transform-origin: left;
+    transition:
+      scale 0.9s var(--ease-standard),
+      opacity var(--motion-slow) ease;
+  }
+
+  /* ---------- Live: the four beats ---------- */
+  .passive.is-live {
+    padding-block: 0;
+  }
+  .is-live .pin {
+    justify-content: center;
+    min-height: 100svh;
+    padding-block: calc(64px + var(--space-5)) var(--space-6);
+  }
+  .is-live .says {
+    grid-template-areas: 'say';
+    align-items: end;
+  }
+  .is-live .say {
+    grid-area: say;
+    margin: 0;
+  }
+  .is-live .say .w {
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+  .is-live[data-step='0'] [data-say='0'] .w,
+  .is-live[data-step='1'] [data-say='1'] .w,
+  .is-live[data-step='2'] [data-say='2'] .w,
+  .is-live[data-step='3'] [data-say='3'] .w {
+    opacity: 1;
+    transition-delay: calc(0.25s + var(--w) * 0.07s);
+  }
+  .is-live .closer {
+    opacity: 0;
+    transition: opacity var(--motion-slow) ease;
+  }
+  .is-live[data-step='3'] .closer {
+    opacity: 1;
+    transition-delay: 0.9s;
+  }
+
+  /* Beat 0: a row of people, you among them, your week folded away. */
+  .is-live[data-step='0'] .person {
+    --o: 1;
+  }
+  .is-live[data-step='0'] .you {
+    --x: 50%;
+    --cw: 184px;
+  }
+  .is-live[data-step='0'] .week {
+    grid-template-rows: 0fr;
+  }
+  /* Beat 1: the others step back; you come forward, with your week. */
+  .is-live[data-step='1'] .person {
+    --o: 0.16;
+    --s: 0.92;
+  }
+  .is-live[data-step='1'] .you {
+    --x: 50%;
+    --s: 1.1;
+  }
+  /* Beat 2: notes settle around you. */
+  .is-live[data-step='2'] .you {
+    --x: 50%;
+  }
+  .is-live[data-step='2'] .note {
+    --o: 1;
+  }
+  .is-live[data-step='2'] .n0 { --x: 18%; --y: 22%; --r: -2deg; }
+  .is-live[data-step='2'] .n1 { --x: 82%; --y: 20%; --r: 1.5deg; }
+  .is-live[data-step='2'] .n2 { --x: 17%; --y: 78%; --r: 1.2deg; }
+  .is-live[data-step='2'] .n3 { --x: 83%; --y: 80%; --r: -1.6deg; }
+  /* Before beat 3: the Rep isn't here yet. */
+  .is-live:not([data-step='3']) .rep {
+    --o: 0;
+    --x: 88%;
+  }
+  .is-live:not([data-step='3']) .thread {
+    opacity: 0;
+    scale: 0 1;
+    transition-delay: 0s;
+  }
+  .is-live[data-step='3'] .thread {
+    transition-delay: 0.6s;
+  }
+  .is-live[data-step='3'] .rep {
+    transition-delay: 0.2s;
+  }
+
+  /* ---------- Phones: a column ---------- */
+  @media (max-width: 720px) {
+    .pin {
+      gap: var(--space-6);
+    }
+    .thesis {
+      font-size: clamp(2.25rem, 1rem + 6vw, 3rem);
+    }
+    .stage {
+      height: 540px;
+    }
+    .sheet-card {
+      padding: var(--space-4);
+    }
+    .p0,
+    .p3 {
+      display: none;
+    }
+    .person,
+    .you {
+      --cw: 78%;
+    }
+    .p1 { --x: 50%; --y: 14%; }
+    .p2 { --x: 50%; --y: 86%; }
+    /* Notes carry only their words here; your week folds when the Rep comes. */
+    .note {
+      --cw: 44%;
+      --x: 50%;
+      --y: 72%;
+      padding: var(--space-3) var(--space-4);
+    }
+    .note-label {
+      display: none;
+    }
+    .rep-status {
+      margin: var(--space-3) calc(var(--space-4) * -1) calc(var(--space-4) * -1);
+      padding: var(--space-3) var(--space-4);
+    }
+    .you {
+      --x: 50%;
+      --y: 20%;
+    }
+    .passive:not(.is-live) .week,
+    .is-live[data-step='3'] .week {
+      grid-template-rows: 0fr;
+    }
+    .rep {
+      --cw: 78%;
+      --x: 50%;
+      --y: 70%;
+    }
+    .thread {
+      top: calc(20% + 68px);
+      left: 50%;
+      width: 2px;
+      height: calc(50% - 212px);
+      transform-origin: top;
+    }
+    .is-live[data-step='0'] .you {
+      --x: 50%;
+      --y: 50%;
+      --cw: 78%;
+    }
+    .is-live[data-step='1'] .you,
+    .is-live[data-step='2'] .you {
+      --x: 50%;
+      --y: 50%;
+    }
+    .is-live[data-step='2'] .person {
+      --o: 0;
+    }
+    .is-live[data-step='2'] .n0 { --x: 27%; --y: 9%; }
+    .is-live[data-step='2'] .n1 { --x: 73%; --y: 10%; }
+    .is-live[data-step='2'] .n2 { --x: 27%; --y: 90%; }
+    .is-live[data-step='2'] .n3 { --x: 73%; --y: 91%; }
+    .is-live:not([data-step='3']) .rep {
+      --x: 50%;
+      --y: 92%;
+    }
+    .is-live:not([data-step='3']) .thread {
+      scale: 1 0;
+    }
+  }
 </style>
+
+<script>
+  import { steppedScene, reducedMotion } from '../../scripts/motion';
+
+  const scene = document.querySelector<HTMLElement>('.passive');
+
+  if (scene && !reducedMotion) {
+    scene.classList.add('is-live');
+    scene.dataset.step = '0';
+    const setStep = (n: number) => {
+      if (scene.dataset.step !== String(n)) scene.dataset.step = String(n);
+    };
+    // The scene holds still; each scroll gesture plays one beat.
+    steppedScene({ trigger: scene, pin: scene.querySelector<HTMLElement>('.pin')!, steps: 4, onStep: setStep, hold: 1800 });
+  }
+</script>

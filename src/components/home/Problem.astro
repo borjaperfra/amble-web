@@ -1,6 +1,14 @@
 ---
-// The problem, before anything else: the loop everyone knows, what it costs,
-// and the one line that answers it. Then the bridge into the demo.
+// The problem, told with the paperwork everyone knows. One pinned scene in four
+// beats, on the sunken band:
+//
+//   0  a pile of roles
+//   1  search, filter, apply, repeat: every one of them stamped Applied
+//   2  and most never answer; a recruiter asks for what's on your CV
+//   3  the pile falls away; the eye is left, listening
+//
+// Without motion, the scene renders its last beat, statements first.
+import Symbol from '../Symbol.astro';
 import type { HomeContent } from '../../content/home';
 
 interface Props {
@@ -8,22 +16,58 @@ interface Props {
 }
 
 const { c } = Astro.props;
+const words = (s: string) => s.split(' ');
+const statements = [c.title, c.verbs.join(' '), c.never];
 ---
 
-<section class="problem" id="problem" aria-labelledby="problem-title">
-  <div class="container inner">
-    <h2 class="display title" id="problem-title" data-reveal>{c.title}</h2>
+<section class="problem" id="problem" aria-labelledby="problem-title" data-step="3">
+  <div class="pin container">
+    <div class="says">
+      {
+        statements.map((s, i) => (
+          <p class="say display" data-say={i}>
+            {words(s).map((w, j) => (
+              <span class="w" style={`--w:${j}`}>
+                {w}{' '}
+              </span>
+            ))}
+          </p>
+        ))
+      }
+      <h2 class="say display thesis" id="problem-title" data-say="3">
+        {words(c.answer).map((w, j) => (
+          <span class="w" style={`--w:${j}`}>
+            {w}{' '}
+          </span>
+        ))}
+      </h2>
+    </div>
 
-    <p class="verbs" data-scene aria-label={c.verbs.join(' ')}>
-      {c.verbs.map((v, i) => <span class="verb" style={`--v:${i}`} aria-hidden="true">{v}</span>)}
-      <span class="loop" aria-hidden="true">↻</span>
-    </p>
+    <div class="stage" aria-hidden="true">
+      {
+        c.applications.map((a, i) => (
+          <div class:list={['sheet-card', 'app', `a${i}`]} style={`--i:${i}`}>
+            <p class="role heading">{a.role}</p>
+            <p class="company">{a.company}</p>
+            <span class="stamps">
+              <span class="stamp applied">{c.status.applied}</span>
+              <span class:list={['stamp', 'after', { rejected: i === 3 }]}>{i === 3 ? c.status.rejected : c.status.noReply}</span>
+            </span>
+          </div>
+        ))
+      }
 
-    <ul class="pains" role="list">
-      {c.pains.map((p, i) => <li data-reveal style={`--i:${i}`}>{p}</li>)}
-    </ul>
+      <div class="sheet-card recruiter">
+        <p class="from">{c.recruiter.from}</p>
+        <p class="message">{c.recruiter.text}</p>
+        <span class="on-cv">{c.recruiter.note}</span>
+      </div>
 
-    <p class="answer heading" data-reveal>{c.answer}</p>
+      <div class="rest">
+        <Symbol size={96} breathe />
+        <p class="listening"><span class="breath" />{c.listening}</p>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -32,74 +76,325 @@ const { c } = Astro.props;
     padding-block: var(--space-section);
     background: var(--color-surface-sunken);
   }
-  .inner {
+  .pin {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-7);
+    max-width: calc(var(--width-wide) + var(--gutter) * 2);
+  }
+
+  /* The statements: static, they stack; live, they share one cell. */
+  .says {
+    display: grid;
+    gap: var(--space-4);
+    justify-items: center;
+    text-align: center;
+  }
+  .say {
+    font-size: var(--text-chapter);
+    text-wrap: balance;
+  }
+  .thesis {
+    margin-top: var(--space-5);
+    max-width: 22ch;
+    font-size: var(--text-thesis);
+    line-height: 1.02;
+    color: var(--color-accent-strong);
+  }
+
+  /* ---------- The stage ---------- */
+  .stage {
+    position: relative;
+    width: 100%;
+    height: 420px;
+  }
+  .sheet-card {
+    position: absolute;
+    left: var(--x);
+    top: var(--y);
+    width: var(--cw, 232px);
+    translate: -50% -50%;
+    rotate: var(--r, 0deg);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-1);
+    padding: var(--space-4) var(--space-5);
+    background: var(--color-surface-raised);
+    border: var(--border-width) solid var(--color-border-subtle);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sheet);
+    opacity: var(--o, 1);
+    transition:
+      left 1.1s var(--ease-standard),
+      top 1.1s var(--ease-standard),
+      rotate 1.1s var(--ease-standard),
+      opacity var(--motion-slow) ease;
+  }
+
+  /* Applications: a messy pile. Static, they're gone. */
+  .app {
+    --o: 0;
+    transition-delay: calc(var(--i) * 0.06s);
+  }
+  .a0 { --x: 34%; --y: 24%; --r: -4deg; }
+  .a1 { --x: 58%; --y: 20%; --r: 3deg; }
+  .a2 { --x: 24%; --y: 62%; --r: 2.5deg; }
+  .a3 { --x: 48%; --y: 52%; --r: -1.5deg; }
+  .a4 { --x: 72%; --y: 58%; --r: 4deg; }
+  .a5 { --x: 40%; --y: 82%; --r: -3deg; }
+  .role {
+    font-size: var(--text-heading-sm);
+  }
+  .company {
+    font-size: var(--text-body-sm);
+    color: var(--color-text-muted);
+  }
+  /* Two stamps share one cell: Applied, then what came back. */
+  .stamps {
+    display: grid;
+    margin-top: var(--space-3);
+  }
+  .stamp {
+    grid-area: 1 / 1;
+    justify-self: start;
+    padding: var(--space-1) var(--space-3);
+    font-size: var(--text-label);
+    font-weight: var(--weight-medium);
+    border-radius: var(--radius-full);
+    opacity: 0;
+    transition:
+      opacity 0.4s ease,
+      scale 0.4s var(--ease-standard);
+  }
+  .applied {
+    color: var(--color-text-inverse);
+    background: var(--color-action);
+    scale: 1.3;
+  }
+  .after {
+    color: var(--color-text-muted);
+    background: var(--color-surface);
+    border: var(--border-width) solid var(--color-border-subtle);
+  }
+  .after.rejected {
+    color: var(--color-caution);
+    background: var(--color-caution-soft);
+    border-color: transparent;
+  }
+
+  /* A recruiter, asking for what's already on your CV. */
+  .recruiter {
+    --cw: 280px;
+    --x: 84%;
+    --y: 26%;
+    --r: 1.5deg;
+    --o: 0;
+    gap: var(--space-2);
+    z-index: 2;
+  }
+  .from {
+    font-size: var(--text-label);
+    font-weight: var(--weight-semibold);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--color-text-faint);
+  }
+  .message {
+    font-family: var(--font-display);
+    font-size: var(--text-heading-sm);
+    line-height: var(--leading-tight, 1.3);
+  }
+  .on-cv {
+    margin-top: var(--space-1);
+    padding: var(--space-1) var(--space-3);
+    font-size: var(--text-label);
+    font-weight: var(--weight-medium);
+    color: var(--color-caution);
+    background: var(--color-caution-soft);
+    border-radius: var(--radius-full);
+  }
+
+  /* What's left: the eye, listening. */
+  .rest {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    translate: -50% -50%;
     display: flex;
     flex-direction: column;
     align-items: center;
-    text-align: center;
+    gap: var(--space-4);
+    color: var(--color-text);
+    transition: opacity var(--motion-slow) ease;
   }
-  .title {
-    max-width: 16ch;
-    font-size: var(--text-chapter);
-  }
-
-  /* The loop: four verbs taking turns, forever. */
-  .verbs {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: baseline;
-    gap: var(--space-2) var(--space-5);
-    margin-top: var(--space-7);
+  .listening {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3);
     font-family: var(--font-display);
-    font-size: var(--text-heading-lg);
-  }
-  .verb {
-    color: var(--color-text);
-  }
-  .loop {
-    color: var(--color-text-muted);
-  }
-  :global(.motion) .verbs.is-playing .verb {
-    animation: turn 4s ease-in-out infinite;
-    animation-delay: calc(var(--v) * 1s);
-    color: var(--color-text-muted);
-  }
-  :global(.motion) .verbs.is-playing .loop {
-    animation: spin 4s linear infinite;
-    display: inline-block;
-  }
-  @keyframes turn {
-    0%,
-    25% {
-      color: var(--color-accent-strong);
-    }
-    30%,
-    100% {
-      color: var(--color-text-muted);
-    }
-  }
-  @keyframes spin {
-    to {
-      rotate: 360deg;
-    }
-  }
-
-  .pains {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-2);
-    margin-top: var(--space-7);
-    font-size: var(--text-body-lg);
-    color: var(--color-text-muted);
-  }
-  .pains li:last-child {
-    color: var(--color-text);
-    font-weight: var(--weight-medium);
-  }
-  .answer {
-    margin-top: var(--space-8);
-    font-size: var(--text-heading-xl);
+    font-size: var(--text-heading-md);
     color: var(--color-accent-strong);
   }
+  .breath {
+    position: relative;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--color-accent);
+  }
+  .breath::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 1.5px solid var(--color-accent);
+    animation: ripple 2.4s ease-out infinite;
+  }
+  @keyframes ripple {
+    from {
+      scale: 1;
+      opacity: 0.9;
+    }
+    to {
+      scale: 2.8;
+      opacity: 0;
+    }
+  }
+  /* The eye looks around, resting at each end. */
+  .rest :global(.iris) {
+    animation: scan 5s ease-in-out infinite;
+  }
+  @keyframes scan {
+    0%,
+    100% {
+      translate: 0 0;
+    }
+    20%,
+    32% {
+      translate: -4.5px 0.5px;
+    }
+    58%,
+    72% {
+      translate: 4.5px 0.5px;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .breath::after,
+    .rest :global(.iris) {
+      animation: none;
+    }
+  }
+
+  /* ---------- Live: the four beats ---------- */
+  .problem.is-live {
+    padding-block: 0;
+  }
+  .is-live .pin {
+    justify-content: center;
+    min-height: 100svh;
+    padding-block: calc(64px + var(--space-5)) var(--space-6);
+  }
+  .is-live .says {
+    grid-template-areas: 'say';
+    align-items: end;
+  }
+  .is-live .say {
+    grid-area: say;
+    margin: 0;
+  }
+  .is-live .say .w {
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+  .is-live[data-step='0'] [data-say='0'] .w,
+  .is-live[data-step='1'] [data-say='1'] .w,
+  .is-live[data-step='2'] [data-say='2'] .w,
+  .is-live[data-step='3'] [data-say='3'] .w {
+    opacity: 1;
+    transition-delay: calc(0.25s + var(--w) * 0.07s);
+  }
+
+  /* Beats 0–2: the pile is there; the eye isn't yet. */
+  .is-live:not([data-step='3']) .app {
+    --o: 1;
+  }
+  .is-live:not([data-step='3']) .rest {
+    opacity: 0;
+  }
+  .is-live[data-step='3'] .rest {
+    transition-delay: 0.7s;
+  }
+  /* Beat 1: stamped, one after another. */
+  .is-live[data-step='1'] .applied {
+    opacity: 1;
+    scale: 1;
+    transition-delay: calc(0.3s + var(--i) * 0.28s);
+  }
+  /* Beat 2: what came back. And a recruiter. */
+  .is-live[data-step='2'] .after {
+    opacity: 1;
+    transition-delay: calc(0.2s + var(--i) * 0.12s);
+  }
+  .is-live[data-step='2'] .app {
+    --o: 0.85;
+  }
+  .is-live[data-step='2'] .recruiter {
+    --o: 1;
+    transition-delay: 0.9s;
+  }
+  /* Beat 3: it all falls away. */
+  .is-live[data-step='3'] .app {
+    --o: 0;
+    --y: 120%;
+    --r: 8deg;
+  }
+  .is-live[data-step='3'] .recruiter {
+    --o: 0;
+    --y: 110%;
+  }
+
+  /* ---------- Phones: a stack ---------- */
+  @media (max-width: 720px) {
+    .pin {
+      gap: var(--space-6);
+    }
+    .thesis {
+      font-size: clamp(2.25rem, 1rem + 6vw, 3rem);
+    }
+    .stage {
+      height: 480px;
+    }
+    .sheet-card {
+      --cw: 74%;
+      padding: var(--space-3) var(--space-4);
+    }
+    .a0 { --x: 44%; --y: 11%; }
+    .a1 { --x: 56%; --y: 26%; }
+    .a2 { --x: 44%; --y: 41%; }
+    .a3 { --x: 56%; --y: 56%; }
+    .a4 { --x: 44%; --y: 71%; }
+    .a5 { --x: 56%; --y: 86%; }
+    .recruiter {
+      --cw: 82%;
+      --x: 50%;
+      --y: 50%;
+    }
+  }
 </style>
+
+<script>
+  import { steppedScene, reducedMotion } from '../../scripts/motion';
+
+  const scene = document.querySelector<HTMLElement>('.problem');
+
+  if (scene && !reducedMotion) {
+    scene.classList.add('is-live');
+    scene.dataset.step = '0';
+    const setStep = (n: number) => {
+      if (scene.dataset.step !== String(n)) scene.dataset.step = String(n);
+    };
+    // The scene holds still; each scroll gesture plays one beat.
+    steppedScene({ trigger: scene, pin: scene.querySelector<HTMLElement>('.pin')!, steps: 4, onStep: setStep, hold: (n) => [900, 2200, 1600, 1600][n] });
+  }
+</script>

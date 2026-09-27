@@ -90,7 +90,7 @@ Needs many reviews first; it will happen, not for launch.
 
 ## Open points
 
-- **Career coach agent (to pick up next):** the site barely mentions it (only "+ career coach" on the roadmap's v0). It needs to be told properly — what it does (strengthen your profile, how to look for work when you want to) — without making the home longer. Options to weigh: fold it into an existing scene (e.g. the "I don't know yet" gap in chapter 1 or the roadmap v0), or give it its own page linked from the roadmap.
+- ~~Career coach agent~~ Done 2026-09-27: told inside the Map. Under "What it still doesn't know · Leading a team", a coach note turns the gap into a next step (surface evidence first, then one step if you want it); a line below the columns for when you want to move (what to say, who to talk to, what your career.md says). The roadmap's Now line mentions it. No page of its own.
 
 - Legal entity for the privacy page (`src/config/legal.ts`): name, tax ID, address.
 - `privacy@amble.fyi` must exist as a real inbox before launch.

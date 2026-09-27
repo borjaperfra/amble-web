@@ -32,7 +32,7 @@ const c = home[lang];
       <Interlude lines={c.story.interlude} body={c.story.interludeBody} bridge={c.problem.bridge} id="interlude-pdf" />
       <Story c={c.story} strength={c.strength} sourceNames={c.sourceNames} />
       <div data-count="turn"><YourTurn c={c.yourTurn} /></div>
-      <MapSection c={c.map} strength={c.strength} />
+      <MapSection c={c.map} strength={c.strength} sourceNames={c.sourceNames} />
     </div>
     <div data-stage="asks" id="stage-asks">
       <Interview c={c.interview} sourceNames={c.sourceNames} />

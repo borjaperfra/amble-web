@@ -1,0 +1,171 @@
+---
+// Most people aren't looking, told with the home's paper: profile cards, one
+// open to work, and moss notes stuck on the others with what would still move
+// them. Then the line under it.
+import type { ManifestoContent } from '../../content/pages';
+
+interface Props {
+  c: ManifestoContent['figures']['people'];
+}
+
+const { c } = Astro.props;
+let n = 0;
+---
+
+<figure class="people" data-scene>
+  <ul class="grid" role="list">
+    {
+      c.cards.map((p, i) => (
+        <li class:list={['card', { open: p.looking }]} style={`--i:${i}`}>
+          <p class="name heading">{p.name}</p>
+          <p class="role">{p.role}</p>
+          <span class="status">{p.looking ? c.looking : c.notLooking}</span>
+          {p.note && (
+            <span class="note" style={`--n:${n++}`}>
+              <span class="note-label">{c.noteLabel}</span>
+              <span class="note-text heading">{p.note}</span>
+            </span>
+          )}
+        </li>
+      ))
+    }
+  </ul>
+  <figcaption class="statement display">{c.statement}</figcaption>
+</figure>
+
+<style>
+  .people {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-9);
+    margin-block: var(--space-8);
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-8) var(--space-5);
+    width: 100%;
+    max-width: var(--width-wide);
+  }
+  /* Phones: one column, four people, the note tucked on the edge. */
+  @media (max-width: 559px) {
+    .grid {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-7);
+      padding-right: var(--space-3);
+    }
+    .card:nth-child(n + 5) {
+      display: none;
+    }
+    .note {
+      right: calc(var(--space-3) * -1);
+    }
+  }
+  @media (min-width: 760px) {
+    .grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--space-9) var(--space-7);
+    }
+  }
+  .card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-1);
+    padding: var(--space-5);
+    background: var(--color-surface-raised);
+    border: var(--border-width) solid var(--color-border-subtle);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sheet);
+    transition:
+      opacity var(--motion-slow) ease,
+      translate var(--motion-arrive) var(--ease-standard);
+    transition-delay: calc(var(--i) * 0.09s);
+  }
+  .card:nth-child(odd) {
+    rotate: -0.6deg;
+  }
+  .card:nth-child(even) {
+    rotate: 0.5deg;
+  }
+  .name {
+    font-size: var(--text-heading-sm);
+  }
+  .role {
+    font-size: var(--text-body-sm);
+    color: var(--color-text-muted);
+  }
+  .status {
+    margin-top: var(--space-3);
+    padding: var(--space-1) var(--space-3);
+    font-size: var(--text-label);
+    font-weight: var(--weight-medium);
+    color: var(--color-text-muted);
+    background: var(--color-surface);
+    border: var(--border-width) solid var(--color-border-subtle);
+    border-radius: var(--radius-full);
+  }
+  .open .status {
+    color: var(--color-text-inverse);
+    background: var(--color-action);
+    border-color: var(--color-action);
+  }
+
+  /* The note: a moss wash stuck on the card's corner. */
+  .note {
+    position: absolute;
+    right: calc(var(--space-4) * -1);
+    bottom: calc(var(--space-6) * -1);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: var(--space-2) var(--space-4);
+    background: var(--color-accent-wash);
+    border: var(--border-width) solid var(--color-accent-soft);
+    border-radius: var(--radius-md);
+    box-shadow: 0 8px 20px rgb(37 37 31 / 0.07);
+    rotate: 2deg;
+    transition:
+      opacity var(--motion-slow) ease,
+      translate var(--motion-arrive) var(--ease-standard),
+      rotate var(--motion-arrive) var(--ease-standard);
+    transition-delay: calc(0.8s + var(--n) * 0.22s);
+  }
+  .card:nth-child(even) .note {
+    rotate: -2deg;
+  }
+  .note-label {
+    font-size: 11px;
+    font-weight: var(--weight-semibold);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--color-accent-strong);
+    white-space: nowrap;
+  }
+  .note-text {
+    font-size: var(--text-body);
+    font-style: italic;
+    white-space: nowrap;
+  }
+
+  .statement {
+    font-size: var(--text-observation);
+    text-align: center;
+    transition: opacity var(--motion-slow) ease 1.8s;
+  }
+
+  :global(.motion) .people:not(.is-playing) .card {
+    opacity: 0;
+    translate: 0 12px;
+  }
+  :global(.motion) .people:not(.is-playing) .note {
+    opacity: 0;
+    translate: 0 8px;
+    rotate: 8deg;
+  }
+  :global(.motion) .people:not(.is-playing) .statement {
+    opacity: 0;
+  }
+</style>

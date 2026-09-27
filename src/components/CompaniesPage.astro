@@ -1,14 +1,13 @@
 ---
-// For companies: the problem first (the people you want aren't applying),
-// then mutual intent, the silent negotiation, the salary rule, and an
-// early-access waitlist (audience "company").
+// For companies: the people you want aren't applying; how your role becomes
+// an agent that finds them, checks their evidence and asks their Rep (one
+// pinned scene); the brief that reaches you; and an early-access waitlist.
 import Base from '../layouts/Base.astro';
 import Waitlist from './Waitlist.astro';
 import Symbol from './Symbol.astro';
 import SectionIntro from './SectionIntro.astro';
-import DotField from './DotField.astro';
-import AgentLine from './AgentLine.astro';
-import RangeFigure from './companies/RangeFigure.astro';
+import InboxFigure from './companies/InboxFigure.astro';
+import FlowScene from './companies/FlowScene.astro';
 import { companies } from '../content/companies';
 import type { Lang } from '../i18n/ui';
 
@@ -16,7 +15,7 @@ const lang = (Astro.currentLocale ?? 'en') as Lang;
 const c = companies[lang];
 ---
 
-<Base title={c.meta.title} description={c.meta.description} path="companies" joinHref="#company-join" joinLabel={c.cta}>
+<Base title={c.meta.title} description={c.meta.description} path="companies" og="companies" joinHref="#company-join" joinLabel={c.cta}>
   <main>
     <!-- Hero: the thesis, and the inbox that can't see who matters -->
     <section class="hero container" id="company-join" aria-labelledby="co-title">
@@ -28,15 +27,13 @@ const c = companies[lang];
         <em>{c.title[1]}</em>
       </h1>
       <p class="lede">
-        {c.lede[0]}
+        <strong>{c.lede[0]}</strong>
         <br />
-        <strong>{c.lede[1]}</strong>
+        {c.lede[1]}
       </p>
       <div class="form"><Waitlist id="company-hero" audience="company" cta={c.cta} note={c.formPrivacy} /></div>
       <p class="note">{c.formNote}</p>
-      <div class="inbox-field">
-        <DotField variant="inbox" inboxLabel={`${c.inbox.inbox} · ${c.inbox.applied}`} outsideTags={[c.inbox.tags[2], c.inbox.tags[0], c.inbox.tags[3]]} />
-      </div>
+      <InboxFigure c={c.inbox} />
     </section>
 
     <!-- The problem -->
@@ -54,68 +51,39 @@ const c = companies[lang];
       </div>
     </section>
 
-    <!-- Mutual intent -->
-    <section class="section container pitch" aria-labelledby="co-pitch">
-      <div class="pitch-grid">
-        <div>
-          <h2 class="display pitch-title" id="co-pitch" data-reveal>
-            {c.pitch.title[0]}
-            <br />
-            <em>{c.pitch.title[1]}</em>
-          </h2>
-          {c.pitch.body.map((p) => <p class="pitch-p" data-reveal>{p}</p>)}
-          <p class="pitch-after" data-reveal>{c.pitch.after}</p>
-        </div>
-        <div class="shift" data-scene aria-label={`${c.funnel.old[0]} → ${c.funnel.next.join(' ')}`}>
-          <p class="q-swap">
-            <span class="q old heading">{c.funnel.old[0]}</span>
-            <span class="q new heading">{c.funnel.next[0]}</span>
-          </p>
-          <p class="q-then">{c.funnel.next[1]}</p>
-          <p class="q-then">{c.funnel.next[2]}</p>
-        </div>
-      </div>
+    <!-- How it works: your role becomes an agent -->
+    <FlowScene c={c.flow} />
 
-      <ol class="sequence" role="list" data-scene>
-        {
-          c.sequence.steps.map((st, i) => (
-            <li class:list={{ last: i === c.sequence.steps.length - 1 }} style={`--i:${i}`}>
-              {st}
+    <!-- What reaches you: the brief -->
+    <section class="section container brief-section" aria-labelledby="co-brief">
+      <SectionIntro id="co-brief" kicker={c.brief.kicker} title={c.brief.title} body={c.brief.line} align="center" />
+      <article class="brief" data-scene>
+        <header class="brief-head">
+          <span class="brief-who">
+            <span class="brief-name heading">{c.brief.name}</span>
+            <span class="brief-role">{c.brief.role}</span>
+          </span>
+          <span class="brief-status">{c.brief.status}</span>
+        </header>
+        <p class="brief-label">{c.brief.whyLabel}</p>
+        <ul class="brief-why" role="list">
+          {c.brief.why.map((w, i) => (
+            <li style={`--i:${i}`}>
+              <span>{w.text}</span>
+              <span class="brief-src">{w.src}</span>
             </li>
-          ))
-        }
-      </ol>
-      <ul class="nos" role="list">
-        {c.sequence.nos.map((n, i) => <li data-reveal style={`--i:${i}`}><span class="x" aria-hidden="true">✕</span>{n}</li>)}
-      </ul>
-      <p class="seq-closer display" data-reveal>
-        {c.sequence.closer[0]}
-        <br />
-        <em>{c.sequence.closer[1]}</em>
-      </p>
-    </section>
-
-    <!-- Agent ↔ Rep -->
-    <section class="section container nego-section" aria-labelledby="co-nego">
-      <SectionIntro id="co-nego" kicker={c.negotiation.kicker} title={c.negotiation.title} align="center" level="observation" />
-      <div class="nego-line">
-        <AgentLine left={c.negotiation.agent} right={c.negotiation.rep} signals={c.negotiation.signals} result={c.negotiation.mutual} note={c.negotiation.question} />
-      </div>
-    </section>
-
-    <!-- The salary rule -->
-    <section class="salary" aria-labelledby="co-salary">
-      <div class="container salary-grid">
-        <div>
-          <p class="kicker s-kicker">{c.salary.kicker}</p>
-          <h2 class="display s-title" id="co-salary">{c.salary.title}</h2>
-          <p class="s-body">{c.salary.body}</p>
-          <ul class="rules" role="list">
-            {c.salary.rules.map((r) => <li><span class="tick" aria-hidden="true">✓</span>{r}</li>)}
-          </ul>
+          ))}
+        </ul>
+        <p class="brief-range"><span aria-hidden="true">🔒</span>{c.brief.range}</p>
+        <div class="brief-consider">
+          <p class="brief-label caution">{c.brief.considerLabel}</p>
+          <p>{c.brief.consider}</p>
         </div>
-        <RangeFigure c={c.salary} />
-      </div>
+        <p class="brief-actions" aria-hidden="true">
+          <span class="btn-dark">{c.brief.actions[0]}</span>
+          <span class="btn-quiet">{c.brief.actions[1]}</span>
+        </p>
+      </article>
     </section>
 
     <!-- What it never does -->
@@ -123,7 +91,7 @@ const c = companies[lang];
       <div class="container never-grid">
         <SectionIntro id="co-never" kicker={c.never.kicker} title={c.never.title} />
         <ul class="never-list" role="list">
-          {c.never.items.map((it, i) => <li data-reveal style={`--i:${i}`}><span class="x" aria-hidden="true">✕</span>{it}</li>)}
+          {c.never.items.map((it, i) => <li data-reveal style={`--i:${i}`}><span class="x" aria-hidden="true" />{it}</li>)}
         </ul>
       </div>
     </section>
@@ -137,6 +105,11 @@ const c = companies[lang];
     </section>
   </main>
 </Base>
+
+<script>
+  import { startSmoothScroll } from '../scripts/motion';
+  startSmoothScroll();
+</script>
 
 <style>
   .hero {
@@ -160,13 +133,10 @@ const c = companies[lang];
     margin-top: var(--space-7);
   }
   .title {
+    max-width: 22ch;
     margin-top: var(--space-4);
-    font-size: var(--text-thesis);
-  }
-  .inbox-field {
-    width: 100%;
-    max-width: var(--width-wide);
-    margin-top: var(--space-9);
+    font-size: clamp(2.4rem, 1.4rem + 4.2vw, 4.5rem);
+    line-height: 1.04;
   }
   .hero .lede {
     max-width: 38rem;
@@ -206,72 +176,8 @@ const c = companies[lang];
       gap: var(--space-9);
     }
   }
-  .p-title,
-  .pitch-title {
+  .p-title {
     font-size: var(--text-chapter);
-  }
-  /* Who applied? → Who should we talk to? Typography, not a diagram. */
-  .shift {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-3);
-  }
-  .q-swap {
-    display: grid;
-  }
-  .q {
-    grid-area: 1 / 1;
-    font-size: var(--text-observation);
-    transition:
-      opacity 0.7s ease,
-      translate 0.8s var(--ease-standard),
-      text-decoration-color 0.4s ease;
-  }
-  .q.old {
-    color: var(--color-text-faint);
-    text-decoration-line: line-through;
-    text-decoration-thickness: 1.5px;
-    text-decoration-color: var(--color-retracted);
-    opacity: 0;
-  }
-  .q.new {
-    color: var(--color-accent-strong);
-  }
-  .q-then {
-    font-family: var(--font-display);
-    font-size: var(--text-heading-sm);
-    color: var(--color-text-muted);
-    transition: opacity 0.7s ease;
-  }
-  :global(.motion) .shift .q.old {
-    opacity: 1;
-    text-decoration-color: transparent;
-    transition-delay: 0s, 0s, 0.5s;
-  }
-  :global(.motion) .shift.is-playing .q.old {
-    text-decoration-color: var(--color-retracted);
-    opacity: 0;
-    translate: 0 -8px;
-    transition-delay: 1.2s, 1.2s, 0.5s;
-  }
-  :global(.motion) .shift:not(.is-playing) .q.new {
-    opacity: 0;
-    translate: 0 8px;
-  }
-  :global(.motion) .shift .q.new {
-    transition-delay: 1.7s;
-  }
-  :global(.motion) .shift:not(.is-playing) .q-then {
-    opacity: 0;
-  }
-  .shift .q-then:nth-of-type(2) {
-    transition-delay: 2.4s;
-  }
-  .shift .q-then:nth-of-type(3) {
-    transition-delay: 2.9s;
-  }
-  .nego-line {
-    margin-top: var(--space-scene);
   }
   .p-body {
     display: flex;
@@ -286,146 +192,144 @@ const c = companies[lang];
     color: var(--color-accent-strong);
   }
 
-  /* Mutual intent */
-  .pitch {
-    max-width: calc(var(--width-wide) + var(--gutter) * 2);
-  }
-  .pitch-grid {
-    display: grid;
-    gap: var(--space-7);
-    align-items: center;
-  }
-  @media (min-width: 900px) {
-    .pitch-grid {
-      grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
-      gap: var(--space-9);
-    }
-  }
-  .pitch-p {
-    margin-top: var(--space-4);
-    font-size: var(--text-body-lg);
-    color: var(--color-text-muted);
-  }
-  .pitch-after {
-    margin-top: var(--space-5);
-    font-size: var(--text-body-lg);
-    font-weight: var(--weight-medium);
-  }
-  .sequence {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--space-2);
-    margin-top: var(--space-9);
-    text-align: center;
-  }
-  .sequence li {
-    font-family: var(--font-display);
-    font-size: var(--text-heading-md);
-    transition:
-      opacity 0.5s ease,
-      translate 0.6s var(--ease-standard);
-    transition-delay: calc(var(--i) * 0.35s);
-  }
-  .sequence li + li::before {
-    content: '↓';
-    display: block;
-    margin-bottom: var(--space-2);
-    font-family: var(--font-ui);
-    font-size: var(--text-body);
-    color: var(--color-accent);
-  }
-  .sequence li.last {
-    color: var(--color-accent-strong);
-    font-size: var(--text-heading-lg);
-  }
-  :global(.motion) .sequence:not(.is-playing) li {
-    opacity: 0;
-    translate: 0 8px;
-  }
-  .nos {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--space-2);
-    margin-top: var(--space-8);
-  }
-  .nos li,
   .never-list li {
     display: flex;
     align-items: center;
     gap: var(--space-3);
   }
-  .nos li {
-    font-size: var(--text-body-lg);
-    color: var(--color-text-muted);
-  }
+  /* A moss point: what you get, and what it promises. */
   .x {
     flex: none;
-    font-size: var(--text-body-sm);
-    color: var(--color-retracted);
-  }
-  .seq-closer {
-    margin-top: var(--space-7);
-    text-align: center;
-    font-size: var(--text-observation);
-  }
-  .seq-closer em {
-    color: var(--color-accent-strong);
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--color-accent);
   }
 
-  /* The salary rule: the page's moss moment */
-  .salary {
-    padding-block: var(--space-section);
-    color: var(--color-text-inverse);
-    background: var(--color-accent-strong);
-  }
-  .salary-grid {
-    display: grid;
-    gap: var(--space-8);
+  /* What reaches you: one brief, as a sheet of paper. */
+  .brief-section {
+    display: flex;
+    flex-direction: column;
     align-items: center;
   }
-  @media (min-width: 960px) {
-    .salary-grid {
-      grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
-      gap: var(--space-9);
-    }
-  }
-  .s-kicker {
-    color: var(--color-accent-soft);
-  }
-  .s-title {
-    margin-top: var(--space-4);
-    font-size: var(--text-chapter);
-  }
-  .s-body {
-    margin-top: var(--space-5);
-    max-width: 34rem;
-    font-size: var(--text-body-lg);
-    color: var(--color-accent-soft);
-  }
-  .rules {
+  .brief {
     display: flex;
     flex-direction: column;
     gap: var(--space-3);
-    margin-top: var(--space-6);
+    width: min(100%, 620px);
+    margin-top: var(--space-scene);
+    padding: clamp(var(--space-5), 1rem + 2vw, var(--space-7));
+    background: var(--color-surface-raised);
+    border: var(--border-width) solid var(--color-border-subtle);
+    border-radius: var(--radius-lg);
+    box-shadow:
+      0 1px 2px rgb(37 37 31 / 0.05),
+      0 14px 36px rgb(37 37 31 / 0.08);
+    rotate: -0.4deg;
   }
-  .rules li {
+  .brief-head {
     display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
     gap: var(--space-3);
-    align-items: flex-start;
+    padding-bottom: var(--space-4);
+    border-bottom: var(--border-width) solid var(--color-border-subtle);
   }
-  .tick {
-    display: grid;
-    place-items: center;
-    flex: none;
-    width: 22px;
-    height: 22px;
-    margin-top: 0.15em;
+  .brief-who {
+    display: flex;
+    flex-direction: column;
+  }
+  .brief-name {
+    font-size: var(--text-heading-lg);
+  }
+  .brief-role {
+    font-size: var(--text-body-sm);
+    color: var(--color-text-muted);
+  }
+  .brief-status {
+    padding: var(--space-1) var(--space-3);
+    font-size: var(--text-label);
+    font-weight: var(--weight-medium);
+    color: var(--color-text-inverse);
+    background: var(--color-accent);
+    border-radius: var(--radius-full);
+  }
+  .brief-label {
+    margin-top: var(--space-2);
+    font-size: var(--text-label);
+    font-weight: var(--weight-semibold);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--color-accent-strong);
+  }
+  .brief-label.caution {
+    margin-top: 0;
+    color: var(--color-caution);
+  }
+  .brief-why {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+  .brief-why li {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding-left: var(--space-4);
+    border-left: 2px solid var(--color-accent-soft);
+    transition:
+      opacity var(--motion-slow) ease,
+      translate var(--motion-arrive) var(--ease-standard);
+    transition-delay: calc(0.2s + var(--i) * 0.2s);
+  }
+  .brief-src {
     font-size: var(--text-label);
     color: var(--color-accent-strong);
-    background: var(--color-accent-soft);
+  }
+  .brief-range {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    font-size: var(--text-body-sm);
+    color: var(--color-accent-strong);
+    background: var(--color-accent-wash);
+    border-radius: var(--radius-md);
+  }
+  .brief-consider {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    padding: var(--space-3) var(--space-4);
+    font-size: var(--text-body-sm);
+    background: var(--color-caution-soft);
+    border-radius: var(--radius-md);
+  }
+  .brief-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-top: var(--space-2);
+  }
+  .btn-dark,
+  .btn-quiet {
+    padding: var(--space-2) var(--space-4);
+    font-size: var(--text-body-sm);
+    font-weight: var(--weight-medium);
     border-radius: var(--radius-full);
+  }
+  .btn-dark {
+    color: var(--color-text-inverse);
+    background: var(--color-action);
+  }
+  .btn-quiet {
+    color: var(--color-text-muted);
+    border: var(--border-width) solid var(--color-border);
+  }
+  :global(.motion) .brief:not(.is-playing) .brief-why li {
+    opacity: 0;
+    translate: 0 8px;
   }
 
   /* What it never does: a sunken band */

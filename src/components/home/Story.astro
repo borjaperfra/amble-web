@@ -33,6 +33,7 @@ const claims = c.sources.flatMap((src) =>
   <div class="story-pin">
     <div class="container story-grid">
       <div class="captions">
+        <h2 class="display chapter" id="story-title">{c.chapter}</h2>
         <ol class="progress" role="list" aria-hidden="true">
           {c.steps.map((_, i) => <li data-i={i}>{String(i + 1).padStart(2, '0')}</li>)}
         </ol>
@@ -41,13 +42,7 @@ const claims = c.sources.flatMap((src) =>
             c.steps.map((step, i) => (
               <div class="caption" data-i={i}>
                 <p class="kicker">{step.kicker}</p>
-                {i === 0 ? (
-                  <h2 class="heading caption-title" id="story-title">
-                    {step.title}
-                  </h2>
-                ) : (
-                  <p class="heading caption-title">{step.title}</p>
-                )}
+                <p class="heading caption-title">{step.title}</p>
                 <p class="lede caption-body">{step.body}</p>
                 {i === 1 && (
                   <p class="legend">
@@ -171,6 +166,23 @@ const claims = c.sources.flatMap((src) =>
     display: flex;
     flex-direction: column;
     gap: var(--space-6);
+  }
+  /* The chapter's title holds at the top while its four steps play below. */
+  .chapter {
+    max-width: 14ch;
+    font-size: var(--text-chapter);
+    line-height: 1.05;
+  }
+  @media (min-width: 960px) {
+    .story.is-live .captions {
+      align-self: stretch;
+    }
+    .story.is-live .progress {
+      margin-top: auto;
+    }
+    .story.is-live .caption-stack {
+      margin-bottom: auto;
+    }
   }
   .progress {
     display: flex;
@@ -296,7 +308,8 @@ const claims = c.sources.flatMap((src) =>
     left: calc(var(--x) * 1cqw);
     top: calc(var(--y) * 1cqw);
     width: calc(var(--w) * 1cqw);
-    padding: 3cqw 3.2cqw 3cqw 4.6cqw;
+    /* A wide left margin: the source badges sit in it, on the paper. */
+    padding: 3cqw 3.2cqw 3cqw calc(2.3em + 1.4cqw);
     font-size: var(--doc-font);
     line-height: 1.5;
     background: var(--color-surface-raised);
@@ -324,7 +337,7 @@ const claims = c.sources.flatMap((src) =>
     justify-content: space-between;
     gap: 2cqw;
     padding-bottom: 1.5cqw;
-    margin: 0 0 1.5cqw -1.4cqw;
+    margin: 0 0 1.5cqw calc(1.8cqw - 2.3em);
     border-bottom: var(--border-width) solid var(--color-border-subtle);
   }
   .doc-source {
@@ -625,7 +638,7 @@ const claims = c.sources.flatMap((src) =>
       --cap-font: max(18px, 5.4cqw);
     }
     .doc {
-      padding: 4cqw 4cqw 4cqw 7cqw;
+      padding: 4cqw 4cqw 4cqw calc(2.3em + 1.4cqw);
       border-radius: 3cqw;
     }
     /* On phones the sources stack like a deck: the CV in front, the others'
@@ -635,13 +648,29 @@ const claims = c.sources.flatMap((src) =>
     .doc[data-doc='gh'] { --x: 2; --y: 18; --w: 96; --r: 0.8; --gx: 25; --gy: 1; --gr: 2; --gs: 0.3; z-index: 3; }
     .doc[data-doc='cv'] { --x: 0; --y: 27; --w: 100; --r: -0.6; --gx: 0; --gy: 0; --gr: -2; --gs: 0.3; z-index: 4; }
     .doc-head {
-      margin-left: -3cqw;
+      margin-left: calc(2.6cqw - 2.3em);
     }
     .caps {
       top: 28cqw;
       left: 0;
       width: 100%;
       gap: 3.4cqw;
+    }
+    /* Without motion the stage holds the final state: the pile, then the
+       capabilities under it, as tall as they need. */
+    .story:not(.is-live) .stage-wrap {
+      width: 100%;
+    }
+    .story:not(.is-live) .stage {
+      container: stage / inline-size;
+      aspect-ratio: auto;
+    }
+    .story:not(.is-live) .docs {
+      position: relative;
+      height: 28cqw;
+    }
+    .story:not(.is-live) .caps {
+      position: static;
     }
     .cap-claims {
       gap: 1.4cqw;
@@ -664,7 +693,7 @@ const claims = c.sources.flatMap((src) =>
 </style>
 
 <script>
-  import { ScrollTrigger, Flip, reducedMotion } from '../../scripts/motion';
+  import { ScrollTrigger, Flip, reducedMotion, steppedScene } from '../../scripts/motion';
 
   const story = document.querySelector<HTMLElement>('.story');
 
@@ -723,14 +752,7 @@ const claims = c.sources.flatMap((src) =>
       onEnter: () => step < 0 && setStep(0),
     });
 
-    // Then the scene holds still while the story plays out over the scroll.
-    ScrollTrigger.create({
-      trigger: story,
-      pin: story.querySelector('.story-pin'),
-      start: 'top top',
-      end: '+=340%',
-      onUpdate: (self) => setStep(Math.min(3, Math.floor(self.progress * 4))),
-      onLeaveBack: () => setStep(0),
-    });
+    // Then the scene holds still; each scroll gesture plays one step.
+    steppedScene({ trigger: story, pin: story.querySelector<HTMLElement>('.story-pin')!, steps: 4, onStep: setStep, hold: 1500 });
   }
 </script>

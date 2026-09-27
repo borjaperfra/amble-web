@@ -1,9 +1,9 @@
 ---
 // Renders a run of manifesto blocks: paragraphs, beats set large, chapter
 // headings, lists, the Rep's quote, and figures.
-import DotField from '../DotField.astro';
 import LoopFigure from './LoopFigure.astro';
-import ArchitectureFigure from './ArchitectureFigure.astro';
+import PeopleFigure from './PeopleFigure.astro';
+import RepFigure from './RepFigure.astro';
 import RemoveFigure from './RemoveFigure.astro';
 import Symbol from '../Symbol.astro';
 import type { Block, ManifestoContent } from '../../content/pages';
@@ -20,18 +20,9 @@ const { blocks, figures } = Astro.props;
   blocks.map((b) => {
     if (b.kind === 'figure') {
       if (b.figure === 'loop') return <LoopFigure c={figures.loop} />;
-      if (b.figure === 'architecture') return <ArchitectureFigure c={figures.architecture} />;
+      if (b.figure === 'rep') return <RepFigure c={figures.rep} />;
       if (b.figure === 'remove') return <RemoveFigure c={figures.remove} />;
-      return (
-        <div class="fig-field">
-          <DotField
-            size="large"
-            lookingLabel={figures.iceberg.looking.toLowerCase()}
-            conditions={figures.iceberg.tags}
-            statement={figures.iceberg.statement}
-          />
-        </div>
-      );
+      return <PeopleFigure c={figures.people} />;
     }
     if (b.kind === 'list')
       return (
@@ -104,8 +95,5 @@ const { blocks, figures } = Astro.props;
     border: var(--border-width) solid var(--color-border-subtle);
     border-radius: 20px 20px 20px 6px;
     box-shadow: var(--shadow-sheet);
-  }
-  .fig-field {
-    margin-block: var(--space-7);
   }
 </style>

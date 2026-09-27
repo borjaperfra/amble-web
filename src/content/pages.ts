@@ -6,7 +6,7 @@ import type { Lang } from '../i18n/ui';
 export type Block =
   | { kind: 'p' | 'beat' | 'chapter' | 'quote'; text: string }
   | { kind: 'list'; text: string[] }
-  | { kind: 'figure'; figure: 'loop' | 'iceberg' | 'architecture' | 'remove' };
+  | { kind: 'figure'; figure: 'loop' | 'people' | 'rep' | 'remove' };
 
 export interface ManifestoContent {
   meta: { title: string; description: string };
@@ -20,20 +20,28 @@ export interface ManifestoContent {
   figures: {
     // The page fills with applications and filters, then clears to these two lines.
     loop: { application: string; filters: string[]; before: string; statement: string };
-    iceberg: { looking: string; notLooking: string; question: string; tags: string[]; statement: string };
-    architecture: {
-      today: string;
-      todaySteps: string[];
-      amble: string;
-      you: string;
+    // People at work as profile cards: one open to work; notes on the others
+    // say what would still move them.
+    people: {
+      looking: string;
+      notLooking: string;
+      noteLabel: string;
+      cards: { name: string; role: string; looking?: boolean; note?: string }[];
+      statement: string;
+    };
+    // Give everyone a Rep: the week's offers, read by your Rep, one reaches you.
+    rep: {
+      offersLabel: string;
+      offers: { role: string; company: string; why: string; fits?: boolean }[];
       rep: string;
       listening: string;
-      opportunity: string;
-      worth: string;
-      conversation: string;
+      you: string;
+      youRole: string;
+      notice: string;
       caption: [string, string];
     };
-    remove: { before: string[]; struck: number[]; after: string[]; middle: string; final: string };
+    // The close, as in the launch film: the chain empties, the ends meet.
+    remove: { you: string; company: string; middle: string[]; final: [string, string] };
   };
 }
 
@@ -48,6 +56,11 @@ export interface HowBuiltContent {
     flow?: string[];
     emphasis?: number;
     states?: { name: string; body: string }[];
+    // A defended-or-retracted claim, told as paper: the claim, the question,
+    // the answer, and what the Rep keeps.
+    defence?: { claim: string; source: string; askLabel: string; ask: string; answer: string; outcomeLabel: string; outcome: string };
+    // One triage offer, the answer, and the rule it leaves.
+    intent?: { role: string; facts: string[]; verdict: string; reason: string; ruleType: string; rule: string; pending: string };
   }[];
 }
 
@@ -84,7 +97,7 @@ const manifestoEn: ManifestoContent = {
       kind: 'p',
       text: 'Some of the best people for a role are already doing good work somewhere else. They aren’t browsing job boards. They aren’t updating their CV. They aren’t applying.',
     },
-    { kind: 'figure', figure: 'iceberg' },
+    { kind: 'figure', figure: 'people' },
     { kind: 'beat', text: 'But not looking isn’t the same as not listening.' },
     {
       kind: 'p',
@@ -101,31 +114,31 @@ const manifestoEn: ManifestoContent = {
     { kind: 'list', text: ['Then you go back to work.', 'Your Rep listens.', 'Most weeks, nothing happens.', 'That’s a feature.'] },
     {
       kind: 'p',
-      text: 'When something deserves your attention, it comes to you, already filtered against your work, your conditions and the things you’ve taught your Rep to care about. No searching. No job alerts. No application. Just:',
+      text: 'When something deserves your attention, it comes to you, already filtered against your work, your conditions and the things you’ve taught your Rep to care about. It arrives with one sentence:',
     },
     { kind: 'quote', text: 'I found something worth your attention.' },
-    { kind: 'figure', figure: 'architecture' },
+    { kind: 'figure', figure: 'rep' },
   ],
   principlesLabel: 'What we build by',
   principles: [
     {
-      title: 'Represent, don’t rank.',
-      body: 'There is no score for a person. What you’re worth depends on who is asking and for what, so your Rep describes you, and never sorts you against anyone else.',
+      title: 'Describe each person on their own.',
+      body: 'What you’re worth depends on who is asking and for what. So your Rep describes you, on your own terms, one person at a time.',
     },
     {
-      title: 'Evidence, not adjectives.',
-      body: 'Every claim your Rep makes points to where it read it. What it can’t source, it doesn’t say, not even to make you look better.',
+      title: 'Every claim has a source.',
+      body: 'Every claim your Rep makes points to where it read it. Without a source, it stays quiet, even when saying more would flatter you.',
     },
     {
-      title: 'Say what you don’t know.',
-      body: 'A good representative is precise about its own uncertainty. “I can’t tell yet” is a useful sentence, not a failure.',
+      title: 'Name the gaps.',
+      body: 'A good representative is precise about its own uncertainty. “I can’t tell yet” is a useful sentence.',
     },
     {
-      title: 'Code shows what shipped, not who decided.',
+      title: 'Ask who decided.',
       body: 'Much of today’s work is written with an agent. So your Rep asks you to explain your decisions, and only claims what you can defend.',
     },
     {
-      title: 'Retract, never delete.',
+      title: 'Retract, and keep the record.',
       body: 'When your Rep stops believing something, it keeps the record of why. A system that can’t unlearn inflates everyone it reads.',
     },
     {
@@ -134,7 +147,7 @@ const manifestoEn: ManifestoContent = {
     },
     {
       title: 'Silence is a feature.',
-      body: 'No feed, no badges, no “seven new matches”. Most weeks, the right number of opportunities is zero.',
+      body: 'Most weeks, the right number of opportunities is zero, and your Rep says nothing at all.',
     },
     {
       title: 'Your data is yours.',
@@ -146,7 +159,7 @@ const manifestoEn: ManifestoContent = {
     },
   ],
   future: [
-    { kind: 'chapter', text: 'Eventually, your Rep won’t search jobs either.' },
+    { kind: 'chapter', text: 'Eventually, the search itself goes away.' },
     {
       kind: 'list',
       text: [
@@ -156,7 +169,7 @@ const manifestoEn: ManifestoContent = {
         'Your Rep will decide whether it’s worth your attention.',
       ],
     },
-    { kind: 'p', text: 'Neither side needs to reveal everything before there’s mutual interest.' },
+    { kind: 'p', text: 'Each side reveals more as interest grows on both.' },
     { kind: 'beat', text: 'Your agent talks to theirs.' },
     { kind: 'p', text: 'And when both sides want the conversation, humans talk.' },
     { kind: 'figure', figure: 'remove' },
@@ -165,34 +178,42 @@ const manifestoEn: ManifestoContent = {
     loop: {
       application: 'application',
       filters: ['filter', 'screen', 'rank'],
-      before: 'We don’t think the answer is a better application.',
-      statement: 'We think the application is the problem.',
+      before: 'A better application keeps the same loop.',
+      statement: 'The application is the problem.',
     },
-    iceberg: {
-      looking: 'Looking',
+    people: {
+      looking: 'Open to work',
       notLooking: 'Not looking',
-      question: 'but would they move?',
-      tags: ['right work', 'more ownership', 'remote', 'the right number', 'the right problem'],
+      noteLabel: 'Would move for',
+      cards: [
+        { name: 'Aiko Tanaka', role: 'Product designer', note: 'the right problem' },
+        { name: 'Daniel Okafor', role: 'Backend engineer', looking: true },
+        { name: 'Lucía Serrano', role: 'Data scientist', note: 'remote' },
+        { name: 'Tom Weber', role: 'Staff engineer' },
+        { name: 'Priya Nair', role: 'ML engineer', note: 'more ownership' },
+        { name: 'Jonas Berg', role: 'Platform engineer', note: 'the right number' },
+      ],
       statement: 'Not looking ≠ not listening.',
     },
-    architecture: {
-      today: 'Today',
-      todaySteps: ['Job', 'Job board', 'Search', 'Application', 'ATS', 'Screening', 'Recruiter', 'Maybe a conversation'],
-      amble: 'Amble',
+    rep: {
+      offersLabel: '37 read this week',
+      offers: [
+        { role: 'Senior ML Engineer', company: 'Adtech', why: 'Office 5 days' },
+        { role: 'Founding AI Engineer', company: 'Seed', why: 'Solo on-call' },
+        { role: 'Evaluation Lead', company: 'Kestrel', why: 'Worth your time', fits: true },
+      ],
+      rep: 'Your Rep',
+      listening: 'Listening',
       you: 'You',
-      rep: 'Rep',
-      listening: 'listening',
-      opportunity: 'Opportunity',
-      worth: 'worth it?',
-      conversation: 'Conversation',
-      caption: ['The old system waits for you to apply.', 'Your Rep doesn’t.'],
+      youRole: 'At work',
+      notice: '1 worth your time',
+      caption: ['The old system waits for you to apply.', 'Your Rep listens for you.'],
     },
     remove: {
-      before: ['Company', 'Job', 'Application', 'Screening', 'Person'],
-      struck: [2, 3],
-      after: ['Company intent', 'Evidence', 'Person intent'],
-      middle: 'No application in the middle.',
-      final: 'Remove applications.',
+      you: 'You',
+      company: 'Company',
+      middle: ['Job board', 'Application', 'ATS', 'Screening'],
+      final: ['Remove', 'applications.'],
     },
   },
 };
@@ -230,7 +251,7 @@ const manifestoEs: ManifestoContent = {
       kind: 'p',
       text: 'Algunas de las mejores personas para un puesto ya están haciendo un buen trabajo en otra parte. No miran portales de empleo. No actualizan su CV. No aplican.',
     },
-    { kind: 'figure', figure: 'iceberg' },
+    { kind: 'figure', figure: 'people' },
     { kind: 'beat', text: 'Pero no buscar no es lo mismo que no escuchar.' },
     {
       kind: 'p',
@@ -247,31 +268,31 @@ const manifestoEs: ManifestoContent = {
     { kind: 'list', text: ['Después tú vuelves al trabajo.', 'Tu Rep escucha.', 'Casi todas las semanas, no pasa nada.', 'Es una función.'] },
     {
       kind: 'p',
-      text: 'Cuando algo merece tu atención, te llega ya filtrado según tu trabajo, tus condiciones y lo que le has enseñado a tu Rep a valorar. Sin buscar. Sin alertas de empleo. Sin candidatura. Solo:',
+      text: 'Cuando algo merece tu atención, te llega ya filtrado según tu trabajo, tus condiciones y lo que le has enseñado a tu Rep a valorar. Llega con una frase:',
     },
     { kind: 'quote', text: 'He encontrado algo que merece tu atención.' },
-    { kind: 'figure', figure: 'architecture' },
+    { kind: 'figure', figure: 'rep' },
   ],
   principlesLabel: 'Con lo que construimos',
   principles: [
     {
-      title: 'Representar, no clasificar.',
-      body: 'No existe una nota para una persona. Lo que vales depende de quién pregunta y para qué, así que tu Rep te describe, y nunca te ordena frente a nadie.',
+      title: 'Describir a cada persona por sí misma.',
+      body: 'Lo que vales depende de quién pregunta y para qué. Por eso tu Rep te describe en tus propios términos, persona a persona.',
     },
     {
-      title: 'Evidencia, no adjetivos.',
-      body: 'Cada afirmación de tu Rep apunta a dónde la leyó. Lo que no puede respaldar, no lo dice, ni siquiera para dejarte mejor.',
+      title: 'Cada afirmación tiene su fuente.',
+      body: 'Cada afirmación de tu Rep apunta a dónde la leyó. Sin fuente, calla, aunque decir más te dejara mejor.',
     },
     {
-      title: 'Decir lo que no sabes.',
-      body: 'Un buen representante es preciso sobre su propia incertidumbre. «Aún no lo sé» es una frase útil, no un fracaso.',
+      title: 'Nombrar los huecos.',
+      body: 'Un buen representante es preciso sobre su propia incertidumbre. «Aún no lo sé» es una frase útil.',
     },
     {
-      title: 'El código dice qué se envió, no quién lo decidió.',
+      title: 'Preguntar quién decidió.',
       body: 'Hoy mucho trabajo se escribe con un agente. Por eso tu Rep te pide que expliques tus decisiones, y solo afirma lo que puedes defender.',
     },
     {
-      title: 'Retirar, nunca borrar.',
+      title: 'Retirar, y guardar el registro.',
       body: 'Cuando tu Rep deja de creer algo, guarda el registro de por qué. Un sistema que no puede desaprender infla a todo el que lee.',
     },
     {
@@ -280,7 +301,7 @@ const manifestoEs: ManifestoContent = {
     },
     {
       title: 'El silencio es una función.',
-      body: 'Sin feed, sin notificaciones, sin «siete nuevos matches». La mayoría de semanas, el número correcto de oportunidades es cero.',
+      body: 'La mayoría de semanas, el número correcto de oportunidades es cero, y tu Rep no dice nada.',
     },
     {
       title: 'Tus datos son tuyos.',
@@ -292,7 +313,7 @@ const manifestoEs: ManifestoContent = {
     },
   ],
   future: [
-    { kind: 'chapter', text: 'Algún día, tu Rep tampoco buscará ofertas.' },
+    { kind: 'chapter', text: 'Algún día, la búsqueda misma desaparece.' },
     {
       kind: 'list',
       text: [
@@ -302,7 +323,7 @@ const manifestoEs: ManifestoContent = {
         'Tu Rep decidirá si merece tu atención.',
       ],
     },
-    { kind: 'p', text: 'Ninguna parte necesita revelarlo todo antes de que haya interés mutuo.' },
+    { kind: 'p', text: 'Cada parte revela más a medida que crece el interés de las dos.' },
     { kind: 'beat', text: 'Tu agente habla con el suyo.' },
     { kind: 'p', text: 'Y cuando los dos lados quieren la conversación, hablan las personas.' },
     { kind: 'figure', figure: 'remove' },
@@ -311,34 +332,42 @@ const manifestoEs: ManifestoContent = {
     loop: {
       application: 'candidatura',
       filters: ['filtrar', 'cribar', 'ordenar'],
-      before: 'No creemos que la respuesta sea una candidatura mejor.',
-      statement: 'Creemos que el problema es la candidatura.',
+      before: 'Una candidatura mejor mantiene el mismo bucle.',
+      statement: 'El problema es la candidatura.',
     },
-    iceberg: {
-      looking: 'Buscando',
+    people: {
+      looking: 'Buscando trabajo',
       notLooking: 'Sin buscar',
-      question: '¿pero se moverían?',
-      tags: ['el trabajo adecuado', 'más responsabilidad', 'remoto', 'la cifra adecuada', 'el problema adecuado'],
+      noteLabel: 'Se movería por',
+      cards: [
+        { name: 'Aiko Tanaka', role: 'Diseñadora', note: 'el problema adecuado' },
+        { name: 'Daniel Okafor', role: 'Ingeniero backend', looking: true },
+        { name: 'Lucía Serrano', role: 'Científica de datos', note: 'remoto' },
+        { name: 'Tom Weber', role: 'Staff engineer' },
+        { name: 'Priya Nair', role: 'Ingeniera de ML', note: 'más responsabilidad' },
+        { name: 'Jonas Berg', role: 'Ingeniero de plataforma', note: 'la cifra adecuada' },
+      ],
       statement: 'No buscar ≠ no escuchar.',
     },
-    architecture: {
-      today: 'Hoy',
-      todaySteps: ['Oferta', 'Portal de empleo', 'Búsqueda', 'Candidatura', 'ATS', 'Cribado', 'Recruiter', 'Quizá una conversación'],
-      amble: 'Amble',
+    rep: {
+      offersLabel: '37 leídas esta semana',
+      offers: [
+        { role: 'Senior ML Engineer', company: 'Adtech', why: '5 días en oficina' },
+        { role: 'Founding AI Engineer', company: 'Seed', why: 'Guardias en solitario' },
+        { role: 'Evaluation Lead', company: 'Kestrel', why: 'Merece tu tiempo', fits: true },
+      ],
+      rep: 'Tu Rep',
+      listening: 'Escuchando',
       you: 'Tú',
-      rep: 'Rep',
-      listening: 'escuchando',
-      opportunity: 'Oportunidad',
-      worth: '¿merece la pena?',
-      conversation: 'Conversación',
-      caption: ['El sistema antiguo espera a que apliques.', 'Tu Rep no.'],
+      youRole: 'Trabajando',
+      notice: '1 merece tu tiempo',
+      caption: ['El sistema antiguo espera a que apliques.', 'Tu Rep escucha por ti.'],
     },
     remove: {
-      before: ['Empresa', 'Oferta', 'Candidatura', 'Cribado', 'Persona'],
-      struck: [2, 3],
-      after: ['Intención de la empresa', 'Evidencia', 'Intención de la persona'],
-      middle: 'Sin candidatura en medio.',
-      final: 'Adiós a las candidaturas.',
+      you: 'Tú',
+      company: 'Empresa',
+      middle: ['Portal de empleo', 'Candidatura', 'ATS', 'Cribado'],
+      final: ['Adiós a las', 'candidaturas.'],
     },
   },
 };
@@ -349,7 +378,7 @@ const howEn: HowBuiltContent = {
     description: 'Sources, claims, evidence, capabilities. How Amble reads your work, and the rules that keep it honest.',
   },
   kicker: 'How it’s built',
-  title: 'A careful pipeline, not a clever guess.',
+  title: 'A careful pipeline, checked at every step.',
   lede: 'What happens between the documents you give your Rep and the map it shows you, and the rules that keep it honest along the way.',
   sections: [
     {
@@ -385,12 +414,30 @@ const howEn: HowBuiltContent = {
       body: [
         'When evidence comes from co-produced work, your Rep asks you to explain a decision in it. Defended, it becomes evidence of your judgment. Not defended, it is retracted: kept on record with the question and the answer, and never claimed again.',
       ],
+      defence: {
+        claim: 'Designed the caching strategy',
+        source: 'GitHub · co-produced',
+        askLabel: 'Your Rep asks',
+        ask: 'Why cache on the prompt hash, not the user?',
+        answer: '“Honestly? The agent picked that. I never checked why.”',
+        outcomeLabel: 'Retracted · kept on record',
+        outcome: 'Never claimed again. The question and the answer stay with it.',
+      },
     },
     {
       title: 'Intent, measured',
       body: [
         'What you say you want is a start. What you turn down is the data. A short triage of offers, each a real trade-off, reveals the rules you actually decide by. They stay proposals until you confirm them.',
       ],
+      intent: {
+        role: 'Founding AI Engineer',
+        facts: ['€115K + 1.2%', 'Remote', 'Solo on-call'],
+        verdict: 'No',
+        reason: '“I won’t carry a pager alone again.”',
+        ruleType: 'Won’t consider',
+        rule: 'Solo on-call',
+        pending: 'Proposed · confirm it',
+      },
     },
     {
       title: 'User zero',
@@ -419,7 +466,7 @@ const howEs: HowBuiltContent = {
     description: 'Fuentes, afirmaciones, evidencia, capacidades. Cómo lee Amble tu trabajo y las reglas que lo mantienen honesto.',
   },
   kicker: 'Cómo está hecho',
-  title: 'Un proceso cuidadoso, no una suposición ingeniosa.',
+  title: 'Un proceso cuidadoso, comprobado en cada paso.',
   lede: 'Lo que pasa entre los documentos que le das a tu Rep y el mapa que te enseña, y las reglas que lo mantienen honesto por el camino.',
   sections: [
     {
@@ -455,12 +502,30 @@ const howEs: HowBuiltContent = {
       body: [
         'Cuando la evidencia viene de trabajo co-producido, tu Rep te pide que expliques una decisión que hay en él. Si la defiendes, se convierte en evidencia de tu criterio. Si no, se retira: queda registrada con la pregunta y la respuesta, y no vuelve a afirmarse.',
       ],
+      defence: {
+        claim: 'Diseñó la estrategia de caché',
+        source: 'GitHub · co-producido',
+        askLabel: 'Tu Rep pregunta',
+        ask: '¿Por qué cachear por el hash del prompt y no por usuario?',
+        answer: '«Sinceramente, lo eligió el agente. Nunca comprobé por qué.»',
+        outcomeLabel: 'Retirada · queda registrada',
+        outcome: 'No vuelve a afirmarse. La pregunta y la respuesta se quedan con ella.',
+      },
     },
     {
       title: 'La intención, medida',
       body: [
         'Lo que dices que quieres es un principio. Lo que rechazas es el dato. Un triage corto de ofertas, cada una un intercambio real, revela las reglas con las que de verdad decides. Siguen siendo propuestas hasta que las confirmas.',
       ],
+      intent: {
+        role: 'Founding AI Engineer',
+        facts: ['115 k€ + 1,2 %', 'Remoto', 'Guardias en solitario'],
+        verdict: 'No',
+        reason: '«No vuelvo a llevar el busca sola.»',
+        ruleType: 'No considera',
+        rule: 'Guardias en solitario',
+        pending: 'Propuesta · confírmala',
+      },
     },
     {
       title: 'Usuario cero',

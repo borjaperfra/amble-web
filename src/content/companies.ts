@@ -1,8 +1,17 @@
 import type { Lang } from '../i18n/ui';
 
-// The companies page: the problem first (the people you want aren't
-// applying), then how Amble finds mutual intent, the salary rule, and a
-// waitlist. The company side is v2; the page says so plainly.
+// The companies page: the people you want aren't applying; how a role becomes
+// an agent that finds them, checks their evidence and asks their Reps; the
+// salary rule; and a waitlist. The company side is v2; the page says so.
+
+type Candidate = {
+  name: string;
+  role: string;
+  // What the agent's checks found. `out` is the beat at which they drop out.
+  evidence: string;
+  range?: string;
+  out?: 2 | 3;
+};
 
 export interface CompaniesContent {
   meta: { title: string; description: string };
@@ -13,32 +22,45 @@ export interface CompaniesContent {
   cta: string;
   formNote: string;
   formPrivacy: string;
-  inbox: { inbox: string; applied: string; outside: string; tags: string[] };
-  problem: { title: [string, string]; body: string[]; closer: string };
-  pitch: { title: [string, string]; body: string[]; after: string };
-  funnel: { traditional: string; amble: string; old: string[]; next: string[] };
-  sequence: { steps: string[]; nos: string[]; closer: [string, string] };
-  negotiation: {
-    kicker: string;
-    title: string;
-    agent: string;
-    rep: string;
-    signals: string[];
-    mutual: string;
-    question: string;
+  // Hero: your inbox, and the people outside it.
+  inbox: {
+    label: string;
+    count: string;
+    applied: string;
+    rows: string[];
+    outside: string;
+    noteLabel: string;
+    notLooking: string;
+    people: { name: string; role: string; note: string }[];
   };
-  salary: {
+  problem: { title: [string, string]; body: string[]; closer: string };
+  // How it works: one pinned scene, five beats.
+  flow: {
     kicker: string;
     title: string;
-    body: string;
-    rules: string[];
-    company: string;
-    person: string;
-    privateRange: string;
-    privateFloor: string;
-    overlap: string;
-    works: string;
-    worksSub: string;
+    statements: [string, string, string, string, string];
+    offer: { label: string; title: string; company: string; lines: string[]; rangeLabel: string; range: string; private: string };
+    agent: { name: string; lookingFor: string; items: string[]; status: string; done: string };
+    notLooking: string;
+    candidates: Candidate[];
+    rangeWorks: string;
+    interested: string;
+    schedule: string;
+  };
+  // What reaches you: one brief per person who fits and wants to talk.
+  brief: {
+    kicker: string;
+    title: string;
+    line: string;
+    name: string;
+    role: string;
+    status: string;
+    whyLabel: string;
+    why: { text: string; src: string }[];
+    range: string;
+    considerLabel: string;
+    consider: string;
+    actions: [string, string];
   };
   never: { kicker: string; title: string; items: string[] };
   finale: { title: string; body: string };
@@ -47,94 +69,106 @@ export interface CompaniesContent {
 const en: CompaniesContent = {
   meta: {
     title: 'For companies — Amble',
-    description: 'The person you want probably isn’t applying. Amble finds mutual intent, with evidence and private salary ranges.',
+    description: 'The person you want probably isn’t applying. Amble turns your role into an agent that finds them, checks their evidence and asks their Rep, with a private salary range.',
   },
   badge: 'Early access · company side in v2',
   kicker: 'For companies',
-  title: ['The person you want', 'probably isn’t applying.'],
-  lede: ['Your inbox shows you who applied.', 'It doesn’t show you who would move.'],
+  title: ['An AI agent that sources, checks', 'and reaches real candidates.'],
+  lede: ['Remove applications. Forget about LinkedIn.', 'Your role becomes an agent that pings every candidate who fits and is listening, on their phone.'],
   cta: 'Request early access',
   formNote: 'We’re building the company side now. We’ll write when there’s a place for you.',
   formPrivacy: 'Only about early access. Nothing else.',
   inbox: {
-    inbox: 'Your inbox',
+    label: 'Your inbox',
+    count: '412 applications',
     applied: 'Applied',
+    rows: ['Keyword match', 'Keyword match', 'Generated cover letter', 'Keyword match', 'Applied to 60 roles today'],
     outside: 'The people you’d actually want to talk to',
-    tags: ['happy where they are', 'not checking LinkedIn', 'not actively looking', 'would move for the right role'],
+    noteLabel: 'Would move for',
+    notLooking: 'Not looking',
+    people: [
+      { name: 'Maya Lindqvist', role: 'AI engineer', note: 'owning evals' },
+      { name: 'Lucía Serrano', role: 'Data scientist', note: 'remote' },
+      { name: 'Jonas Berg', role: 'Platform engineer', note: 'the right number' },
+    ],
   },
   problem: {
-    title: ['They aren’t looking.', 'That doesn’t mean they wouldn’t move.'],
+    title: ['The person you want', 'probably isn’t applying.'],
     body: [
       'The people you want aren’t necessarily looking for another job. They’re working. They may be perfectly happy where they are.',
-      'But that doesn’t mean they wouldn’t move for the right work, team, ownership, conditions or compensation.',
+      'The right work, team, ownership, conditions or compensation could still move them.',
       'Traditional recruiting tries to discover that with cold outreach.',
     ],
     closer: 'Amble already has a Rep listening for them.',
   },
-  pitch: {
-    title: ['Stop collecting applicants.', 'Start finding mutual intent.'],
-    body: [
-      'Tell Amble who you need. Not a list of keywords: the actual work.',
-      'What they need to have demonstrated. What is non-negotiable. What you’re flexible on. And what you’re willing to pay.',
+  flow: {
+    kicker: 'How it works',
+    title: 'Your role becomes an agent that does the sourcing.',
+    statements: [
+      'You post the role, with its range.',
+      'It becomes your agent.',
+      'It finds people who aren’t applying, and checks their evidence.',
+      'Their Reps check your range, privately.',
+      'You meet the ones who fit, and want to talk.',
     ],
-    after: 'Your agent can then talk to the Reps of people who aren’t applying anywhere.',
-  },
-  funnel: {
-    traditional: 'Traditional',
-    amble: 'Amble',
-    old: ['Who applied?', 'Who survives the filters?', 'Who should we talk to?'],
-    next: ['Who should we talk to?', 'Can they demonstrate it?', 'Would they actually move?'],
-  },
-  sequence: {
-    steps: [
-      'You describe the work.',
-      'Your agent finds people with the evidence to do it.',
-      'Their Reps check whether it’s worth their attention.',
-      'Both sides want to talk.',
-      'Introduction.',
+    offer: {
+      label: 'New role',
+      title: 'Evaluation Lead',
+      company: 'Kestrel · Series A',
+      lines: ['Owns LLM evaluation end to end', 'Remote, Europe', 'Works with the research team'],
+      rangeLabel: 'Range',
+      range: '€110–135K',
+      private: 'Private',
+    },
+    agent: {
+      name: 'Kestrel’s agent',
+      lookingFor: 'Looking for',
+      items: ['Owns evaluation', 'Remote, Europe', 'Range set'],
+      status: 'Sourcing',
+      done: '2 ready to talk',
+    },
+    notLooking: 'Not looking',
+    candidates: [
+      { name: 'Maya Lindqvist', role: 'AI engineer', evidence: '✓ Evidence · ✓ Conditions', range: '✓ Range works' },
+      { name: 'Tom Weber', role: 'Staff engineer', evidence: '✕ Limited evidence', out: 2 },
+      { name: 'Priya Nair', role: 'ML engineer', evidence: '✓ Evidence · ✓ Conditions', range: '✕ Below her floor', out: 3 },
+      { name: 'Lucía Serrano', role: 'Data scientist', evidence: '✓ Evidence · ✓ Conditions', range: '✓ Range works' },
+      { name: 'Jonas Berg', role: 'Platform engineer', evidence: '✕ Needs relocation', out: 2 },
     ],
-    nos: ['No 400 applications to screen.', 'No cold outreach to 100 people.', 'No conversation where compensation was never going to work.'],
-    closer: ['Fewer conversations.', 'Better reasons to have them.'],
+    rangeWorks: 'Range works',
+    interested: 'Interested',
+    schedule: 'Schedule interview',
   },
-  negotiation: {
-    kicker: 'Agent ↔ Rep',
-    title: 'Not keyword matching. Two representatives checking whether it’s worth human time.',
-    agent: 'Company agent',
-    rep: 'Her Rep',
-    signals: ['evidence', 'conditions', 'range'],
-    mutual: 'Mutual intent',
-    question: 'Talk to each other?',
-  },
-  salary: {
-    kicker: 'The salary rule',
-    title: 'Every role has a range. Only the agents need to know it.',
-    body: 'No range, no role. The system checks that conditions overlap without revealing anyone’s private number.',
-    rules: [
-      'Every role carries a range, or it isn’t listed.',
-      'Ranges are never published, not even to us in a dashboard.',
-      'Agents compare privately and share only whether they overlap.',
-      'A candidate hears the range only when it fits theirs.',
+  brief: {
+    kicker: 'What reaches you',
+    title: 'A brief you can act on.',
+    line: 'For each person who fits and wants to talk: why they fit, where the evidence comes from, and what to ask about.',
+    name: 'Maya Lindqvist',
+    role: 'AI engineer · Lantern Labs',
+    status: 'Interested',
+    whyLabel: 'Why she fits',
+    why: [
+      { text: 'Built and ran Lantern’s evaluation pipeline, and defended its design.', src: 'CV · GitHub · Interview' },
+      { text: 'Wants to own evaluation end to end.', src: 'Her choices' },
+      { text: 'Remote in Europe works for her.', src: 'Her choices' },
     ],
-    company: 'Company',
-    person: 'Person',
-    privateRange: 'private range',
-    privateFloor: 'private floor',
-    overlap: 'overlap',
-    works: 'The range works.',
-    worksSub: 'Neither side had to reveal their number.',
+    range: 'Your range works for her. Neither number was shown.',
+    considerLabel: 'Worth asking',
+    consider: 'She hasn’t led a team yet. This would be her first time setting direction.',
+    actions: ['Schedule interview', 'Pass'],
   },
   never: {
-    kicker: 'What it never does',
+    kicker: 'What it promises',
     title: 'Built to be trusted by both sides.',
     items: [
-      'No ranking candidates against each other.',
-      'No scraping profiles without the candidate’s consent.',
-      'No cold outreach. Every conversation is wanted on both sides.',
-      'No private data shared beyond what the candidate allows.',
+      'Every candidate is described on their own.',
+      'Profiles are read only with the candidate’s consent.',
+      'Every conversation is wanted on both sides.',
+      'Private data leaves only when the candidate shares it.',
     ],
   },
   finale: {
-    title: 'The goal isn’t more candidates. It’s fewer conversations that should never have happened.',
+    title: 'Fewer conversations, and every one worth having.',
     body: 'Join the early-access list for companies.',
   },
 };
@@ -142,94 +176,106 @@ const en: CompaniesContent = {
 const es: CompaniesContent = {
   meta: {
     title: 'Para empresas — Amble',
-    description: 'La persona que buscas probablemente no está aplicando. Amble encuentra intención mutua, con evidencia y rangos salariales privados.',
+    description: 'La persona que buscas probablemente no está aplicando. Amble convierte tu puesto en un agente que la encuentra, comprueba su evidencia y habla con su Rep, con un rango salarial privado.',
   },
   badge: 'Acceso anticipado · lado de empresa en la v2',
   kicker: 'Para empresas',
-  title: ['La persona que buscas', 'probablemente no está aplicando.'],
-  lede: ['Tu bandeja te enseña quién ha aplicado.', 'No te enseña quién se movería.'],
+  title: ['Un agente de IA que busca, comprueba', 'y contacta a candidatos reales.'],
+  lede: ['Adiós a las candidaturas. Olvídate de LinkedIn.', 'Tu puesto se convierte en un agente que avisa a cada candidato que encaja y está escuchando, en su móvil.'],
   cta: 'Pedir acceso anticipado',
   formNote: 'Estamos construyendo el lado de empresa. Te escribiremos cuando haya sitio para ti.',
   formPrivacy: 'Solo sobre el acceso anticipado. Nada más.',
   inbox: {
-    inbox: 'Tu bandeja',
-    applied: 'Han aplicado',
+    label: 'Tu bandeja',
+    count: '412 candidaturas',
+    applied: 'Ha aplicado',
+    rows: ['Coincide por palabras clave', 'Coincide por palabras clave', 'Carta generada', 'Coincide por palabras clave', 'Ha aplicado a 60 puestos hoy'],
     outside: 'Las personas con las que de verdad querrías hablar',
-    tags: ['contenta donde está', 'sin mirar LinkedIn', 'sin buscar activamente', 'se movería por el puesto adecuado'],
+    noteLabel: 'Se movería por',
+    notLooking: 'Sin buscar',
+    people: [
+      { name: 'Marta Quiroga', role: 'Ingeniera de IA', note: 'llevar las evals' },
+      { name: 'Lucía Serrano', role: 'Científica de datos', note: 'remoto' },
+      { name: 'Jonas Berg', role: 'Ingeniero de plataforma', note: 'la cifra adecuada' },
+    ],
   },
   problem: {
-    title: ['No están buscando.', 'Eso no significa que no se moverían.'],
+    title: ['La persona que buscas', 'probablemente no está aplicando.'],
     body: [
       'Las personas que quieres no están necesariamente buscando otro trabajo. Están trabajando. Puede que estén perfectamente a gusto donde están.',
-      'Pero eso no significa que no se moverían por el trabajo, el equipo, la responsabilidad, las condiciones o la retribución adecuados.',
+      'El trabajo, el equipo, la responsabilidad, las condiciones o la retribución adecuados podrían moverlas.',
       'El reclutamiento tradicional intenta descubrirlo con contacto en frío.',
     ],
     closer: 'Amble ya tiene un Rep escuchando por ellas.',
   },
-  pitch: {
-    title: ['Deja de coleccionar candidatos.', 'Empieza a encontrar intención mutua.'],
-    body: [
-      'Cuéntale a Amble a quién necesitas. No una lista de palabras clave: el trabajo real.',
-      'Qué necesitan haber demostrado. Qué no es negociable. En qué eres flexible. Y cuánto estás dispuesto a pagar.',
+  flow: {
+    kicker: 'Cómo funciona',
+    title: 'Tu puesto se convierte en un agente que busca por ti.',
+    statements: [
+      'Publicas el puesto, con su rango.',
+      'Se convierte en tu agente.',
+      'Encuentra a personas que no están aplicando y comprueba su evidencia.',
+      'Sus Reps comprueban tu rango, en privado.',
+      'Conoces a quienes encajan y quieren hablar.',
     ],
-    after: 'Tu agente puede entonces hablar con los Reps de personas que no están aplicando en ningún sitio.',
-  },
-  funnel: {
-    traditional: 'Tradicional',
-    amble: 'Amble',
-    old: ['¿Quién ha aplicado?', '¿Quién sobrevive a los filtros?', '¿Con quién deberíamos hablar?'],
-    next: ['¿Con quién deberíamos hablar?', '¿Puede demostrarlo?', '¿Se movería de verdad?'],
-  },
-  sequence: {
-    steps: [
-      'Describes el trabajo.',
-      'Tu agente encuentra a personas con la evidencia para hacerlo.',
-      'Sus Reps comprueban si merece su atención.',
-      'Los dos lados quieren hablar.',
-      'Presentación.',
+    offer: {
+      label: 'Nuevo puesto',
+      title: 'Evaluation Lead',
+      company: 'Kestrel · Serie A',
+      lines: ['Lleva la evaluación de LLMs de principio a fin', 'Remoto, Europa', 'Trabaja con el equipo de investigación'],
+      rangeLabel: 'Rango',
+      range: '110–135 k€',
+      private: 'Privado',
+    },
+    agent: {
+      name: 'Agente de Kestrel',
+      lookingFor: 'Busca',
+      items: ['Lleva la evaluación', 'Remoto, Europa', 'Rango definido'],
+      status: 'Buscando',
+      done: '2 listas para hablar',
+    },
+    notLooking: 'Sin buscar',
+    candidates: [
+      { name: 'Marta Quiroga', role: 'Ingeniera de IA', evidence: '✓ Evidencia · ✓ Condiciones', range: '✓ El rango encaja' },
+      { name: 'Tom Weber', role: 'Staff engineer', evidence: '✕ Poca evidencia', out: 2 },
+      { name: 'Priya Nair', role: 'Ingeniera de ML', evidence: '✓ Evidencia · ✓ Condiciones', range: '✕ Por debajo de su suelo', out: 3 },
+      { name: 'Lucía Serrano', role: 'Científica de datos', evidence: '✓ Evidencia · ✓ Condiciones', range: '✓ El rango encaja' },
+      { name: 'Jonas Berg', role: 'Ingeniero de plataforma', evidence: '✕ Necesita mudarse', out: 2 },
     ],
-    nos: ['Sin 400 candidaturas que cribar.', 'Sin contacto en frío a 100 personas.', 'Sin conversaciones en las que la retribución nunca iba a encajar.'],
-    closer: ['Menos conversaciones.', 'Mejores motivos para tenerlas.'],
+    rangeWorks: 'El rango encaja',
+    interested: 'Interesada',
+    schedule: 'Agendar entrevista',
   },
-  negotiation: {
-    kicker: 'Agente ↔ Rep',
-    title: 'No es buscar palabras clave. Son dos representantes comprobando si merece la pena el tiempo de las personas.',
-    agent: 'Agente de empresa',
-    rep: 'Su Rep',
-    signals: ['evidencia', 'condiciones', 'rango'],
-    mutual: 'Intención mutua',
-    question: '¿Hablamos?',
-  },
-  salary: {
-    kicker: 'La regla del salario',
-    title: 'Cada puesto tiene un rango. Solo los agentes necesitan saberlo.',
-    body: 'Sin rango, no hay puesto. El sistema comprueba que las condiciones se solapan sin revelar la cifra privada de nadie.',
-    rules: [
-      'Cada puesto lleva un rango, o no se publica.',
-      'Los rangos nunca se publican, ni siquiera para nosotros en un panel.',
-      'Los agentes comparan en privado y solo comparten si se solapan.',
-      'Al candidato solo se le dice el rango cuando encaja con el suyo.',
+  brief: {
+    kicker: 'Lo que te llega',
+    title: 'Un resumen con el que puedes actuar.',
+    line: 'De cada persona que encaja y quiere hablar: por qué encaja, de dónde sale la evidencia y qué conviene preguntarle.',
+    name: 'Marta Quiroga',
+    role: 'Ingeniera de IA · Farolillo Labs',
+    status: 'Interesada',
+    whyLabel: 'Por qué encaja',
+    why: [
+      { text: 'Construyó y operó el pipeline de evaluación de Farolillo, y defendió su diseño.', src: 'CV · GitHub · Entrevista' },
+      { text: 'Quiere llevar la evaluación de principio a fin.', src: 'Sus decisiones' },
+      { text: 'Remoto en Europa le encaja.', src: 'Sus decisiones' },
     ],
-    company: 'Empresa',
-    person: 'Persona',
-    privateRange: 'rango privado',
-    privateFloor: 'suelo privado',
-    overlap: 'se solapan',
-    works: 'El rango encaja.',
-    worksSub: 'Ninguna parte tuvo que revelar su cifra.',
+    range: 'Tu rango le encaja. Ninguna cifra se ha enseñado.',
+    considerLabel: 'Conviene preguntar',
+    consider: 'Aún no ha liderado un equipo. Sería su primera vez marcando la dirección.',
+    actions: ['Agendar entrevista', 'Descartar'],
   },
   never: {
-    kicker: 'Lo que nunca hace',
+    kicker: 'Lo que promete',
     title: 'Hecho para que confíen los dos lados.',
     items: [
-      'No clasifica candidatos unos contra otros.',
-      'No extrae perfiles sin el consentimiento del candidato.',
-      'No hace contacto en frío. Cada conversación la quieren los dos lados.',
-      'No comparte datos privados más allá de lo que permite el candidato.',
+      'Cada candidato se describe por sí mismo.',
+      'Los perfiles se leen solo con el consentimiento del candidato.',
+      'Cada conversación la quieren los dos lados.',
+      'Los datos privados solo salen cuando el candidato los comparte.',
     ],
   },
   finale: {
-    title: 'El objetivo no es tener más candidatos. Es tener menos conversaciones que nunca debieron ocurrir.',
+    title: 'Menos conversaciones, y todas merecen la pena.',
     body: 'Apúntate a la lista de acceso anticipado para empresas.',
   },
 };

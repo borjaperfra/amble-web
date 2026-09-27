@@ -1,6 +1,8 @@
 ---
 // A pipeline drawn as steps and arrows, for the long-form pages. The last
-// `emphasis` steps are shown in moss: where the idea lands.
+// `emphasis` steps are shown in moss: where the idea lands. Long pipelines
+// break into two even rows, the second picking up with an arrow, so no step
+// is ever left alone on a line; on phones the steps run down the page.
 interface Props {
   steps: string[];
   emphasis?: number;
@@ -8,33 +10,41 @@ interface Props {
 }
 
 const { steps, emphasis = 1, label } = Astro.props;
+const split = steps.length > 4 ? Math.ceil(steps.length / 2) : steps.length;
+const rows = [steps.slice(0, split), steps.slice(split)].filter((r) => r.length);
+const strong = (i: number) => i >= steps.length - emphasis;
 ---
 
 <figure class="flow" aria-label={label ?? steps.join(' → ')}>
-  <ol role="list">
-    {
-      steps.map((step, i) => (
-        <li class:list={{ strong: i >= steps.length - emphasis }}>
-          <span>{step}</span>
-        </li>
-      ))
-    }
-  </ol>
+  {
+    rows.map((row, r) => (
+      <ol role="list" class:list={['row', { cont: r > 0 }]} aria-hidden="true">
+        {row.map((step, j) => (
+          <li class:list={{ strong: strong(r * split + j) }}>
+            <span>{step}</span>
+          </li>
+        ))}
+      </ol>
+    ))
+  }
 </figure>
 
 <style>
   .flow {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
     margin: var(--space-6) 0;
   }
-  ol {
+  .row {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     align-items: center;
-    gap: var(--space-2) 0;
   }
   li {
     display: flex;
     align-items: center;
+    white-space: nowrap;
   }
   li span {
     padding: var(--space-2) var(--space-4);
@@ -50,9 +60,32 @@ const { steps, emphasis = 1, label } = Astro.props;
     background: var(--color-accent);
     border-color: var(--color-accent);
   }
-  li + li::before {
+  li + li::before,
+  .cont li:first-child::before {
     content: '→';
     padding: 0 var(--space-2);
     color: var(--color-accent);
+  }
+  .cont li:first-child::before {
+    padding-left: 0;
+  }
+
+  /* Phones: one step per line, arrows pointing down. */
+  @media (max-width: 640px) {
+    .flow,
+    .row {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0;
+    }
+    li {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    li + li::before,
+    .cont li:first-child::before {
+      content: '↓';
+      padding: var(--space-1) 0 var(--space-1) var(--space-4);
+    }
   }
 </style>

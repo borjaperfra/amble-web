@@ -15,7 +15,7 @@ const mail = `mailto:${legal.privacyEmail}`;
 
     <h2>Who is responsible</h2>
     <p>
-      {legal.controller}{legal.entity && `, operated by ${legal.entity.name} (${legal.entity.taxId}), ${legal.entity.address}`}.
+      {legal.controller}, operated by {legal.entity ? `${legal.entity.name} (${legal.entity.taxId}), ${legal.entity.address}` : legal.operator}.
       For anything about your data: <a href={mail}>{legal.privacyEmail}</a>.
     </p>
 

@@ -1,39 +1,80 @@
 ---
-// The professional map, told honestly in three columns: what the Rep can stand
-// behind, what it's less sure about, and what it still doesn't know.
-// No score, no ranking.
+// The professional map as what it is: a document. One sheet, three honest
+// columns — what the Rep can stand behind, what it's less sure about, what it
+// doesn't know yet — each capability with its evidence and where it was read.
+// No score, no ranking. The coach's note is stuck on the paper, by the gap.
 import EvidenceDots from '../EvidenceDots.astro';
+import SourceIcon from '../SourceIcon.astro';
+import Symbol from '../Symbol.astro';
 import type { HomeContent } from '../../content/home';
 
 interface Props {
   c: HomeContent['map'];
   strength: HomeContent['strength'];
+  sourceNames: HomeContent['sourceNames'];
 }
 
-const { c, strength } = Astro.props;
+const { c, strength, sourceNames } = Astro.props;
 ---
 
 <section class="map container" aria-labelledby="map-title">
   <p class="kicker" data-reveal>{c.kicker}</p>
   <h2 class="display title" id="map-title" data-reveal>{c.title}</h2>
 
-  <div class="cols" data-scene>
-    {
-      c.cols.map((col, i) => (
-        <section class:list={['col', { unknown: col.strength === 0 }]} style={`--i:${i}`}>
-          <p class="col-label">{col.label}</p>
-          <ul class="col-items" role="list">
-            {col.items.map((item) => (
-              <li>
-                <span class="item-name heading">{item}</span>
-                <EvidenceDots strength={col.strength} label={strength[col.strength]} />
-              </li>
-            ))}
-          </ul>
-        </section>
-      ))
-    }
+  <div class="scene" data-scene>
+    <article class="sheet-doc">
+      <header class="doc-head">
+        <span class="doc-who">
+          <Symbol size={24} />
+          {c.sheet.title}
+        </span>
+        <span class="doc-meta">{c.sheet.meta}</span>
+      </header>
+
+      <div class="cols">
+        {
+          c.cols.map((col, i) => (
+            <section class:list={['col', { unknown: col.strength === 0 }]} style={`--i:${i}`}>
+              <p class="col-label">{col.label}</p>
+              <ul class="col-items" role="list">
+                {col.items.map((item) => (
+                  <li>
+                    <span class="item-name heading">{item.name}</span>
+                    <EvidenceDots strength={col.strength} label={strength[col.strength]} />
+                    {item.sources.length > 0 && (
+                      <span class="sources">
+                        {item.sources.map((src) => (
+                          <span class="source">
+                            <SourceIcon source={src} size={14} />
+                            {sourceNames[src]}
+                          </span>
+                        ))}
+                      </span>
+                    )}
+                    {item.note && <span class="item-note">{item.note}</span>}
+                  </li>
+                ))}
+              </ul>
+              {col.strength === 0 && (
+                <aside class="coach" aria-label={c.coach.label}>
+                  <p class="coach-label">
+                    <Symbol size={20} />
+                    {c.coach.label}
+                  </p>
+                  {c.coach.lines.map((line) => (
+                    <p class="coach-line">{line}</p>
+                  ))}
+                </aside>
+              )}
+            </section>
+          ))
+        }
+      </div>
+
+    </article>
   </div>
+
+  <p class="move" data-reveal><strong>{c.move.lead}</strong> {c.move.rest}</p>
 
   <p class="closer heading" data-reveal>{c.closer}</p>
 </section>
@@ -47,41 +88,92 @@ const { c, strength } = Astro.props;
     padding-block: var(--space-section);
   }
   .title {
-    max-width: 18ch;
+    max-width: 26ch;
     margin-top: var(--space-4);
     font-size: var(--text-chapter);
   }
-  .cols {
-    display: grid;
-    gap: var(--space-5);
+  .scene {
     width: 100%;
     max-width: var(--width-wide);
     margin-top: var(--space-scene);
     text-align: left;
   }
+
+  /* ---------- The sheet ---------- */
+  .sheet-doc {
+    position: relative;
+    padding: clamp(var(--space-5), 1rem + 2vw, var(--space-7));
+    padding-bottom: clamp(var(--space-6), 2rem + 2vw, var(--space-8));
+    background: var(--color-surface-raised);
+    border: var(--border-width) solid var(--color-border-subtle);
+    border-radius: var(--radius-lg);
+    box-shadow:
+      0 1px 2px rgb(37 37 31 / 0.05),
+      0 14px 36px rgb(37 37 31 / 0.08);
+    rotate: -0.4deg;
+    transition:
+      opacity var(--motion-slow) ease,
+      translate var(--motion-arrive) var(--ease-standard);
+  }
+  .doc-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2) var(--space-4);
+    padding-bottom: var(--space-4);
+    border-bottom: var(--border-width) solid var(--color-border-subtle);
+  }
+  .doc-who {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3);
+    font-family: var(--font-display);
+    font-size: var(--text-heading-md);
+    line-height: 1.2;
+    color: var(--color-text);
+  }
+  .doc-meta {
+    font-family: var(--font-mono);
+    font-size: var(--text-mono);
+    color: var(--color-text-faint);
+  }
+
+  /* Three columns on the paper, hairlines between them. */
+  .cols {
+    display: grid;
+    gap: var(--space-6);
+    margin-top: var(--space-6);
+  }
   @media (min-width: 860px) {
     .cols {
       grid-template-columns: repeat(3, 1fr);
+      gap: 0;
+    }
+    .col {
+      padding-inline: var(--space-6);
+    }
+    .col:first-child {
+      padding-left: 0;
+    }
+    .col:last-child {
+      padding-right: 0;
+    }
+    .col + .col {
+      border-left: var(--border-width) solid var(--color-border-subtle);
+    }
+    .col.unknown {
+      border-left-style: dashed;
     }
   }
-  /* Columns separated by hairlines, no surfaces. */
   .col {
     display: flex;
     flex-direction: column;
     gap: var(--space-5);
-    padding-top: var(--space-5);
-    border-top: 1.5px solid var(--color-text);
     transition:
       opacity var(--motion-slow) ease,
       translate var(--motion-arrive) var(--ease-standard);
-    transition-delay: calc(var(--i) * 0.18s);
-  }
-  .col.unknown {
-    border-top: 1.5px dashed var(--color-text-faint);
-  }
-  :global(.motion) .cols:not(.is-playing) .col {
-    opacity: 0;
-    translate: 0 10px;
+    transition-delay: calc(0.2s + var(--i) * 0.18s);
   }
   .col-label {
     font-size: var(--text-label);
@@ -96,18 +188,111 @@ const { c, strength } = Astro.props;
   .col-items {
     display: flex;
     flex-direction: column;
-    gap: var(--space-4);
+    gap: var(--space-5);
   }
   .col-items li {
     display: flex;
     flex-direction: column;
-    gap: var(--space-1);
+    align-items: flex-start;
+    gap: var(--space-2);
   }
   .item-name {
+    font-size: var(--text-heading-md);
+  }
+  /* Where it was read: the same marks as the sources in chapter 1. */
+  .sources {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+  .source {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    padding: 2px var(--space-2);
+    font-size: var(--text-label);
+    font-weight: var(--weight-medium);
+    color: var(--color-text-muted);
+    background: var(--color-surface);
+    border: var(--border-width) solid var(--color-border-subtle);
+    border-radius: var(--radius-sm);
+  }
+  .item-note {
+    max-width: 26ch;
+    font-size: var(--text-body-sm);
+    color: var(--color-text-muted);
+  }
+
+  /* The coach's note: a moss note stuck on the paper, by the gap. */
+  .coach {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-4) var(--space-5);
+    background: var(--color-accent-wash);
+    border: var(--border-width) solid var(--color-accent-soft);
+    border-radius: var(--radius-md);
+    rotate: 1deg;
+    transition:
+      opacity var(--motion-slow) ease,
+      translate var(--motion-arrive) var(--ease-standard),
+      rotate var(--motion-arrive) var(--ease-standard);
+    transition-delay: 1.1s;
+  }
+  /* On wide screens it hangs off the sheet's edge, stuck on. */
+  @media (min-width: 860px) {
+    .coach {
+      margin: var(--space-2) calc(clamp(var(--space-5), 1rem + 2vw, var(--space-7)) * -1 - var(--space-5)) 0 0;
+      box-shadow: 0 10px 24px rgb(37 37 31 / 0.08);
+    }
+  }
+  .coach-label {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-label);
+    font-weight: var(--weight-semibold);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--color-accent-strong);
+  }
+  .coach-line {
+    font-size: var(--text-body-sm);
+    color: var(--color-text);
+  }
+  .coach-line:last-child {
+    font-family: var(--font-display);
     font-size: var(--text-heading-sm);
+    font-style: italic;
+  }
+
+  /* Arrival: the sheet, then its columns one by one, then the note. */
+  :global(.motion) .scene:not(.is-playing) .sheet-doc {
+    opacity: 0;
+    translate: 0 14px;
+  }
+  :global(.motion) .scene:not(.is-playing) .col {
+    opacity: 0;
+    translate: 0 8px;
+  }
+  :global(.motion) .scene:not(.is-playing) .coach {
+    opacity: 0;
+    translate: 0 10px;
+    rotate: 5deg;
+  }
+
+  .move {
+    max-width: var(--width-reading);
+    margin-top: var(--space-9);
+    color: var(--color-text-muted);
+  }
+  .move strong {
+    display: block;
+    font-weight: var(--weight-medium);
+    color: var(--color-text);
   }
   .closer {
-    margin-top: var(--space-8);
+    margin-top: var(--space-6);
     font-size: var(--text-heading-lg);
     color: var(--color-accent-strong);
   }

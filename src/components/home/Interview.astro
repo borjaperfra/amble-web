@@ -252,43 +252,43 @@ const { c, sourceNames } = Astro.props;
   }
 
   /* Choreography: clues, what they tell, the threads meet, the question arrives. */
-  .js .scene .clue,
-  .js .scene .reads,
-  .js .scene .ask,
-  .js .scene .question,
-  .js .scene .gap,
-  .js .scene .knot {
+  :global(.motion) .scene .clue,
+  :global(.motion) .scene .reads,
+  :global(.motion) .scene .ask,
+  :global(.motion) .scene .question,
+  :global(.motion) .scene .gap,
+  :global(.motion) .scene .knot {
     transition:
       opacity var(--motion-arrive) ease,
       translate var(--motion-arrive) var(--ease-standard),
       scale 0.5s cubic-bezier(0.3, 1.5, 0.5, 1);
   }
-  .js .scene:not(.is-playing) :is(.clue, .reads, .ask, .question, .gap) {
+  :global(.motion) .scene:not(.is-playing) :is(.clue, .reads, .ask, .question, .gap) {
     opacity: 0;
     translate: 0 10px;
   }
-  .js .scene:not(.is-playing) .knot {
+  :global(.motion) .scene:not(.is-playing) .knot {
     opacity: 0;
     scale: 0;
   }
-  .js .scene .clue {
+  :global(.motion) .scene .clue {
     transition-delay: calc(var(--n) * 450ms);
   }
-  .js .scene .reads {
+  :global(.motion) .scene .reads {
     transition-delay: calc(350ms + var(--n) * 450ms);
   }
-  .js .scene .knot {
+  :global(.motion) .scene .knot {
     transform-box: fill-box;
     transform-origin: center;
     transition-delay: 2.1s;
   }
-  .js .scene .ask {
+  :global(.motion) .scene .ask {
     transition-delay: 2.2s;
   }
-  .js .scene .gap {
+  :global(.motion) .scene .gap {
     transition-delay: 2.4s;
   }
-  .js .scene .question {
+  :global(.motion) .scene .question {
     transition-delay: 2.65s;
   }
   @media (prefers-reduced-motion: reduce) {

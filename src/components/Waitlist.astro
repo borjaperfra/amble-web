@@ -63,7 +63,7 @@ const statusId = `${id}-status`;
   <div class="done" role="status" aria-live="polite">
     <Symbol size={48} breathe />
     <p class="done-title">{t('waitlist.doneTitle')}</p>
-    <p class="done-body">{t('waitlist.doneBody')}</p>
+    <p class="done-body">{t(audience === 'company' ? 'waitlist.doneBodyCompany' : 'waitlist.doneBody')}</p>
   </div>
   <p class="status-line">
     <span class="status" id={statusId} role="status" aria-live="polite">{noteText}</span>

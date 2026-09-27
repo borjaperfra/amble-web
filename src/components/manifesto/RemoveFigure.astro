@@ -1,7 +1,7 @@
 ---
-// The close, as one line of words on the page: company, job, application,
-// screening, person. The application and the screening are struck and fall
-// away; the ends draw together as intent ↔ evidence ↔ intent.
+// The close, as in the launch film: one line from you to the company, with
+// everything the old system puts in between. The middle empties, word by word;
+// the ends draw together, point at each other, and the statement is left.
 import type { ManifestoContent } from '../../content/pages';
 
 interface Props {
@@ -12,166 +12,114 @@ const { c } = Astro.props;
 ---
 
 <figure class="remove" data-scene>
-  <div class="stage">
-    <p class="row before">
-      {
-        c.before.map((b, i) => (
-          <>
-            {i > 0 && <span class:list={['rule', { gone: c.struck.includes(i) || c.struck.includes(i - 1) }]} aria-hidden="true" />}
-            <span class:list={['word', { struck: c.struck.includes(i) }]}>{b}</span>
-          </>
-        ))
-      }
-    </p>
-    <p class="row after">
-      {
-        c.after.map((a, i) => (
-          <>
-            {i > 0 && <span class="link" aria-hidden="true">↔</span>}
-            <span class:list={['word', { middle: i === 1 }]}>{a}</span>
-          </>
-        ))
-      }
-    </p>
-  </div>
-  <figcaption>
-    <span class="middle-line">{c.middle}</span>
-    <span class="final display">{c.final}</span>
+  <p class="chain" aria-hidden="true">
+    <span class="end">{c.you}</span>
+    <span class="join left"><span class="dash" /><span class="arrow">→</span></span>
+    {
+      c.middle.map((m, i) => (
+        <span class="step" style={`--i:${i}`}>
+          <span class="step-word">{m}</span>
+        </span>
+      ))
+    }
+    <span class="join right"><span class="arrow">←</span><span class="dash" /></span>
+    <span class="end">{c.company}</span>
+  </p>
+  <figcaption class="final display">
+    {c.final[0]} <em>{c.final[1]}</em>
   </figcaption>
 </figure>
 
 <style>
   .remove {
-    width: 100vw;
-    margin-left: calc(50% - 50vw);
-    padding-block: var(--space-9) var(--space-7);
-    text-align: center;
-  }
-  .stage {
-    display: grid;
-    align-items: center;
-    min-height: 90px;
-    padding-inline: var(--gutter);
-  }
-  .row {
-    grid-area: 1 / 1;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-    gap: var(--space-3);
-  }
-  .word {
-    font-size: var(--text-label);
-    font-weight: var(--weight-semibold);
-    letter-spacing: var(--tracking-label);
-    text-transform: uppercase;
-    color: var(--color-text);
-  }
-  .rule {
-    width: 36px;
-    height: 1px;
-    background: var(--color-text-faint);
-  }
-  .after .word {
-    color: var(--color-accent-strong);
-  }
-  .after .word.middle {
-    font-family: var(--font-display);
-    font-size: var(--text-heading-md);
-    font-weight: var(--weight-regular);
-    letter-spacing: 0;
-    text-transform: none;
-  }
-  .link {
-    color: var(--color-accent);
-  }
-  figcaption {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: var(--space-3);
-    margin-top: var(--space-7);
+    gap: var(--space-7);
+    margin-block: var(--space-9) var(--space-8);
+    text-align: center;
   }
-  .middle-line {
+  .chain {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-size: clamp(1.05rem, 0.6rem + 1.6vw, 1.9rem);
+    white-space: nowrap;
+  }
+  .end {
+    color: var(--color-text);
+  }
+  /* A middle step: it fades, then gives its room back, so the ends meet. */
+  .step {
+    display: inline-block;
+    overflow: hidden;
+    max-width: 0;
+    opacity: 0;
     color: var(--color-text-muted);
+  }
+  .step-word {
+    padding-inline: 0.45em;
+  }
+  .join {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2em;
+    margin-inline: 0.4em;
+    color: var(--color-accent-strong);
+  }
+  .dash {
+    display: inline-block;
+    width: 1.1em;
+    height: 1.5px;
+    background: var(--color-text-faint);
+  }
+  .arrow {
+    display: inline-block;
+    font-family: var(--font-body);
   }
   .final {
     font-size: var(--text-thesis);
+    line-height: 1.02;
+  }
+  .final em {
     color: var(--color-accent-strong);
   }
 
-  /* Resolved by default: the new line only. */
-  .before {
-    display: none;
-  }
-  :global(.motion) .remove .before {
-    display: flex;
-    transition: opacity 0.6s ease 2.3s;
-  }
-  :global(.motion) .remove .word.struck {
-    text-decoration-line: line-through;
-    text-decoration-thickness: 1.5px;
-    text-decoration-color: transparent;
+  /* Live: the full chain first; then each step goes, in order, and the room
+     closes; the arrows appear once they've met; then the line. */
+  :global(.motion) .remove .step {
+    max-width: 12em;
+    opacity: 1;
     transition:
-      text-decoration-color 0.4s ease 0.6s,
-      translate 0.9s cubic-bezier(0.5, 0, 0.75, 0) 1.3s,
-      rotate 0.9s ease 1.3s,
-      opacity 0.9s ease 1.3s;
+      opacity 0.5s ease,
+      max-width 0.7s var(--ease-standard);
   }
-  :global(.motion) .remove .rule.gone {
-    transition: opacity 0.5s ease 1.3s;
-  }
-  :global(.motion) .remove.is-playing .word.struck {
-    text-decoration-color: var(--color-retracted);
-    translate: 0 40px;
-    rotate: 8deg;
+  :global(.motion) .remove.is-playing .step {
+    max-width: 0;
     opacity: 0;
+    transition-delay: calc(0.6s + var(--i) * 0.55s), calc(0.95s + var(--i) * 0.55s);
   }
-  :global(.motion) .remove.is-playing .rule.gone {
+  :global(.motion) .remove .arrow {
+    max-width: 0;
     opacity: 0;
-  }
-  :global(.motion) .remove.is-playing .before {
-    opacity: 0;
-  }
-  :global(.motion) .remove .after > * {
+    overflow: hidden;
     transition:
-      opacity 0.7s ease,
-      translate 0.8s var(--ease-standard);
-    transition-delay: 2.9s;
+      opacity 0.4s ease 3.1s,
+      max-width 0.4s ease 3.1s;
   }
-  :global(.motion) .remove .after .link {
-    transition-delay: 3.3s;
+  :global(.motion) .remove.is-playing .arrow {
+    max-width: 1em;
+    opacity: 1;
   }
-  :global(.motion) .remove:not(.is-playing) .after > * {
+  :global(.motion) .remove .final {
+    transition:
+      opacity 0.8s ease 3.6s,
+      translate 1s var(--ease-standard) 3.6s;
+  }
+  :global(.motion) .remove:not(.is-playing) .final {
     opacity: 0;
-  }
-  :global(.motion) .remove:not(.is-playing) .after .word:first-child {
-    translate: -24px 0;
-  }
-  :global(.motion) .remove:not(.is-playing) .after .word:last-child {
-    translate: 24px 0;
-  }
-  :global(.motion) .remove figcaption > * {
-    transition: opacity 0.8s ease 3.8s;
-  }
-  :global(.motion) .remove:not(.is-playing) figcaption > * {
-    opacity: 0;
-  }
-  @media (max-width: 640px) {
-    .row {
-      flex-direction: column;
-      gap: var(--space-2);
-    }
-    .rule {
-      width: 1px;
-      height: 16px;
-    }
-    .link {
-      rotate: 90deg;
-    }
-    .stage {
-      min-height: 240px;
-    }
+    translate: 0 10px;
   }
 </style>

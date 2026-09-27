@@ -192,6 +192,14 @@ const readThisWeek = 37;
     border-radius: var(--radius-full);
   }
 
+  /* Phones: the reason goes under the role, so the role keeps its line. */
+  @media (max-width: 560px) {
+    .offer:not(.match) {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-1);
+    }
+  }
   .salary {
     display: flex;
     align-items: center;
@@ -202,6 +210,7 @@ const readThisWeek = 37;
     color: var(--color-accent-strong);
     background: var(--color-accent-wash);
     border-radius: var(--radius-md);
+    text-wrap: balance;
   }
   .salary-mark {
     display: grid;
@@ -404,58 +413,91 @@ const readThisWeek = 37;
   }
 
   /* ---------- Choreography ---------- */
-  .js .scene .offer,
-  .js .scene .reason,
-  .js .scene .msg,
-  .js .scene .why li,
-  .js .scene .consider,
-  .js .scene .actions {
+  :global(.motion) .scene .offer,
+  :global(.motion) .scene .reason,
+  :global(.motion) .scene .msg,
+  :global(.motion) .scene .why li,
+  :global(.motion) .scene .consider,
+  :global(.motion) .scene .actions {
     transition:
       opacity var(--motion-slow) ease,
       translate var(--motion-arrive) var(--ease-standard);
   }
-  .js .scene:not(.is-playing) .offer {
+  :global(.motion) .scene:not(.is-playing) .offer {
     opacity: 0;
     translate: -14px 0;
   }
-  .js .scene:not(.is-playing) .reason,
-  .js .scene:not(.is-playing) :is(.msg, .why li, .consider, .actions) {
+  :global(.motion) .scene:not(.is-playing) .reason,
+  :global(.motion) .scene:not(.is-playing) :is(.msg, .why li, .consider, .actions) {
     opacity: 0;
     translate: 0 8px;
   }
-  .js .scene:not(.is-playing) .offer:not(.match) .offer-role {
+  :global(.motion) .scene:not(.is-playing) .offer:not(.match) .offer-role {
     text-decoration-color: transparent;
   }
-  .js .scene .offer {
+  :global(.motion) .scene .offer {
     transition-delay: calc(0.2s + var(--i) * 0.45s);
   }
-  .js .scene .offer:not(.match) {
+  :global(.motion) .scene .offer:not(.match) {
     transition-delay: calc(0.2s + var(--i) * 0.45s), calc(0.2s + var(--i) * 0.45s), 0s;
   }
-  .js .scene .reason {
+  :global(.motion) .scene .reason {
     transition-delay: calc(0.55s + var(--i) * 0.45s);
   }
-  .js .scene .offer-role {
+  :global(.motion) .scene .offer-role {
     transition: text-decoration-color var(--motion-slow) ease;
     transition-delay: calc(0.55s + var(--i) * 0.45s);
   }
-  .js .scene .msg.first {
+  :global(.motion) .scene .msg.first {
     transition-delay: 3.3s;
   }
-  .js .scene .msg.card {
+  :global(.motion) .scene .msg.card {
     transition-delay: 3.9s;
   }
-  .js .scene .why li {
+  :global(.motion) .scene .why li {
     transition-delay: calc(4.3s + var(--w) * 0.25s);
   }
-  .js .scene .consider {
+  :global(.motion) .scene .consider {
     transition-delay: 5.2s;
   }
-  .js .scene .actions {
+  :global(.motion) .scene .actions {
     transition-delay: 5.5s;
   }
-  .js .scene.is-playing .match {
+  :global(.motion) .scene.is-playing .match {
     animation: land 0.8s var(--ease-standard) 2.9s both;
+  }
+  /* The buzz: as the message lands, the phone shivers twice, the way a phone
+     on a desk does, and a soft ring spreads from it. No sound. */
+  :global(.motion) .scene.is-playing .phone {
+    animation:
+      buzz 1s linear 3.15s both,
+      ring 1.4s ease-out 3.15s both;
+  }
+  @keyframes buzz {
+    0%, 32%, 46%, 80%, 100% { translate: 0 0; rotate: 0deg; }
+    4%, 50% { translate: -3px 0; rotate: -1.2deg; }
+    8%, 54% { translate: 3px 0; rotate: 1.2deg; }
+    12%, 58% { translate: -3px 0; rotate: -1deg; }
+    16%, 62% { translate: 3px 0; rotate: 1deg; }
+    20%, 66% { translate: -2px 0; rotate: -0.6deg; }
+    24%, 70% { translate: 2px 0; rotate: 0.6deg; }
+  }
+  @keyframes ring {
+    from {
+      box-shadow:
+        0 30px 60px rgb(37 37 31 / 0.18),
+        0 0 0 0 rgb(82 99 79 / 0.35);
+    }
+    to {
+      box-shadow:
+        0 30px 60px rgb(37 37 31 / 0.18),
+        0 0 0 28px rgb(82 99 79 / 0);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    :global(.motion) .scene.is-playing .phone {
+      animation: none;
+    }
   }
   @keyframes land {
     from {

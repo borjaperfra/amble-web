@@ -17,9 +17,11 @@ const { c } = Astro.props;
   <ol class="line" role="list" data-scene>
     {
       c.steps.map((st, i) => (
-        <li class:list={['stop', { now: i === 0 }]} style={`--i:${i}`}>
+        <li class:list={['stop', { now: i === 0, soon: i === 1 }]} style={`--i:${i}`}>
           <span class="when">{st.when}</span>
-          <span class="point" aria-hidden="true" />
+          <span class="track" aria-hidden="true">
+            <span class="point" />
+          </span>
           <p class="heading stop-title">{st.title}</p>
           <p class="short">{st.short}</p>
           <p class="detail">{st.line}</p>
@@ -54,32 +56,6 @@ const { c } = Astro.props;
       grid-template-columns: repeat(3, 1fr);
       gap: var(--space-6);
     }
-    /* The line: solid through Now, dashed ahead. */
-    .line::before,
-    .line::after {
-      content: '';
-      position: absolute;
-      top: 52px;
-      height: 2px;
-      transform-origin: left;
-      transition: transform 1.2s var(--ease-standard) 0.2s;
-    }
-    .line::before {
-      left: 16.6%;
-      width: 16.6%;
-      background: var(--color-accent);
-    }
-    .line::after {
-      left: 33.2%;
-      right: 16.6%;
-      background-image: linear-gradient(to right, var(--color-text-faint) 50%, transparent 0);
-      background-size: 10px 2px;
-      transition-delay: 0.7s;
-    }
-    :global(.motion) .line:not(.is-playing)::before,
-    :global(.motion) .line:not(.is-playing)::after {
-      transform: scaleX(0);
-    }
   }
   .stop {
     display: flex;
@@ -102,15 +78,65 @@ const { c } = Astro.props;
     text-transform: uppercase;
     color: var(--color-text-muted);
   }
-  .now .when {
+  .now .when,
+  .soon .when {
     color: var(--color-accent-strong);
+  }
+  /* The rail: each stop draws its own half-segments from the edge of its
+     point, centred on it, so the line never runs through a circle. Solid
+     from Now to Soon (nearly there), dashed ahead. */
+  .track {
+    --gap: 12px; /* air between a point and the line */
+    --r: 11px;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin: var(--space-2) 0 var(--space-3);
+  }
+  .now .track {
+    --r: 17px; /* its halo */
+  }
+  @media (min-width: 860px) {
+    .track::before,
+    .track::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      height: 2px;
+      margin-top: -1px;
+      background-image: linear-gradient(to right, var(--color-text-faint) 50%, transparent 0);
+      background-size: 10px 2px;
+      transform-origin: left;
+      transition: scale 0.9s var(--ease-standard);
+      transition-delay: calc(0.3s + var(--i) * 0.3s);
+    }
+    .track::before {
+      left: calc(var(--space-6) / -2);
+      right: calc(50% + var(--r) + var(--gap));
+    }
+    .track::after {
+      left: calc(50% + var(--r) + var(--gap));
+      right: calc(var(--space-6) / -2);
+    }
+    .stop:first-child .track::before,
+    .stop:last-child .track::after {
+      display: none;
+    }
+    .now .track::after,
+    .soon .track::before {
+      background: var(--color-accent);
+    }
+    :global(.motion) .line:not(.is-playing) .track::before,
+    :global(.motion) .line:not(.is-playing) .track::after {
+      scale: 0 1;
+    }
   }
   .point {
     position: relative;
     z-index: 1;
     width: 22px;
     height: 22px;
-    margin: var(--space-2) 0 var(--space-3);
     background: var(--color-bg);
     border: 2px dashed var(--color-text-faint);
     border-radius: var(--radius-full);
@@ -119,6 +145,13 @@ const { c } = Astro.props;
     background: var(--color-accent);
     border: 2px solid var(--color-accent);
     box-shadow: 0 0 0 6px var(--color-accent-soft);
+  }
+  /* Soon: nearly done, so no longer dashed. */
+  .soon .point {
+    border: 2px solid var(--color-accent);
+    box-shadow:
+      inset 0 0 0 4px var(--color-bg),
+      inset 0 0 0 11px var(--color-accent-soft);
   }
   .now .point::after {
     content: '';

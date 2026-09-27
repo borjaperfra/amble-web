@@ -1,12 +1,12 @@
 // Who is responsible for the data (GDPR art. 13). One place, used by the
 // privacy page in both languages.
 //
-// TODO before launch: fill in the legal entity (company name, tax ID, address).
-// The privacy page states that Amble is the controller; a registered entity has
-// to stand behind that name.
+// No company yet: Amble is run by Borja, who is the controller. When there is a
+// registered entity, add it here (name, tax ID, address) and it replaces him.
 export const legal = {
   controller: 'Amble',
+  operator: 'Borja Pérez Francés',
   entity: null as null | { name: string; taxId: string; address: string },
   privacyEmail: 'privacy@amble.fyi',
-  updated: '2026-09-26',
+  updated: '2026-09-27',
 };

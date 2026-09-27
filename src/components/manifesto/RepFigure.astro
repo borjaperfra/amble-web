@@ -1,0 +1,334 @@
+---
+// Give everyone a Rep, in three pieces of paper: the week's offers (most
+// struck, one that fits), your Rep reading them and listening, and you, at
+// work, with the one thing that reached you. Moss threads carry it across.
+import Symbol from '../Symbol.astro';
+import type { ManifestoContent } from '../../content/pages';
+
+interface Props {
+  c: ManifestoContent['figures']['rep'];
+}
+
+const { c } = Astro.props;
+---
+
+<figure class="rep-fig" data-scene>
+  <div class="row">
+    <div class="offers">
+      <p class="offers-label">{c.offersLabel}</p>
+      <ol class="stack" role="list">
+        {
+          c.offers.map((o, i) => (
+            <li class:list={['offer', { fits: o.fits }]} style={`--i:${i}`}>
+              <span class="offer-role">{o.role}</span>
+              <span class="offer-company">{o.company}</span>
+              <span class="offer-why">{o.fits ? '✓' : '✕'} {o.why}</span>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+
+    <span class="thread one" aria-hidden="true" />
+
+    <div class="sheet rep">
+      <p class="rep-head">
+        <span class="rep-eye"><Symbol size={40} /></span>
+        {c.rep}
+      </p>
+      <p class="rep-status heading"><span class="breath" />{c.listening}</p>
+    </div>
+
+    <span class="thread two" aria-hidden="true" />
+
+    <div class="sheet you">
+      <p class="you-name heading"><span class="me" />{c.you}</p>
+      <p class="you-role">{c.youRole}</p>
+      <p class="notice">{c.notice}</p>
+    </div>
+  </div>
+
+  <figcaption>
+    <span>{c.caption[0]}</span>
+    <em>{c.caption[1]}</em>
+  </figcaption>
+</figure>
+
+<style>
+  .rep-fig {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-8);
+    margin-block: var(--space-8);
+  }
+  .row {
+    display: grid;
+    align-items: center;
+    gap: var(--space-5);
+    width: 100%;
+    max-width: var(--width-wide);
+  }
+  @media (min-width: 900px) {
+    .row {
+      grid-template-columns: minmax(0, 1.25fr) 56px minmax(0, 1fr) 56px minmax(0, 0.9fr);
+      gap: 0;
+    }
+  }
+
+  /* The week's offers: a stack of small sheets. */
+  .offers-label {
+    margin-bottom: var(--space-3);
+    font-family: var(--font-mono);
+    font-size: var(--text-mono);
+    color: var(--color-text-faint);
+  }
+  .stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+  .offer {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    column-gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    background: var(--color-surface-raised);
+    border: var(--border-width) solid var(--color-border-subtle);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sheet);
+    transition:
+      opacity var(--motion-slow) ease,
+      translate var(--motion-arrive) var(--ease-standard),
+      border-color var(--motion-slow) ease;
+    transition-delay: calc(var(--i) * 0.15s);
+  }
+  .offer-role {
+    font-family: var(--font-display);
+    font-size: var(--text-heading-sm);
+  }
+  .offer-company {
+    grid-row: 2;
+    font-size: var(--text-body-sm);
+    color: var(--color-text-muted);
+  }
+  .offer-why {
+    grid-row: 1 / 3;
+    grid-column: 2;
+    align-self: center;
+    font-size: var(--text-body-sm);
+    color: var(--color-retracted);
+    transition: opacity var(--motion-slow) ease;
+    transition-delay: calc(0.6s + var(--i) * 0.3s);
+  }
+  .offer:not(.fits) .offer-role {
+    text-decoration: line-through;
+    text-decoration-color: var(--color-retracted);
+  }
+  .offer:not(.fits) {
+    opacity: 0.6;
+  }
+  .offer.fits {
+    border-color: var(--color-accent);
+    box-shadow:
+      0 0 0 4px var(--color-accent-wash),
+      var(--shadow-sheet);
+  }
+  .offer.fits .offer-why {
+    font-weight: var(--weight-medium);
+    color: var(--color-accent-strong);
+  }
+
+  /* Threads between the pieces: moss, drawn in order. */
+  .thread {
+    justify-self: center;
+    width: 2px;
+    height: 36px;
+    background: var(--color-accent);
+    transform-origin: top;
+    transition: scale 0.7s var(--ease-standard);
+  }
+  .thread.one {
+    transition-delay: 1.6s;
+  }
+  .thread.two {
+    transition-delay: 2.4s;
+  }
+  @media (min-width: 900px) {
+    .thread {
+      width: 100%;
+      height: 2px;
+      transform-origin: left;
+    }
+  }
+
+  .sheet {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-2);
+    padding: var(--space-5);
+    background: var(--color-surface-raised);
+    border: var(--border-width) solid var(--color-border-subtle);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sheet);
+    transition:
+      opacity var(--motion-slow) ease,
+      translate var(--motion-arrive) var(--ease-standard);
+  }
+  .rep {
+    overflow: hidden;
+    padding-bottom: 0;
+    transition-delay: 1.8s;
+  }
+  .rep-head {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3);
+    font-size: var(--text-label);
+    font-weight: var(--weight-semibold);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+  .rep-eye {
+    display: inline-flex;
+    color: var(--color-text);
+  }
+  .rep-eye :global(.iris) {
+    animation: scan 5s ease-in-out infinite;
+  }
+  @keyframes scan {
+    0%,
+    100% {
+      translate: 0 0;
+    }
+    20%,
+    32% {
+      translate: -4.5px 0.5px;
+    }
+    58%,
+    72% {
+      translate: 4.5px 0.5px;
+    }
+  }
+  .rep-status {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3);
+    align-self: stretch;
+    margin: var(--space-3) calc(var(--space-5) * -1) 0;
+    padding: var(--space-3) var(--space-5);
+    font-size: var(--text-heading-md);
+    color: var(--color-accent-strong);
+    background: var(--color-accent-wash);
+    border-top: var(--border-width) solid var(--color-accent-soft);
+  }
+  .breath,
+  .me {
+    position: relative;
+    flex: none;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: var(--color-accent);
+  }
+  .breath::after,
+  .me::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 1.5px solid var(--color-accent);
+    animation: ripple 2.4s ease-out infinite;
+  }
+  @keyframes ripple {
+    from {
+      scale: 1;
+      opacity: 0.9;
+    }
+    to {
+      scale: 2.8;
+      opacity: 0;
+    }
+  }
+
+  .you {
+    border-color: var(--color-accent);
+    box-shadow:
+      0 0 0 1.5px var(--color-accent),
+      0 0 0 8px var(--color-accent-wash),
+      var(--shadow-sheet);
+    transition-delay: 2.6s;
+  }
+  .you-name {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-heading-sm);
+    color: var(--color-accent-strong);
+  }
+  .you-role {
+    font-size: var(--text-body-sm);
+    color: var(--color-text-muted);
+  }
+  .notice {
+    margin-top: var(--space-2);
+    padding: var(--space-1) var(--space-3);
+    font-size: var(--text-label);
+    font-weight: var(--weight-medium);
+    color: var(--color-text-inverse);
+    background: var(--color-accent);
+    border-radius: var(--radius-full);
+    transition:
+      opacity 0.4s ease,
+      scale 0.5s cubic-bezier(0.3, 1.5, 0.5, 1);
+    transition-delay: 3.1s;
+  }
+
+  figcaption {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-1);
+    font-family: var(--font-display);
+    font-size: var(--text-heading-md);
+    color: var(--color-text-muted);
+    text-align: center;
+  }
+  figcaption em {
+    color: var(--color-accent-strong);
+  }
+
+  /* Arrival: the offers, the strikes, the thread, the Rep, the thread, you. */
+  :global(.motion) .rep-fig:not(.is-playing) .offer {
+    opacity: 0;
+    translate: 0 10px;
+  }
+  :global(.motion) .rep-fig:not(.is-playing) .offer-why {
+    opacity: 0;
+  }
+  :global(.motion) .rep-fig:not(.is-playing) .thread {
+    scale: 0 1;
+  }
+  @media (max-width: 899px) {
+    :global(.motion) .rep-fig:not(.is-playing) .thread {
+      scale: 1 0;
+    }
+  }
+  :global(.motion) .rep-fig:not(.is-playing) .sheet {
+    opacity: 0;
+    translate: 0 10px;
+  }
+  :global(.motion) .rep-fig:not(.is-playing) .notice {
+    opacity: 0;
+    scale: 0.6;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .rep-eye :global(.iris),
+    .breath::after,
+    .me::after {
+      animation: none;
+    }
+  }
+</style>

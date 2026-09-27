@@ -14,31 +14,20 @@ const { c, more = true } = Astro.props;
 
 <section class="hero container" aria-labelledby="hero-title" id="join">
   <Symbol size={108} watch breathe class="eye" />
-  <p class="live rise" aria-hidden="true" data-live>
-    <span class="live-prefix">{c.status.prefix}</span>
-    <span class="live-words">
-      {c.status.words.map((w, i) => <span class:list={['live-word', { 'is-on': i === 0 }]}>{w}</span>)}
-    </span>
-  </p>
   <h1 id="hero-title" class="display title rise d1">
     {c.title[0]}
     <br />
     <em>Amble</em>{' '}{c.title[1]}
   </h1>
-  <p class="lead rise d2">{c.lead}</p>
-  <p class="subtitle rise d2">{c.subtitle}</p>
-  <p class="punch rise d2">{c.punch}</p>
-  <div class="beta rise d3">
-    <p class="beta-title">{c.beta.title}</p>
-    <p class="beta-body">{c.beta.body}</p>
+  <div class="join rise d2">
+    <p class="lead"><strong>{c.lead}</strong> {c.subtitle}</p>
     <div class="form">
-      <Waitlist id="hero" />
+      <Waitlist id="hero" note="" />
     </div>
-    <p class="closer">{c.beta.closer}</p>
   </div>
   {
     more && (
-      <a class="more text-link rise d4" href="#problem">
+      <a class="more text-link rise d3" href="#problem">
         {c.more}
         <span class="arrow" aria-hidden="true">↓</span>
       </a>
@@ -58,123 +47,37 @@ const { c, more = true } = Astro.props;
     margin-bottom: var(--space-6);
     color: var(--color-text);
   }
-  /* What the Rep is doing, one quiet line that changes. */
-  .live {
-    margin: calc(var(--space-4) * -1) 0 var(--space-6);
-    font-size: var(--text-body-sm);
-    color: var(--color-text-muted);
-  }
-  /* Two centred lines: the prefix as a quiet label, the phrase beneath it.
-     The phrases share one centred cell, so nothing shifts when they change. */
-  .live {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--space-1);
-  }
-  .live-prefix {
-    font-size: var(--text-label);
-    font-weight: var(--weight-semibold);
-    letter-spacing: var(--tracking-label);
-    text-transform: uppercase;
-    color: var(--color-text-faint);
-  }
-  .live-words {
-    display: grid;
-    justify-items: center;
-    text-align: center;
-  }
-  .live-word {
-    grid-area: 1 / 1;
-    color: var(--color-accent-strong);
-    font-weight: var(--weight-medium);
-    opacity: 0;
-    translate: 0 4px;
-    transition:
-      opacity 0.6s ease,
-      translate 0.6s var(--ease-standard);
-  }
-  .live-word.is-on {
-    opacity: 1;
-    translate: none;
-  }
-  .tag {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-2);
-    height: 28px;
-    padding: 0 var(--space-3);
-    font-size: var(--text-body-sm);
-    font-weight: var(--weight-medium);
-    color: var(--color-accent-strong);
-    background: var(--color-accent-wash);
-    border: var(--border-width) solid var(--color-accent-soft);
-    border-radius: var(--radius-full);
-  }
-  .tag-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: var(--radius-full);
-    background: var(--color-accent);
-  }
   .title {
     margin-top: var(--space-2);
     font-size: var(--text-display-xl);
   }
-  .lead {
-    margin-top: var(--space-6);
-    font-family: var(--font-display);
-    font-size: var(--text-heading-md);
-  }
-  .punch {
-    margin-top: var(--space-4);
-    font-weight: var(--weight-medium);
-    color: var(--color-accent-strong);
-  }
-  /* The beta block: what you're joining, right by the form. */
-  .beta {
+  /* One block: what the Rep is, and the form right under it. */
+  .join {
     display: flex;
     flex-direction: column;
     align-items: center;
     width: 100%;
     max-width: 34rem;
     margin-top: var(--space-7);
-    padding-top: var(--space-6);
-    border-top: var(--border-width) solid var(--color-border-subtle);
   }
-  .beta-title {
-    font-size: var(--text-label);
-    font-weight: var(--weight-semibold);
-    letter-spacing: var(--tracking-label);
-    text-transform: uppercase;
-    color: var(--color-accent-strong);
-  }
-  .beta-body {
-    margin-top: var(--space-2);
-    color: var(--color-text-muted);
-    text-wrap: balance;
-  }
-  .closer {
-    margin-top: var(--space-5);
-    font-family: var(--font-display);
-    font-size: var(--text-heading-sm);
-  }
-  .subtitle {
-    margin-top: var(--space-3);
-    max-width: 34rem;
+  .lead {
     font-size: var(--text-body-lg);
     color: var(--color-text-muted);
     text-wrap: pretty;
+  }
+  .lead strong {
+    font-weight: var(--weight-medium);
+    color: var(--color-text);
   }
   .form {
     display: flex;
     justify-content: center;
     width: 100%;
-    margin-top: var(--space-5);
+    margin-top: var(--space-6);
   }
 
   .more {
-    margin-top: var(--space-8);
+    margin-top: var(--space-9);
     font-size: var(--text-body-sm);
   }
   .arrow {
@@ -204,9 +107,6 @@ const { c, more = true } = Astro.props;
   .d3 {
     animation-delay: 340ms;
   }
-  .d4 {
-    animation-delay: 460ms;
-  }
   @keyframes rise {
     from {
       opacity: 0;
@@ -215,15 +115,3 @@ const { c, more = true } = Astro.props;
   }
 </style>
 
-<script>
-  const live = document.querySelector<HTMLElement>('[data-live]');
-  if (live && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    const words = [...live.querySelectorAll<HTMLElement>('.live-word')];
-    let i = 0;
-    setInterval(() => {
-      words[i].classList.remove('is-on');
-      i = (i + 1) % words.length;
-      words[i].classList.add('is-on');
-    }, 3200);
-  }
-</script>

@@ -1,0 +1,239 @@
+---
+// The hero's picture: your inbox, full of applications that match keywords,
+// and outside it, the people you'd actually want: not looking, with notes on
+// what would still move them. The home's paper, as on the manifesto.
+import type { CompaniesContent } from '../../content/companies';
+
+interface Props {
+  c: CompaniesContent['inbox'];
+}
+
+const { c } = Astro.props;
+---
+
+<figure class="inbox-fig" data-scene aria-hidden="true">
+  <div class="sheet inbox">
+    <p class="inbox-head">
+      <span class="inbox-label">{c.label}</span>
+      <span class="inbox-count">{c.count}</span>
+    </p>
+    <ul class="rows" role="list">
+      {
+        c.rows.map((r, i) => (
+          <li style={`--i:${i}`}>
+            <span class="avatar" />
+            <span class="row-text">
+              <span class="bar" />
+              <span class="row-why">{c.applied} · {r}</span>
+            </span>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+
+  <div class="outside">
+    <p class="outside-label">{c.outside}</p>
+    <ul class="people" role="list">
+      {
+        c.people.map((p, i) => (
+          <li class="sheet person" style={`--i:${i}`}>
+            <span class="name heading">{p.name}</span>
+            <span class="role">{p.role}</span>
+            <span class="status">{c.notLooking}</span>
+            <span class="note">
+              <span class="note-label">{c.noteLabel}</span>
+              <span class="note-text heading">{p.note}</span>
+            </span>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</figure>
+
+<style>
+  .inbox-fig {
+    display: grid;
+    gap: var(--space-8);
+    width: 100%;
+    max-width: var(--width-wide);
+    margin-top: var(--space-9);
+    text-align: left;
+  }
+  @media (min-width: 900px) {
+    .inbox-fig {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      align-items: center;
+      gap: var(--space-9);
+    }
+  }
+  .sheet {
+    background: var(--color-surface-raised);
+    border: var(--border-width) solid var(--color-border-subtle);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sheet);
+  }
+
+  /* Your inbox: a document full of applications, fading as it goes. */
+  .inbox {
+    padding: var(--space-5);
+    rotate: -0.6deg;
+    -webkit-mask-image: linear-gradient(to bottom, #000 70%, transparent);
+    mask-image: linear-gradient(to bottom, #000 70%, transparent);
+  }
+  .inbox-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding-bottom: var(--space-3);
+    border-bottom: var(--border-width) solid var(--color-border-subtle);
+  }
+  .inbox-label {
+    font-family: var(--font-display);
+    font-size: var(--text-heading-md);
+  }
+  .inbox-count {
+    font-family: var(--font-mono);
+    font-size: var(--text-mono);
+    color: var(--color-text-faint);
+  }
+  .rows {
+    display: flex;
+    flex-direction: column;
+  }
+  .rows li {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding-block: var(--space-3);
+    border-bottom: var(--border-width) solid var(--color-border-subtle);
+    transition: opacity var(--motion-slow) ease;
+    transition-delay: calc(var(--i) * 0.08s);
+  }
+  .avatar {
+    flex: none;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--color-surface-sunken);
+  }
+  .row-text {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .bar {
+    width: 9rem;
+    height: 8px;
+    border-radius: 4px;
+    background: var(--color-surface-sunken);
+  }
+  .row-why {
+    font-size: var(--text-label);
+    color: var(--color-text-faint);
+  }
+
+  /* Outside: the people who matter, with what would move them. */
+  .outside-label {
+    margin-bottom: var(--space-5);
+    font-family: var(--font-display);
+    font-size: var(--text-heading-md);
+    font-style: italic;
+    color: var(--color-accent-strong);
+  }
+  .people {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+  .person {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    width: min(100%, 300px);
+    padding: var(--space-4) var(--space-5);
+    transition:
+      opacity var(--motion-slow) ease,
+      translate var(--motion-arrive) var(--ease-standard);
+    transition-delay: calc(0.5s + var(--i) * 0.2s);
+  }
+  .person:nth-child(2) {
+    margin-left: var(--space-8);
+    rotate: 0.8deg;
+  }
+  .person:nth-child(3) {
+    margin-left: var(--space-4);
+    rotate: -0.6deg;
+  }
+  .name {
+    font-size: var(--text-heading-sm);
+  }
+  .role {
+    font-size: var(--text-body-sm);
+    color: var(--color-text-muted);
+  }
+  .status {
+    margin-top: var(--space-2);
+    padding: 2px var(--space-3);
+    font-size: var(--text-label);
+    font-weight: var(--weight-medium);
+    color: var(--color-text-muted);
+    background: var(--color-surface);
+    border: var(--border-width) solid var(--color-border-subtle);
+    border-radius: var(--radius-full);
+  }
+  .note {
+    position: absolute;
+    right: calc(var(--space-8) * -1);
+    bottom: calc(var(--space-3) * -1);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: var(--space-2) var(--space-4);
+    background: var(--color-accent-wash);
+    border: var(--border-width) solid var(--color-accent-soft);
+    border-radius: var(--radius-md);
+    box-shadow: 0 8px 20px rgb(37 37 31 / 0.07);
+    rotate: 2deg;
+    transition:
+      opacity var(--motion-slow) ease,
+      rotate var(--motion-arrive) var(--ease-standard);
+    transition-delay: calc(1.1s + var(--i) * 0.2s);
+  }
+  .note-label {
+    font-size: 11px;
+    font-weight: var(--weight-semibold);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--color-accent-strong);
+    white-space: nowrap;
+  }
+  .note-text {
+    font-size: var(--text-body);
+    font-style: italic;
+    white-space: nowrap;
+  }
+  @media (max-width: 520px) {
+    .note {
+      right: calc(var(--space-2) * -1);
+    }
+    .person:nth-child(2) {
+      margin-left: var(--space-5);
+    }
+  }
+
+  :global(.motion) .inbox-fig:not(.is-playing) .rows li {
+    opacity: 0;
+  }
+  :global(.motion) .inbox-fig:not(.is-playing) .person {
+    opacity: 0;
+    translate: 0 10px;
+  }
+  :global(.motion) .inbox-fig:not(.is-playing) .note {
+    opacity: 0;
+    rotate: 8deg;
+  }
+</style>
