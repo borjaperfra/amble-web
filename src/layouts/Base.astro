@@ -35,6 +35,9 @@ const {
   joinLabel,
 } = Astro.props;
 const canonical = new URL(getRelativeLocaleUrl(lang, path), Astro.site);
+// Bump OG_VERSION whenever the cards change: X and LinkedIn cache images by URL.
+const OG_VERSION = '2026-09-27';
+const ogImage = new URL(`${og ? `/og-${og}-${lang}.png` : `/og-${lang}.png`}?v=${OG_VERSION}`, Astro.site).href;
 ---
 
 <!doctype html>
@@ -56,11 +59,15 @@ const canonical = new URL(getRelativeLocaleUrl(lang, path), Astro.site);
     <meta property="og:url" content={canonical} />
     <meta property="og:type" content="website" />
     <meta property="og:locale" content={lang === 'es' ? 'es_ES' : 'en_US'} />
-    <meta property="og:image" content={new URL(og ? `/og-${og}-${lang}.png` : `/og-${lang}.png`, Astro.site)} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:alt" content={title} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:site_name" content="Amble" />
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
     <Font cssVariable="--font-inter" preload />
     <Font cssVariable="--font-newsreader" preload />
     <script is:inline define:vars={{ away: t('tab.away') }}>

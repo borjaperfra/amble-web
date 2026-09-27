@@ -69,7 +69,7 @@ export interface CompaniesContent {
 const en: CompaniesContent = {
   meta: {
     title: 'For companies — Amble',
-    description: 'The person you want probably isn’t applying. Amble turns your role into an agent that finds them, checks their evidence and asks their Rep, with a private salary range.',
+    description: 'An AI agent that sources, checks and reaches real candidates, including the ones who aren’t applying. Your role becomes the agent; you meet the ones who fit and want to talk.',
   },
   badge: 'Early access · company side in v2',
   kicker: 'For companies',
@@ -176,7 +176,7 @@ const en: CompaniesContent = {
 const es: CompaniesContent = {
   meta: {
     title: 'Para empresas — Amble',
-    description: 'La persona que buscas probablemente no está aplicando. Amble convierte tu puesto en un agente que la encuentra, comprueba su evidencia y habla con su Rep, con un rango salarial privado.',
+    description: 'Un agente de IA que busca, comprueba y contacta a candidatos reales, también a los que no están aplicando. Tu puesto se convierte en el agente; conoces a quienes encajan y quieren hablar.',
   },
   badge: 'Acceso anticipado · lado de empresa en la v2',
   kicker: 'Para empresas',
