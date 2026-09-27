@@ -12,15 +12,15 @@ Later, the site grows into: social login → create a profile → start your age
 
 - Astro 7, static pages + one server endpoint (`@astrojs/node`, standalone) for the waitlist.
 - EN at `/`, ES at `/es/` (Astro i18n).
-- Postgres on Railway for the waitlist. Resend for double opt-in.
+- Postgres on Railway for the waitlist. Resend for the welcome email.
 - Tokens copied from `../amble/src/app/globals.css`.
 
 ## Waitlist
 
-- Email only. Double opt-in (GDPR). Store email, locale, consent timestamp, confirmation timestamp.
+- Email only. Two lists in one table: candidates and companies (the same address can be on both). Store email, locale, audience, consent timestamp, welcome-sent timestamp.
+- No double opt-in (changed 2026-09-26): submitting the form is the consent. One welcome email from Borja per address and list (EN/ES, candidate/company). Kept until the beta ends or until the person asks to delete it; the privacy page says so.
 - No queue position, no referrals (no artificial scarcity — PRODUCT_SPEC §2).
-- Success copy is understated: "Got it. Check your inbox."
-- Built: `POST /api/waitlist` (JSON for fetch, 303 redirect without JS), `GET /api/waitlist/confirm`, `/joined` and `/confirmed` in both languages. Honeypot, per-IP rate limit, 2-minute resend cooldown, same answer whether or not the email is already on the list, hashed tokens that expire in 7 days.
+- Built: `POST /api/waitlist` (JSON for fetch, 303 redirect without JS) and `/joined` in both languages. Honeypot, per-IP rate limit, 2-minute retry cooldown when a welcome email fails, same answer whether or not the email is already on the list. The confirm route and `/confirmed` pages are gone.
 
 ## Roadmap (told on the site, openly)
 
@@ -57,13 +57,13 @@ Needs many reviews first; it will happen, not for launch.
 
 ## Domain
 
-`amble.fyi` (free as of 2026-09-26, not bought yet). Resend needs it verified before real emails go out.
+`amble.fyi`, live on Railway since 2026-09-26 in **launch mode**: `SITE_MODE=launch` serves only the hero with the form, the privacy page and the waitlist; every other page redirects home in its language. `SITE_MODE=full` (default) is the whole site. Behind Railway's proxy, `security.allowedDomains` in `astro.config.mjs` is needed for Astro to trust `X-Forwarded-Proto`, or its origin check rejects the form's posts.
 
 ## Done (2026-09-26)
 
 - Home in EN and ES, all sections above. Design system in `DESIGN.md`, symbol in `src/components/Symbol.astro`.
 - `/privacy` in both languages. No cookies, no analytics, no third-party requests.
-- Form hardening: urlencoded only, ≤1 KB, exactly `email`/`locale`/`website`, strict ASCII email rule shared by browser and server, spaces stripped as typed, same answer for known and unknown addresses. Unconfirmed signups deleted after 30 days.
+- Form hardening: urlencoded only, ≤1 KB, exactly `email`/`locale`/`website`, strict ASCII email rule shared by browser and server, spaces stripped as typed, same answer for known and unknown addresses. (Superseded: the 30-day deletion of unconfirmed signups went away with double opt-in.)
 
 ## Done (later on 2026-09-26)
 
@@ -82,6 +82,12 @@ Needs many reviews first; it will happen, not for launch.
 - "Your turn" moved to just before the close, with a line for people without GitHub.
 - Tests: `npm test` (email rules, rate limit, eye geometry).
 
+## Done (night of 2026-09-26)
+
+- Copy rewrite across the site (ES translated); passive-market piece, manifesto essay, companies page rebuilt around who isn't applying.
+- Art direction carried through the second half (`ART_DIRECTION_AUDIT.md`): `DotField`, `AgentLine`, hairlines instead of cards.
+- Launch mode at amble.fyi; one welcome email instead of double opt-in (see Waitlist and Domain).
+
 ## Open points
 
 - **Career coach agent (to pick up next):** the site barely mentions it (only "+ career coach" on the roadmap's v0). It needs to be told properly — what it does (strengthen your profile, how to look for work when you want to) — without making the home longer. Options to weigh: fold it into an existing scene (e.g. the "I don't know yet" gap in chapter 1 or the roadmap v0), or give it its own page linked from the roadmap.
@@ -89,3 +95,4 @@ Needs many reviews first; it will happen, not for launch.
 - Legal entity for the privacy page (`src/config/legal.ts`): name, tax ID, address.
 - `privacy@amble.fyi` must exist as a real inbox before launch.
 - GitHub sync of your data (section 10) doesn't exist yet: place it in v0 or on the roadmap.
+- v1 offer reading: look at career-ops' MIT job-board connectors (`providers/` in github.com/career-ops-hq/career-ops) as a possible base, with attribution. Reviewed 2026-09-27; nothing else from it (scores, ATS keywords, apply-better positioning) fits Amble.
