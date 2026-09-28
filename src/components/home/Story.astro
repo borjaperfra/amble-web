@@ -841,12 +841,12 @@ const claims = c.sources.flatMap((src) =>
       onEnter: () => step < 0 && setStep(0),
     });
 
-    // Then the scene holds still; each scroll gesture plays one step.
+    // Then the scene holds still while its steps play, at the reader's pace.
     fit();
     ScrollTrigger.addEventListener('refreshInit', () => (stage.style.scale = ''));
     ScrollTrigger.addEventListener('refresh', fit);
 
     const pin = story.querySelector<HTMLElement>('.story-pin')!;
-    steppedScene({ trigger: pin, pin, steps: 4, onStep: setStep, hold: 700 });
+    steppedScene({ trigger: pin, pin, steps: 4, onStep: setStep });
   }
 </script>

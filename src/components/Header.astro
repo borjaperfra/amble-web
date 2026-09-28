@@ -412,8 +412,7 @@ const pages = [
   }
 
   // The menu: a modal dialog, so focus stays inside and Escape closes it. The
-  // page behind doesn't scroll while it's open; pages with smooth scrolling
-  // hear about it through amble:scroll-lock.
+  // page behind doesn't scroll while it's open.
   const menu = document.querySelector<HTMLDialogElement>('#site-menu');
   const openers = [...document.querySelectorAll<HTMLButtonElement>('[data-menu-open]')];
   if (menu) {
@@ -423,7 +422,6 @@ const pages = [
       if (on === locked) return;
       locked = on;
       document.documentElement.classList.toggle('menu-open', on);
-      window.dispatchEvent(new CustomEvent('amble:scroll-lock', { detail: on }));
       openers.forEach((b) => b.setAttribute('aria-expanded', String(on)));
     };
     // Unlocked right away rather than on the dialog's close event, which some

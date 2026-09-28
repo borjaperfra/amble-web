@@ -628,8 +628,6 @@ const ys = [10, 30, 50, 70, 90];
       trigger: scene,
       pin: scene.querySelector<HTMLElement>('.pin')!,
       steps: 5,
-      // Beat 1 folds the role into the agent; 2 and 3 check five people one by one.
-      hold: (n) => [400, 900, 1100, 900, 500][n],
       onStep: (n) => {
         if (scene.dataset.step !== String(n)) scene.dataset.step = String(n);
       },

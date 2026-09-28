@@ -20,21 +20,11 @@ const { c, more = true } = Astro.props;
     <em>Amble</em>{' '}{c.title[1]}
   </h1>
   <div class="join rise d2">
-    {
-      c.thesis ? (
-        <>
-          <p class="thesis">
-            <span>{c.thesis[0]}</span>
-            <em>{c.thesis[1]}</em>
-          </p>
-          <p class="lead">{c.subtitle}</p>
-        </>
-      ) : (
-        <p class="lead">
-          <strong>{c.lead}</strong> {c.subtitle}
-        </p>
-      )
-    }
+    <p class="thesis">
+      <span>{c.thesis[0]}</span>
+      <em>{c.thesis[1]}</em>
+    </p>
+    <p class="lead">{c.subtitle}</p>
     <div class="form">
       <Waitlist id="hero" note="" />
     </div>
@@ -93,10 +83,6 @@ const { c, more = true } = Astro.props;
   }
   .thesis + .lead {
     margin-top: var(--space-4);
-  }
-  .lead strong {
-    font-weight: var(--weight-medium);
-    color: var(--color-text);
   }
   .form {
     display: flex;

@@ -1,4 +1,5 @@
 import type { Lang } from '../i18n/ui';
+import { manifesto, type Block } from './pages';
 
 // Home page copy and the demo profile it shows working. One object per
 // language, same shape, so every section renders from data.
@@ -27,16 +28,15 @@ type Person = { name: string; role: string; looking: boolean };
 
 export interface HomeContent {
   // The agent's loop, shown as a rail beside the page. Sections carry data-stage.
-  stages: { id: 'reads' | 'asks' | 'checks' | 'learns' | 'listens' | 'tells'; label: string }[];
+  stages: { id: 'knows' | 'listens' | 'tells'; label: string }[];
   hero: {
     title: [string, string]; // second line gets the italic "Amble"
-    lead?: string; // "Meet your professional Rep."
-    // The v2 home: the manifesto's thesis, set apart above the subtitle, in
-    // place of the lead.
-    thesis?: [string, string];
-    subtitle: string;
+    thesis: [string, string]; // the manifesto's, the second line in moss
+    subtitle: string; // what a Rep is
     more: string;
   };
+  // Manifesto blocks between the scenes (see essay() below).
+  essay: { problem: Block[]; rep: Block[]; future: Block[]; end: Block[] };
   // Right after the hero, in its voice: three statements over a pinned scene
   // of sheets, then the thesis. Four people around you; four conditions.
   passive: {
@@ -50,22 +50,10 @@ export interface HomeContent {
     conditions: [string, string, string, string];
     rep: { label: string; listening: string; status: string };
   };
-  // The paperwork everyone knows, in four beats: a pile of roles, all applied
-  // to, most never answered; then the eye, listening.
-  problem: {
-    title: string;
-    verbs: string[];
-    never: string;
-    answer: string;
-    bridge: string;
-    applications: { role: string; company: string }[];
-    status: { applied: string; noReply: string; rejected: string };
-    recruiter: { from: string; text: string; note: string };
-    listening: string;
-  };
   story: {
     interlude: [string, string];
     interludeBody: string[];
+    bridge: string; // leads into the interlude
     chapter: string; // holds above the four steps
     steps: { kicker: string; title: string; body: string }[];
     sources: StorySource[];
@@ -91,33 +79,6 @@ export interface HomeContent {
     join: string;
     again: string;
     noGithub: string;
-  };
-  interview: {
-    kicker: string;
-    title: string;
-    line: string;
-    rep: string;
-    // What the Rep read, and what it concluded it couldn't tell.
-    clues: { source: Source; text: string; reads: string }[];
-    question: string;
-    gap: string;
-    talk: string;
-  };
-  defence: {
-    kicker: string;
-    title: string;
-    line: string;
-    cases: {
-      file: string;
-      code: { text: string; key?: boolean }[];
-      claim: string;
-      assisted: string;
-      ask: string;
-      answer: string;
-      verdict: 'defended' | 'retracted';
-      stamp: string;
-      outcome: string;
-    }[];
   };
   // The professional map, told as three honest columns.
   map: {
@@ -218,21 +179,38 @@ export interface HomeContent {
   sourceNames: Record<Source, string>;
 }
 
+// The page follows the manifesto's order: the old loop, then not looking ≠ not
+// listening (the passive scene), then what a Rep is, and only then the demo.
+// Those essay parts are the manifesto's own blocks, so the copy lives in one
+// place.
+function essay(lang: Lang): HomeContent['essay'] {
+  const { intro, future } = manifesto[lang];
+  const loop = intro.findIndex((b) => b.kind === 'figure' && b.figure === 'loop');
+  const chapters = intro.flatMap((b, i) => (b.kind === 'chapter' ? [i] : []));
+  // "Your agent talks to theirs" is the agents scene; the figure closes.
+  const beat = future.findIndex((b) => b.kind === 'beat');
+  return {
+    problem: intro.slice(0, loop + 1),
+    // Its second chapter ("Most people aren't looking") is the passive scene.
+    rep: intro.slice(chapters[1]),
+    future: future.slice(0, beat),
+    end: future.filter((b) => b.kind === 'figure'),
+  };
+}
+
 const en: HomeContent = {
   stages: [
-    { id: 'reads', label: 'Reads' },
-    { id: 'asks', label: 'Asks' },
-    { id: 'checks', label: 'Checks' },
-    { id: 'learns', label: 'Learns' },
+    { id: 'knows', label: 'Knows you' },
     { id: 'listens', label: 'Listens' },
     { id: 'tells', label: 'Tells you' },
   ],
   hero: {
     title: ['I’m not looking.', 'is.'],
-    lead: 'Meet your professional Rep.',
-    subtitle: 'It gets to know your work, learns what would make you move, and finds the opportunities worth your time.',
-    more: 'See how it works',
+    thesis: ['The job market is built for people looking for jobs.', 'Amble is built for people who aren’t.'],
+    subtitle: 'It gives you a Rep: an agent that knows your work, listens to the market for you, and only speaks up when something deserves your time.',
+    more: 'See why',
   },
+  essay: essay('en'),
   passive: {
     statements: ['Only a few people are looking.', 'But you’re not. You’re working.', 'But some things would make you listen.'],
     title: 'Not looking doesn’t mean not interested.',
@@ -249,30 +227,13 @@ const en: HomeContent = {
     conditions: ['the right problem', 'more ownership', 'remote', 'the right number'],
     rep: { label: 'Your Rep', listening: 'Listening for', status: 'Listening' },
   },
-  problem: {
-    title: 'Looking for a job has become a job.',
-    verbs: ['Search.', 'Filter.', 'Apply.', 'Repeat.'],
-    never: 'And most never answer you.',
-    answer: 'Amble does the looking instead.',
-    bridge: 'But first, your Rep needs to know you.',
-    applications: [
-      { role: 'Senior Backend Engineer', company: 'Fintech · Series B' },
-      { role: 'Platform Engineer', company: 'Logistics · 200 people' },
-      { role: 'Staff Engineer', company: 'Remote (US only)' },
-      { role: 'Backend Engineer', company: 'Agency · on-site' },
-      { role: 'Senior Software Engineer', company: 'Scale-up · Berlin' },
-      { role: 'Tech Lead', company: 'E-commerce · 5 days in office' },
-    ],
-    status: { applied: 'Applied', noReply: 'No reply · 3 weeks', rejected: 'Rejected · automatically' },
-    recruiter: { from: 'Recruiter', text: '“How many years of Python do you have? Could you send your CV again?”', note: 'It’s on your CV' },
-    listening: 'Listening',
-  },
   story: {
     interlude: ['You’re more than', 'a PDF.'],
     interludeBody: [
       'A CV tells your Rep where you’ve worked. Your work shows what you’ve actually done.',
       'Amble reads your CV, GitHub, LinkedIn and the work you choose to share. Then it asks about what it couldn’t find.',
     ],
+    bridge: 'But first, your Rep needs to know you.',
     chapter: 'How your Rep gets to know you.',
     steps: [
       { kicker: '01 · Reads', title: 'It reads before it asks.', body: 'CV, LinkedIn, GitHub, your writing.' },
@@ -380,54 +341,6 @@ const en: HomeContent = {
     join: 'Want your Rep to read the rest? Join the beta',
     again: 'Try another',
     noGithub: 'No GitHub? In the beta, your Rep starts with your CV.',
-  },
-  interview: {
-    kicker: 'The interview',
-    title: 'It asks about what your CV leaves out.',
-    line: 'Your Rep asks about the things that actually matter: what you owned, what you decided, and what the work alone can’t prove.',
-    rep: 'Your Rep',
-    clues: [
-      { source: 'cv', text: 'Led the evaluation pipeline', reads: 'she led it' },
-      { source: 'gh', text: 'tern · 92% of commits', reads: 'she wrote it' },
-    ],
-    question: 'Who decided what to measure?',
-    gap: 'Neither says who decided.',
-    talk: 'Hold to talk',
-  },
-  defence: {
-    kicker: 'It checks itself',
-    title: 'Code shows what shipped. Your Rep asks who decided.',
-    line: 'AI made producing work easier. It also made proving who did what harder. When ownership matters, your Rep asks.',
-    cases: [
-      {
-        file: 'tern/export.py',
-        code: [
-          { text: 'traces.save(local=True)', key: true },
-          { text: 'upload(scores)  # never traces' },
-        ],
-        claim: 'Keeps traces local, ships only scores',
-        assisted: 'co-produced',
-        ask: 'Why is the line there?',
-        answer: 'Because traces carry our customers’ prompts. Scores don’t.',
-        verdict: 'defended',
-        stamp: 'Defended',
-        outcome: 'Now evidence of her own judgment.',
-      },
-      {
-        file: 'tern/cache.py',
-        code: [
-          { text: 'key = sha256(prompt)', key: true },
-          { text: 'return store.get(key)' },
-        ],
-        claim: 'Designed the caching strategy',
-        assisted: 'co-produced',
-        ask: 'Why cache by prompt hash?',
-        answer: 'Honestly? The agent picked that. I never checked why.',
-        verdict: 'retracted',
-        stamp: 'Retracted',
-        outcome: 'Kept on record. No longer claimed.',
-      },
-    ],
   },
   map: {
     kicker: 'Your professional map',
@@ -624,19 +537,17 @@ const en: HomeContent = {
 
 const es: HomeContent = {
   stages: [
-    { id: 'reads', label: 'Lee' },
-    { id: 'asks', label: 'Pregunta' },
-    { id: 'checks', label: 'Comprueba' },
-    { id: 'learns', label: 'Aprende' },
+    { id: 'knows', label: 'Te conoce' },
     { id: 'listens', label: 'Escucha' },
     { id: 'tells', label: 'Te avisa' },
   ],
   hero: {
     title: ['Yo no busco.', 'sí.'],
-    lead: 'Conoce a tu Rep profesional.',
-    subtitle: 'Entiende tu trabajo, aprende qué te haría cambiar y encuentra las oportunidades que merecen tu tiempo.',
-    more: 'Mira cómo funciona',
+    thesis: ['El mercado laboral está construido para quien busca trabajo.', 'Amble, para quien no.'],
+    subtitle: 'Te da un Rep: un agente que conoce tu trabajo, escucha el mercado por ti y solo te avisa cuando algo merece tu tiempo.',
+    more: 'Mira por qué',
   },
+  essay: essay('es'),
   passive: {
     statements: ['Solo unos pocos están buscando.', 'Pero tú no. Tú estás trabajando.', 'Pero hay cosas que te harían escuchar.'],
     title: 'No buscar no significa no estar interesado.',
@@ -653,30 +564,13 @@ const es: HomeContent = {
     conditions: ['el problema adecuado', 'más responsabilidad', 'remoto', 'la cifra adecuada'],
     rep: { label: 'Tu Rep', listening: 'Atento a', status: 'Escuchando' },
   },
-  problem: {
-    title: 'Buscar trabajo se ha convertido en un trabajo.',
-    verbs: ['Buscar.', 'Filtrar.', 'Aplicar.', 'Repetir.'],
-    never: 'Y la mayoría ni te contesta.',
-    answer: 'Amble busca por ti.',
-    bridge: 'Pero antes, tu Rep necesita conocerte.',
-    applications: [
-      { role: 'Senior Backend Engineer', company: 'Fintech · Serie B' },
-      { role: 'Platform Engineer', company: 'Logística · 200 personas' },
-      { role: 'Staff Engineer', company: 'Remoto (solo EE. UU.)' },
-      { role: 'Backend Engineer', company: 'Consultora · presencial' },
-      { role: 'Senior Software Engineer', company: 'Scale-up · Berlín' },
-      { role: 'Tech Lead', company: 'E-commerce · 5 días en oficina' },
-    ],
-    status: { applied: 'Enviada', noReply: 'Sin respuesta · 3 semanas', rejected: 'Descartada · automáticamente' },
-    recruiter: { from: 'Recruiter', text: '“¿Cuántos años de Python tienes? ¿Me reenvías el CV?”', note: 'Está en tu CV' },
-    listening: 'Escuchando',
-  },
   story: {
     interlude: ['Eres más que', 'un PDF.'],
     interludeBody: [
       'Un CV le dice a tu Rep dónde has trabajado. Tu trabajo enseña lo que de verdad has hecho.',
       'Amble lee tu CV, GitHub, LinkedIn y el trabajo que decidas compartir. Después pregunta por lo que no pudo encontrar.',
     ],
+    bridge: 'Pero antes, tu Rep necesita conocerte.',
     chapter: 'Cómo te conoce tu Rep.',
     steps: [
       { kicker: '01 · Lee', title: 'Lee antes de preguntar.', body: 'CV, LinkedIn, GitHub, lo que escribes.' },
@@ -784,54 +678,6 @@ const es: HomeContent = {
     join: '¿Quieres que tu Rep lea el resto? Entra en la beta',
     again: 'Probar otro',
     noGithub: '¿Sin GitHub? En la beta, tu Rep empieza por tu CV.',
-  },
-  interview: {
-    kicker: 'La entrevista',
-    title: 'Pregunta por lo que tu CV no cuenta.',
-    line: 'Tu Rep pregunta por lo que de verdad importa: de qué fuiste responsable, qué decidiste y lo que el trabajo por sí solo no puede demostrar.',
-    rep: 'Tu Rep',
-    clues: [
-      { source: 'cv', text: 'Lideró el pipeline de evaluación', reads: 'lo lideró' },
-      { source: 'gh', text: 'sonda · 92 % de los commits', reads: 'lo escribió' },
-    ],
-    question: '¿Quién decidió qué medir?',
-    gap: 'Ninguno dice quién decidió.',
-    talk: 'Mantén para hablar',
-  },
-  defence: {
-    kicker: 'Se comprueba a sí mismo',
-    title: 'El código dice qué se envió. Tu Rep pregunta quién lo decidió.',
-    line: 'La IA ha hecho más fácil producir trabajo. Y más difícil demostrar quién hizo qué. Cuando importa de quién es algo, tu Rep pregunta.',
-    cases: [
-      {
-        file: 'sonda/export.py',
-        code: [
-          { text: 'traces.save(local=True)', key: true },
-          { text: 'upload(scores)  # nunca trazas' },
-        ],
-        claim: 'Deja las trazas en local y solo envía puntuaciones',
-        assisted: 'co-producido',
-        ask: '¿Por qué está la línea ahí?',
-        answer: 'Porque las trazas llevan los prompts de nuestros clientes. Las puntuaciones no.',
-        verdict: 'defended',
-        stamp: 'Defendida',
-        outcome: 'Ahora es evidencia de su propio criterio.',
-      },
-      {
-        file: 'sonda/cache.py',
-        code: [
-          { text: 'key = sha256(prompt)', key: true },
-          { text: 'return store.get(key)' },
-        ],
-        claim: 'Diseñó la estrategia de caché',
-        assisted: 'co-producido',
-        ask: '¿Por qué cachear por hash del prompt?',
-        answer: '¿Sinceramente? Lo eligió el agente. Nunca revisé por qué.',
-        verdict: 'retracted',
-        stamp: 'Retirada',
-        outcome: 'Queda registrada. Ya no se afirma.',
-      },
-    ],
   },
   map: {
     kicker: 'Tu mapa profesional',
