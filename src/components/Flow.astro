@@ -2,7 +2,8 @@
 // A pipeline drawn as steps and arrows, for the long-form pages. The last
 // `emphasis` steps are shown in moss: where the idea lands. Long pipelines
 // break into two even rows, the second picking up with an arrow, so no step
-// is ever left alone on a line; on phones the steps run down the page.
+// is ever left alone on a line; on wide screens the two rows sit side by side
+// as one line, past the text column; on phones the steps run down the page.
 interface Props {
   steps: string[];
   emphasis?: number;
@@ -47,7 +48,7 @@ const strong = (i: number) => i >= steps.length - emphasis;
     white-space: nowrap;
   }
   li span {
-    padding: var(--space-2) var(--space-4);
+    padding: var(--space-2) var(--space-3);
     font-size: var(--text-body-sm);
     font-weight: var(--weight-medium);
     color: var(--color-text);
@@ -63,11 +64,24 @@ const strong = (i: number) => i >= steps.length - emphasis;
   li + li::before,
   .cont li:first-child::before {
     content: '→';
-    padding: 0 var(--space-2);
+    padding: 0 var(--space-1);
     color: var(--color-accent);
   }
   .cont li:first-child::before {
     padding-left: 0;
+  }
+
+  /* Wide screens: the longest pipeline (Spanish, seven steps) fits the full
+     container's column, so it runs as one line. */
+  @media (min-width: 1180px) {
+    .flow {
+      flex-direction: row;
+      gap: 0;
+      width: max-content;
+    }
+    .cont li:first-child::before {
+      padding-left: var(--space-1);
+    }
   }
 
   /* Phones: one step per line, arrows pointing down. */

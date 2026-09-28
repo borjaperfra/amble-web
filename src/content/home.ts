@@ -30,7 +30,10 @@ export interface HomeContent {
   stages: { id: 'reads' | 'asks' | 'checks' | 'learns' | 'listens' | 'tells'; label: string }[];
   hero: {
     title: [string, string]; // second line gets the italic "Amble"
-    lead: string; // "Meet your professional Rep."
+    lead?: string; // "Meet your professional Rep."
+    // The v2 home: the manifesto's thesis, set apart above the subtitle, in
+    // place of the lead.
+    thesis?: [string, string];
     subtitle: string;
     more: string;
   };

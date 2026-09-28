@@ -33,6 +33,9 @@ const launch = SITE_MODE === 'launch';
           <a class="text-link" href={getRelativeLocaleUrl(lang, 'privacy')}>{t('footer.privacy')}</a>
           <a class="text-link" href={getRelativeLocaleUrl(other, path)} hreflang={other} lang={other}>{t('nav.otherLang')}</a>
           <span class="copy">© 2026 Amble</span>
+          <span class="copy">
+            {t('footer.builtBy')} <a class="text-link" href="https://x.com/borjaperfra" rel="author">@borjaperfra</a>
+          </span>
         </div>
       </nav>
     </div>

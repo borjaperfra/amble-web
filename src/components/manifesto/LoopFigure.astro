@@ -23,7 +23,7 @@ for (let i = 1; i < 60; i++) {
     x: 4 + rand() * 84,
     y: 8 + rand() * 82,
     // Slow at first, then faster: density accelerates.
-    t: Math.pow(i / 60, 0.8) * 0.7,
+    t: Math.pow(i / 60, 0.8) * 0.6, // full by 0.62, clear at 0.72
     kind: filter ? 'filter' : 'app',
     r: (rand() - 0.5) * 6,
   });
@@ -55,12 +55,16 @@ for (let i = 1; i < 60; i++) {
     width: 100vw;
     margin-left: calc(50% - 50vw);
     height: 260vh;
+    /* The two lines sit mid-screen, so the screen's lower half is empty: what
+       follows rises into it while the figure is still held. */
+    margin-bottom: -30vh;
   }
   .stick {
     position: sticky;
     top: 0;
     height: 100vh;
     overflow: hidden;
+    pointer-events: none;
   }
   .field {
     position: absolute;
@@ -136,6 +140,7 @@ for (let i = 1; i < 60; i++) {
   /* Without motion: no crowd, just the two lines. */
   :global(html:not(.motion)) .noise {
     height: auto;
+    margin-bottom: 0;
     padding-block: var(--space-8);
   }
   :global(html:not(.motion)) .stick {
@@ -161,7 +166,8 @@ for (let i = 1; i < 60; i++) {
       const span = r.height - window.innerHeight;
       const p = Math.min(1, Math.max(0, -r.top / span));
       for (const w of words) w.el.classList.toggle('on', p >= w.t + 0.02);
-      fig.classList.toggle('is-clear', p > 0.82);
+      // Clear before what follows rises into view (the figure's -30vh margin).
+      fig.classList.toggle('is-clear', p > 0.72);
     };
     update();
     window.addEventListener('scroll', update, { passive: true });

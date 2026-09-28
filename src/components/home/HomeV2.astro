@@ -1,64 +1,82 @@
 ---
+// The home since 2026-09-28 (see content/home-v2.ts): the manifesto's order and
+// figures, then the scenes in three stages. Home.astro is the first version,
+// no longer routed.
 import Base from '../../layouts/Base.astro';
+import Blocks from '../manifesto/Blocks.astro';
 import Hero from './Hero.astro';
 import Interlude from './Interlude.astro';
 import Story from './Story.astro';
 import YourTurn from './YourTurn.astro';
-import Interview from './Interview.astro';
-import Defence from './Defence.astro';
 import MapSection from './MapSection.astro';
-import Problem from './Problem.astro';
+import Passive from './Passive.astro';
 import Triage from './Triage.astro';
 import Listening from './Listening.astro';
 import Opportunity from './Opportunity.astro';
-import Agents from './Agents.astro';
 import Roadmap from './Roadmap.astro';
 import Ownership from './Ownership.astro';
-import Passive from './Passive.astro';
 import Finale from './Finale.astro';
 import { home } from '../../content/home';
+import { homeV2 } from '../../content/home-v2';
+import { manifesto } from '../../content/pages';
 import type { Lang } from '../../i18n/ui';
 
 const lang = (Astro.currentLocale ?? 'en') as Lang;
 const c = home[lang];
+const v = homeV2[lang];
+const figures = manifesto[lang].figures;
 ---
 
-<Base joinHref="#join" stages={c.stages}>
+<Base joinHref="#join" stages={v.stages}>
   <main>
-    <Hero c={c.hero} />
+    <Hero c={v.hero} />
+    <section class="essay container" id="problem">
+      <Blocks blocks={v.problem} figures={figures} />
+    </section>
     <Passive c={c.passive} />
-    <Problem c={c.problem} />
-    <div data-stage="reads" id="stage-reads">
+    <section class="essay container">
+      <Blocks blocks={v.rep} figures={figures} />
+    </section>
+    <div data-stage="knows" id="stage-knows">
       <Interlude lines={c.story.interlude} body={c.story.interludeBody} bridge={c.problem.bridge} id="interlude-pdf" />
       <Story c={c.story} strength={c.strength} sourceNames={c.sourceNames} />
       <div data-count="turn"><YourTurn c={c.yourTurn} /></div>
       <MapSection c={c.map} strength={c.strength} sourceNames={c.sourceNames} />
     </div>
-    <div data-stage="asks" id="stage-asks">
-      <Interview c={c.interview} sourceNames={c.sourceNames} />
-    </div>
-    <div data-stage="checks" id="stage-checks">
-      <Defence c={c.defence} />
-    </div>
-    <div data-stage="learns" id="stage-learns">
-      <Triage c={c.triage} />
-    </div>
     <div data-stage="listens" id="stage-listens">
+      <Triage c={c.triage} />
       <Listening c={c.listening} />
     </div>
     <div data-stage="tells" id="stage-tells">
       <Opportunity c={c.opportunity} />
     </div>
-    <Agents c={c.agents} />
+    <section class="essay container">
+      <Blocks blocks={v.future} figures={figures} />
+    </section>
     <Roadmap c={c.roadmap} />
     <div data-count="yours"><Ownership c={c.ownership} career={c.career} /></div>
-    <div data-count="finale"><Finale c={c.finale} hero={c.hero} /></div>
+    <div data-count="finale"><Finale c={c.finale} hero={v.hero} /></div>
   </main>
 </Base>
 
+<style>
+  /* The manifesto's essay column (ManifestoPage.astro). */
+  .essay {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+    max-width: calc(var(--width-wide) + var(--gutter) * 2);
+    /* The scenes around bring their own room. */
+    padding-block: var(--space-9) 0;
+  }
+  /* The loop figure ends mid-screen and the next scene opens with its own room:
+     one of the two is enough. */
+  #problem {
+    margin-bottom: calc(var(--space-section) * -1);
+  }
+</style>
+
 <script>
-  // The browser's own scroll, no Lenis: a scene never holds the wheel, and a
-  // fast scroll passes it by. Readers set the pace.
   import { inkStatements } from '../../scripts/motion';
   inkStatements();
 </script>
