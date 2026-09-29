@@ -6,11 +6,11 @@ import { legal } from '../../config/legal';
 const mail = `mailto:${legal.privacyEmail}`;
 ---
 
-<Base title="Privacidad — Amble" description="Qué recoge la web de Amble, para qué y cómo pedir que se borre." path="privacy">
-  <Prose kicker="Privacidad" title="Tu email, y nada más." lede="Esto cubre la web de Amble y su lista de espera para la beta. Crecerá cuando crezca el producto, y te avisaremos cuando cambie.">
+<Base title="Privacidad — Amble" description="Qué recogen la web y la app de amble, para qué, y cómo llevártelo o borrarlo." path="privacy">
+  <Prose kicker="Privacidad" title="Lo tuyo es tuyo." lede="Esto cubre la web de amble, su lista de espera y la beta de la app. Te avisaremos cuando cambie.">
     <p class="plain">
-      En corto: guardamos tu email para invitarte a la beta. Sin cookies, sin rastreadores, sin vender
-      nada, sin compartirlo para publicidad. Escríbenos y desaparece.
+      En corto: en la web guardamos tu email para invitarte a la beta. En la app guardamos lo que compartes para que tu
+      Rep escuche por ti. Sin rastreadores, sin vender nada, sin publicidad. Te lo llevas o lo borras cuando quieras.
     </p>
 
     <h2>Quién es responsable</h2>
@@ -19,7 +19,7 @@ const mail = `mailto:${legal.privacyEmail}`;
       Para cualquier cosa sobre tus datos: <a href={mail}>{legal.privacyEmail}</a>.
     </p>
 
-    <h2>Qué recogemos</h2>
+    <h2>En la web: qué recogemos</h2>
     <ul>
       <li><strong>Tu dirección de email</strong>, cuando te apuntas a la lista de espera, y si te apuntas como candidato o como empresa.</li>
       <li><strong>El idioma</strong> de la página desde la que te apuntas, para escribirte en él.</li>
@@ -30,13 +30,13 @@ const mail = `mailto:${legal.privacyEmail}`;
       aceptamos nada más: el formulario rechaza cualquier campo que no sea tu email.
     </p>
 
-    <h2>Para qué, y con qué base</h2>
+    <h2>En la web: para qué, y con qué base</h2>
     <p>
       Para invitarte a la beta cerrada de Amble y contarte cosas sobre ella. Nada más. La base legal es tu consentimiento
       (art. 6.1.a del RGPD), que das al enviar el formulario. Puedes retirarlo cuando quieras.
     </p>
 
-    <h2>Quién más lo trata</h2>
+    <h2>En la web: quién más lo trata</h2>
     <ul>
       <li><strong>Railway</strong> aloja la web y la base de datos donde se guarda tu email.</li>
       <li><strong>Resend</strong> envía el email de bienvenida y, más adelante, tu invitación a la beta.</li>
@@ -46,9 +46,49 @@ const mail = `mailto:${legal.privacyEmail}`;
       las cláusulas contractuales tipo de la Comisión Europea o el Marco de Privacidad de Datos UE–EE. UU.
     </p>
 
-    <h2>Cuánto tiempo lo guardamos</h2>
+    <h2>En la web: cuánto tiempo lo guardamos</h2>
     <p>
       Lo guardamos hasta que termine la beta o hasta que nos pidas borrarlo, lo que ocurra antes.
+    </p>
+
+    <h2>En la app: qué guardamos</h2>
+    <p>Si tienes cuenta en la beta de la app (app.amble.fyi), guardamos lo que hace falta para que tu Rep te conozca y escuche por ti:</p>
+    <ul>
+      <li><strong>Tu cuenta</strong>: tu email, cómo quieres que te llamemos y tu idioma.</li>
+      <li><strong>Lo que compartes</strong>: tu CV, tu perfil de LinkedIn y cualquier otro documento o texto que subas, y el texto que leemos de ellos.</li>
+      <li><strong>Lo que respondes</strong> en la conversación con tu Rep, y lo que aprende de ello: tus capacidades, las evidencias que las sostienen y lo que buscas o descartas.</li>
+      <li><strong>Las ofertas</strong> que tu Rep lee para ti, por qué te las enseña o las aparta, y lo que tú decides sobre cada una.</li>
+      <li><strong>Tus candidaturas</strong>: las respuestas que te prepara, las que escribes tú y el CV que adjuntas.</li>
+      <li><strong>Lo que nos cuentas</strong> con el botón de feedback.</li>
+    </ul>
+
+    <h2>En la app: para qué, y con qué base</h2>
+    <p>
+      Para darte el servicio que pides: entender tu perfil profesional, leer ofertas por ti, enseñarte solo las que merecen
+      tu atención y ayudarte a presentar tu candidatura. La base legal es la ejecución de ese servicio (art. 6.1.b del
+      RGPD), que aceptas al crear tu cuenta. No vendemos tus datos, no los usamos para publicidad y no se los enseñamos a
+      ninguna empresa sin que tú lo decidas.
+    </p>
+
+    <h2>En la app: un modelo lee por ti</h2>
+    <p>
+      Un modelo de lenguaje lee tus documentos y cada oferta, y decide si enseñártela. Siempre te dice por qué, y puedes ver
+      también lo que ha apartado y la razón. Esa decisión solo filtra lo que te enseñamos: nunca envía una candidatura por
+      ti ni decide nada sobre ti ante nadie. Si no estás de acuerdo con cómo te ha leído, dínoslo y lo revisamos.
+    </p>
+
+    <h2>En la app: quién más lo trata</h2>
+    <ul>
+      <li><strong>Railway</strong> aloja la app y su base de datos en la Unión Europea (Ámsterdam).</li>
+      <li><strong>Helmcode</strong> ejecuta el modelo de lenguaje, en infraestructura en la Unión Europea. No guarda lo que le enviamos ni entrena modelos con ello.</li>
+      <li><strong>Resend</strong> envía los emails con tu código de acceso.</li>
+    </ul>
+
+    <h2>En la app: cuánto tiempo, y cómo llevártelo o borrarlo</h2>
+    <p>
+      Mientras tengas cuenta. En la app, en «Tus datos», puedes descargar todo lo que guardamos de ti en un archivo y borrar
+      tu cuenta cuando quieras: se borra al momento, con tus documentos. Las copias de seguridad diarias se guardan 7
+      días, así que a los 7 días no queda nada.
     </p>
 
     <h2>Tus derechos</h2>
@@ -78,7 +118,8 @@ const mail = `mailto:${legal.privacyEmail}`;
     <h2>Cookies</h2>
     <p>
       Ninguna. La web no instala cookies ni carga nada de terceros por su cuenta: las fuentes se sirven desde nuestro
-      propio dominio. La única excepción es la petición a GitHub de arriba, y solo cuando tú la pides.
+      propio dominio. La única excepción es la petición a GitHub de arriba, y solo cuando tú la pides. La app usa una
+      sola cookie, la de tu sesión, que hace falta para que sigas dentro.
     </p>
 
     <p class="updated">Última actualización: {legal.updated}.</p>

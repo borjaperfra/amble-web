@@ -6,11 +6,11 @@ import { legal } from '../config/legal';
 const mail = `mailto:${legal.privacyEmail}`;
 ---
 
-<Base title="Privacy — Amble" description="What Amble's website collects, why, and how to have it deleted." path="privacy">
-  <Prose kicker="Privacy" title="Your email, and nothing else." lede="This covers the Amble website and its beta waitlist. It will grow when the product does, and we’ll tell you when it changes.">
+<Base title="Privacy — Amble" description="What amble's website and app collect, why, and how to take it or delete it." path="privacy">
+  <Prose kicker="Privacy" title="What’s yours is yours." lede="This covers the amble website, its waitlist and the app’s beta. We’ll tell you when it changes.">
     <p class="plain">
-      In short: we keep your email so we can invite you to the beta. No cookies, no trackers, no selling,
-      no sharing for advertising. Write to us and it’s gone.
+      In short: on the website we keep your email to invite you to the beta. In the app we keep what you share so your Rep
+      can listen for you. No trackers, no selling, no advertising. Take it with you or delete it whenever you like.
     </p>
 
     <h2>Who is responsible</h2>
@@ -19,7 +19,7 @@ const mail = `mailto:${legal.privacyEmail}`;
       For anything about your data: <a href={mail}>{legal.privacyEmail}</a>.
     </p>
 
-    <h2>What we collect</h2>
+    <h2>On the website: what we collect</h2>
     <ul>
       <li><strong>Your email address</strong>, when you join the waitlist, and whether you joined as a candidate or a company.</li>
       <li><strong>The language</strong> of the page you signed up from, to write to you in it.</li>
@@ -30,13 +30,13 @@ const mail = `mailto:${legal.privacyEmail}`;
       for, and don’t accept, anything else: the form rejects any field other than your email.
     </p>
 
-    <h2>Why, and on what basis</h2>
+    <h2>On the website: why, and on what basis</h2>
     <p>
       To invite you to the closed beta of Amble and tell you about it. Nothing else. The legal basis is your consent
       (GDPR art. 6.1.a), given when you submit the form. You can withdraw it at any time.
     </p>
 
-    <h2>Who else handles it</h2>
+    <h2>On the website: who else handles it</h2>
     <ul>
       <li><strong>Railway</strong> hosts the website and the database where your email is stored.</li>
       <li><strong>Resend</strong> sends the welcome email and, later, your beta invitation.</li>
@@ -46,9 +46,50 @@ const mail = `mailto:${legal.privacyEmail}`;
       Commission’s standard contractual clauses or the EU–US Data Privacy Framework.
     </p>
 
-    <h2>How long we keep it</h2>
+    <h2>On the website: how long we keep it</h2>
     <p>
       We keep it until the beta ends or until you ask us to delete it, whichever comes first.
+    </p>
+
+    <h2>In the app: what we keep</h2>
+    <p>If you have an account in the app’s beta (app.amble.fyi), we keep what your Rep needs to know you and listen for you:</p>
+    <ul>
+      <li><strong>Your account</strong>: your email, what you want to be called and your language.</li>
+      <li><strong>What you share</strong>: your CV, your LinkedIn profile and any other document or text you upload, and the text we read from them.</li>
+      <li><strong>What you answer</strong> in the conversation with your Rep, and what it learns from it: your capabilities, the evidence behind them, and what you look for or rule out.</li>
+      <li><strong>The offers</strong> your Rep reads for you, why it shows or sets each one aside, and what you decide about them.</li>
+      <li><strong>Your applications</strong>: the answers it prepares, the ones you write and the CV you attach.</li>
+      <li><strong>What you tell us</strong> with the feedback button.</li>
+    </ul>
+
+    <h2>In the app: why, and on what basis</h2>
+    <p>
+      To give you the service you ask for: understand your professional profile, read offers for you, show you only the ones
+      worth your attention and help you apply. The legal basis is providing that service (GDPR art. 6.1.b), which you
+      accept when you create your account. We don’t sell your data, don’t use it for advertising and don’t show it to any
+      company unless you decide to.
+    </p>
+
+    <h2>In the app: a model reads for you</h2>
+    <p>
+      A language model reads your documents and every offer, and decides whether to show it to you. It always tells you why,
+      and you can also see what it set aside and the reason. That decision only filters what we show you: it never sends an
+      application for you or decides anything about you in front of anyone. If you disagree with how it read you, tell us and
+      we’ll look at it.
+    </p>
+
+    <h2>In the app: who else handles it</h2>
+    <ul>
+      <li><strong>Railway</strong> hosts the app and its database in the European Union (Amsterdam).</li>
+      <li><strong>Helmcode</strong> runs the language model, on infrastructure in the European Union. It keeps nothing we send it and trains no models on it.</li>
+      <li><strong>Resend</strong> sends the emails with your sign-in code.</li>
+    </ul>
+
+    <h2>In the app: how long, and how to take it or delete it</h2>
+    <p>
+      For as long as you have an account. In the app, under “Your data”, you can download everything we keep about you as a
+      file and delete your account whenever you like: it goes at once, with your documents. Daily backups are kept for 7
+      days, so after 7 days nothing is left.
     </p>
 
     <h2>Your rights</h2>
@@ -77,7 +118,8 @@ const mail = `mailto:${legal.privacyEmail}`;
     <h2>Cookies</h2>
     <p>
       None. The site sets no cookies and loads nothing from third parties on its own: fonts are served from our own
-      domain. The only exception is the GitHub request above, and only when you ask for it.
+      domain. The only exception is the GitHub request above, and only when you ask for it. The app uses a single
+      cookie, your session’s, which it needs to keep you signed in.
     </p>
 
     <p class="updated">Last updated {legal.updated}.</p>
