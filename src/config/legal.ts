@@ -8,5 +8,5 @@ export const legal = {
   operator: 'Borja Pérez Francés',
   entity: null as null | { name: string; taxId: string; address: string },
   privacyEmail: 'privacy@amble.fyi',
-  updated: '2026-09-29',
+  updated: '2026-09-30',
 };
