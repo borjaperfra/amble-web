@@ -4,6 +4,7 @@ import Base from '../layouts/Base.astro';
 import Waitlist from './Waitlist.astro';
 import Logo from './Logo.astro';
 import Symbol from './Symbol.astro';
+import { APP_LOGIN_URL } from '../lib/app';
 import { useTranslations, type Lang } from '../i18n/ui';
 
 // The quiet page after the waitlist form without JavaScript. It is static, so
@@ -31,6 +32,7 @@ const errors = {
       <Symbol size={120} wake watch breathe class="awake" />
       <h1 class="heading">{t(`${kind}.title`)}</h1>
       <p>{t(`${kind}.body`)}</p>
+      {kind === 'joined' && <p><a class="text-link" href={APP_LOGIN_URL}>{t('waitlist.haveAccess')}</a></p>}
     </section>
 
     {

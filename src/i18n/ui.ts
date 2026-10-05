@@ -14,6 +14,9 @@ export const ui = {
     'notfound.back': 'Back to Amble',
     'nav.label': 'Main',
     'nav.join': 'Join the beta',
+    // For someone who already has access: straight to the app.
+    'nav.signIn': 'Sign in',
+    'waitlist.haveAccess': 'Already have access? Sign in →',
     'nav.menu': 'Menu',
     'nav.close': 'Close menu',
     'nav.otherLang': 'Español',
@@ -51,7 +54,11 @@ export const ui = {
     'notfound.body': 'Pero sigo escuchando.',
     'notfound.back': 'Volver a Amble',
     'nav.label': 'Principal',
-    'nav.join': 'Entrar en la beta',
+    // «Entrar» is signing in, in the app: joining is apuntarse.
+    'nav.join': 'Apúntate a la beta',
+    // For someone who already has access: straight to the app.
+    'nav.signIn': 'Entrar',
+    'waitlist.haveAccess': '¿Ya tienes acceso? Entra →',
     'nav.menu': 'Menú',
     'nav.close': 'Cerrar menú',
     'nav.otherLang': 'English',

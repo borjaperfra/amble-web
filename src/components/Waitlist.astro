@@ -3,6 +3,7 @@ import { getRelativeLocaleUrl } from 'astro:i18n';
 import { useTranslations, type Lang } from '../i18n/ui';
 import { EMAIL_MAX, EMAIL_PATTERN } from '../lib/email-rules';
 import Symbol from './Symbol.astro';
+import { APP_LOGIN_URL } from '../lib/app';
 
 interface Props {
   id?: string;
@@ -64,6 +65,8 @@ const statusId = `${id}-status`;
     <Symbol size={48} breathe />
     <p class="done-title">{t('waitlist.doneTitle')}</p>
     <p class="done-body">{t(audience === 'company' ? 'waitlist.doneBodyCompany' : 'waitlist.doneBody')}</p>
+    {/* Said to everyone, never only to someone already there: the form stays no way to find out who is. */}
+    {audience !== 'company' && <a class="text-link done-signin" href={APP_LOGIN_URL}>{t('waitlist.haveAccess')}</a>}
   </div>
   <p class="status-line">
     <span class="status" id={statusId} role="status" aria-live="polite">{noteText}</span>

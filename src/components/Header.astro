@@ -2,6 +2,7 @@
 import { getRelativeLocaleUrl } from 'astro:i18n';
 import { SITE_MODE } from 'astro:env/server';
 import Logo from './Logo.astro';
+import { APP_LOGIN_URL } from '../lib/app';
 import { useTranslations, type Lang } from '../i18n/ui';
 
 interface Props {
@@ -37,6 +38,7 @@ const pages = [
         </>
       )
     }
+    <a class="signin text-link" href={APP_LOGIN_URL}>{t('nav.signIn')}</a>
     <a class="lang text-link" href={getRelativeLocaleUrl(other, path)} hreflang={other} lang={other}>
       {t('nav.otherLang')}
     </a>
