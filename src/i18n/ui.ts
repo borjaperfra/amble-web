@@ -72,7 +72,7 @@ export const ui = {
     'nav.howBuilt': 'Cómo está hecho',
     'waitlist.label': 'Email',
     'waitlist.placeholder': 'tu@trabajo.dev',
-    'waitlist.cta': 'Entrar en la beta',
+    'waitlist.cta': 'Apuntarme a la beta',
     'waitlist.sending': 'Un momento…',
     'waitlist.note': 'Solo sobre la beta. Nada más.',
     'waitlist.ok': 'Estás dentro. Revisa tu correo.',
