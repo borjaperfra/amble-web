@@ -9,13 +9,13 @@ type Welcome = Omit<Letter, 'lang'> & { subject: string };
 const copy: Record<Lang, Record<Audience, Welcome>> = {
   en: {
     candidate: {
-      subject: 'We’re building amble',
-      preheader: 'You’re on the list for the beta.',
+      subject: 'You’re on the amble list',
+      preheader: 'When it’s your turn, your link to sign in arrives by email.',
       intro: [
         'Hi,',
-        'We’re building amble. The beta will be available soon, and you’re part of the beta-tester team :)',
-        'We’ll write to you with your way in as soon as we’ve tested it end to end.',
-        'Thanks for being part of it.',
+        'You’re on the amble waitlist. We’re opening the beta little by little, in small groups, so we can look after everyone who comes in.',
+        'When it’s your turn, you’ll get an email from hola@amble.fyi with your link to sign in. You don’t need to create an account or do anything else until then. If you don’t see it, check your spam folder.',
+        'Thanks for wanting to try it,',
       ],
       signature: ['Borja'],
       footer: 'You’re getting this because you joined the amble waitlist at amble.fyi.',
@@ -35,13 +35,13 @@ const copy: Record<Lang, Record<Audience, Welcome>> = {
   },
   es: {
     candidate: {
-      subject: 'Estamos construyendo amble',
-      preheader: 'Ya estás en la lista de la beta.',
+      subject: 'Estás en la lista de amble',
+      preheader: 'Cuando te toque, te llegará por email tu enlace para entrar.',
       intro: [
         'Hola,',
-        'Estamos construyendo amble. La beta estará disponible pronto y formas parte del equipo de beta testers :)',
-        'Te escribiremos con tu acceso en cuanto lo hayamos probado de principio a fin.',
-        'Gracias por formar parte.',
+        'Ya estás en la lista de espera de amble. Estamos abriendo la beta poco a poco, por tandas, para cuidar a cada persona que entra.',
+        'Cuando te toque, te llegará un email de hola@amble.fyi con tu enlace para entrar. No necesitas crear cuenta ni hacer nada más hasta entonces. Si no lo ves, mira en la carpeta de spam.',
+        'Gracias por querer probarlo,',
       ],
       signature: ['Borja'],
       footer: 'Recibes este email porque te apuntaste a la lista de espera de amble en amble.fyi.',
